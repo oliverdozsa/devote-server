@@ -1,0 +1,27 @@
+{
+  "title": "A voting",
+  "polls": [
+    {
+      "question": "Choose a color",
+      "options": [
+        {
+          "name": "red",
+          "code": 1
+        },
+        {
+          "name": "green",
+          "code": 2
+        },
+        {
+          "name": "blue",
+          "code": 3
+        }
+      ]
+    }
+  ],
+  "authorization": "KEYBASE",
+  "authorizationKeybaseOptions": "a team",
+  "visibility": "PUBLIC",
+  "isEncrypted": false,
+  "votesCap": 126
+}
