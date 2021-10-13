@@ -1,0 +1,14 @@
+// {type:sequence}
+[Authenticated;Voter]initSession(voteId, authenticationData)>[DeVote;TDS]
+[DeVote;TDS]sessionInfo(rsaPublickKey, sessionId).>[Authenticated;Voter]
+[Authenticated;Voter]createConcealedVoteRequest(voteId, rsaPublicKey)>[Authenticated;Voter]
+[Authenticated;Voter]signConcealedVoteRequest(sessionId, concealedVoteRequest)>[DeVote;TDS]
+[DeVote;TDS]signatureOnConcealedVoteRequest.>[Authenticated;Voter]
+[Authenticated;Voter]createNewKeyPair>[Authenticated;Voter]
+[Authenticated;Voter]createSignatureOfAccountRequest(signatureOnConcealedVoteRequest)>[Authenticated;Voter]
+[Authenticated;Voter]switchToBeingAnonymous(newKeyPair, signatureOfAccountRequest, voteId, rsaPublicKey)>[Anonymous;Voter]
+[Anonymous;Voter]requestAccountCreation(newKeyPair.public, voteId, rsaPublicKey, signatureOfAccountRequest)>[DeVote;TDS]
+[DeVote;TDS]accountCreationTransaction.>[Anonymous;Voter]
+[Anonymous;Voter]
+[DeVote;TDS]
+

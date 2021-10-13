@@ -31,7 +31,7 @@
   <logger name="services" level="INFO" />
   <logger name="data" level="INFO" />
   <logger name="security" level="INFO" />
-  <logger name="blockchain" level="INFO" />
+  <logger name="devote" level="INFO" />
   <logger name="tasks" level="INFO"/>
 
   <!-- Off these ones as they are annoying, and anyway we manage configuration ourselves -->
