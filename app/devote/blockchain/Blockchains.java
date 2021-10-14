@@ -14,7 +14,6 @@ import java.util.Set;
 
 public class Blockchains {
     private final Config config;
-    private final Reflections rootReflections = new Reflections("devote.blockchain");
     private final Map<String, BlockchainFactory> factories = new HashMap<>();
 
     private static final Logger.ALogger logger = Logger.of(Blockchains.class);
@@ -24,6 +23,7 @@ public class Blockchains {
         logger.info("Started discovery of supported blockchains");
         this.config = config;
 
+        Reflections rootReflections = new Reflections("devote.blockchain");
         Set<Class<? extends BlockchainConfiguration>> foundBlockchainConfigs = rootReflections
                 .getSubTypesOf(BlockchainConfiguration.class);
 
@@ -33,6 +33,10 @@ public class Blockchains {
                 .forEach(this::putIfNotAlreadyThere);
 
         logger.info("Found supported blockchains: {}", factories.keySet());
+    }
+
+    public BlockchainFactory getFactoryByNetwork(String networkName) {
+        return factories.get(networkName);
     }
 
     private BlockchainFactory createFactory(Class<? extends BlockchainConfiguration> blockchainConfigClass) {
@@ -65,7 +69,7 @@ public class Blockchains {
             blockchainConfiguration = blockchainConfigClass.getDeclaredConstructor()
                     .newInstance();
         } catch (Exception e) {
-            logger.warn("assembleFactory(): Failed to assemble factory!", e);
+            logger.warn("assembleFactory(): Failed to create config instance!", e);
             return null;
         }
 
