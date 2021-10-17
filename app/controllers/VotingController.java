@@ -5,6 +5,7 @@ import dto.CreateVotingRequest;
 import play.Logger;
 import play.data.Form;
 import play.data.FormFactory;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -49,9 +50,11 @@ public class VotingController extends Controller {
     }
 
     public CompletionStage<Result> single(Long id) {
-        logger.info("single()? id = {}", id);
-        // TODO
-        return completedFuture(ok());
+        logger.info("single(): id = {}", id);
+
+        return votingService.single(id)
+                .thenApply(v -> ok(Json.toJson(v)))
+                .exceptionally(mapExceptionWithUnpack);
     }
 
     private static Result toCreatedVotingResult(Http.Request request, Long votingId) {

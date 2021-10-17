@@ -1,4 +1,4 @@
-import data.operations.PrepareVotingInDb;
+import data.operations.VotingDbOperations;
 import data.repositories.VotingRepository;
 import data.repositories.imp.EbeanVotingRepository;
 import devote.blockchain.Blockchains;
@@ -13,7 +13,7 @@ public class Module extends AbstractModule {
         // Data
         bind(VotingRepository.class).to(EbeanVotingRepository.class).asEagerSingleton();
 
-        bind(PrepareVotingInDb.class).asEagerSingleton();
+        bind(VotingDbOperations.class).asEagerSingleton();
 
         // Services
         bind(VotingService.class).asEagerSingleton();

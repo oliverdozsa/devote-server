@@ -5,5 +5,5 @@ import dto.CreateVotingRequest;
 
 public interface VotingRepository {
     Long initalize(CreateVotingRequest request);
-    JpaVoting byId(Long id);
+    JpaVoting single(Long id);
 }
