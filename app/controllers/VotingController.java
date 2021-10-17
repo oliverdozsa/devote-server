@@ -1,7 +1,7 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import dto.CreateVotingDto;
+import dto.CreateVotingRequest;
 import play.Logger;
 import play.data.Form;
 import play.data.FormFactory;
@@ -34,7 +34,7 @@ public class VotingController extends Controller {
     public CompletionStage<Result> create(Http.Request request) {
         logger.info("create()");
 
-        Form<CreateVotingDto> form = formFactory.form(CreateVotingDto.class).bindFromRequest(request);
+        Form<CreateVotingRequest> form = formFactory.form(CreateVotingRequest.class).bindFromRequest(request);
 
         if(form.hasErrors()) {
             JsonNode errorJson = form.errorsAsJson();
@@ -42,10 +42,22 @@ public class VotingController extends Controller {
 
             return completedFuture(badRequest(errorJson));
         } else {
-            // TODO
-            votingService.create();
-
-            return completedFuture(ok());
+            return votingService.create(form.get())
+                    .thenApply(id -> toCreatedVotingResult(request, id))
+                    .exceptionally(mapExceptionWithUnpack);
         }
+    }
+
+    public CompletionStage<Result> single(Long id) {
+        logger.info("single()? id = {}", id);
+        // TODO
+        return completedFuture(ok());
+    }
+
+    private static Result toCreatedVotingResult(Http.Request request, Long votingId) {
+        String location = routes.VotingController
+                .single(votingId)
+                .absoluteURL(request);
+        return created().withHeader(LOCATION, location);
     }
 }

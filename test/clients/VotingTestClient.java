@@ -1,7 +1,7 @@
 package clients;
 
 import controllers.routes;
-import dto.CreateVotingDto;
+import dto.CreateVotingRequest;
 import play.Application;
 import play.libs.Json;
 import play.mvc.Http;
@@ -16,14 +16,14 @@ public class VotingTestClient extends TestClient {
         super(application);
     }
 
-    public Result createVoting(CreateVotingDto dto) {
+    public Result createVoting(CreateVotingRequest votingRequest) {
         // TODO: JWT auth?
-        Http.RequestBuilder request = new Http.RequestBuilder()
+        Http.RequestBuilder httpRequest = new Http.RequestBuilder()
                 .method(POST)
-                .bodyJson(Json.toJson(dto))
+                .bodyJson(Json.toJson(votingRequest))
                 .header(CONTENT_TYPE, Http.MimeTypes.JSON)
                 .uri(routes.VotingController.create().url());
 
-        return route(application, request);
+        return route(application, httpRequest);
     }
 }

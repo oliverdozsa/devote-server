@@ -77,7 +77,7 @@ public class Blockchains {
         Reflections blockchainReflections = new Reflections(packageName);
 
         Class<? extends IssuerAccount> issuerAccountClass =
-                findUniqueClassOfOrNull(IssuerAccount.class, blockchainReflections);
+                findUniqueSubtypeOfOrNull(IssuerAccount.class, blockchainReflections);
         if (issuerAccountClass == null) {
             return null;
         }
@@ -86,7 +86,7 @@ public class Blockchains {
         return new BlockchainFactory(blockchainConfiguration, issuerAccountClass);
     }
 
-    private static <T> Class<? extends T> findUniqueClassOfOrNull(
+    private static <T> Class<? extends T> findUniqueSubtypeOfOrNull(
             Class<T> classToFind,
             Reflections blockchainReflections
     ) {

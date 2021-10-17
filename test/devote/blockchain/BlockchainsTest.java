@@ -9,8 +9,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class BlockchainsTest {
@@ -40,31 +39,6 @@ public class BlockchainsTest {
         MockBlockchainIssuerAccount mockIssuerAccount = (MockBlockchainIssuerAccount) factoryForMockBlockchain.createIssuerAccount();
         assertBlockchainConfigInitCalled(mockIssuerAccount);
         assertTrue(mockIssuerAccount.isInitCalled());
-    }
-
-    @Test
-    public void testFailedToCreateConfigInstance() {
-        // TODO
-    }
-
-    @Test
-    public void testMoreThanOneIssuerAccountImplementationFound() {
-        // TODO
-    }
-
-    @Test
-    public void testNoIssuerAccountImplementationFound() {
-        // TODO
-    }
-
-    @Test
-    public void testIdenticalNetworkNames(){
-        // TODO
-    }
-
-    @Test
-    public void testBlockchainConfigWithInvalidPackage() {
-        // TODO
     }
 
     private void assertBlockchainConfigInitCalled(MockBlockchainIssuerAccount mockIssuerAccount) {
