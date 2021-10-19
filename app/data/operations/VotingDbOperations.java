@@ -6,6 +6,7 @@ import dto.CreateVotingRequest;
 import executioncontexts.DatabaseExecutionContext;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.concurrent.CompletionStage;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
@@ -26,5 +27,10 @@ public class VotingDbOperations {
 
     public CompletionStage<JpaVoting> single(Long id) {
         return supplyAsync(() -> votingRepository.single(id), dbExecContext);
+    }
+
+    public CompletionStage<Void> issuerAccountsCreated(Long id, List<String> accounts) {
+        // TODO
+        return null;
     }
 }

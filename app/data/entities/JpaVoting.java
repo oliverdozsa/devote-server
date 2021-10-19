@@ -5,7 +5,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.List;
 
 @Entity
 @Table(name = "voting")
@@ -17,6 +19,9 @@ public class JpaVoting {
 
     @Column(name = "network", nullable = false)
     private String network;
+
+    @OneToMany(mappedBy = "voting")
+    private List<JpaVotingIssuer> issuers;
 
     public Long getId() {
         return id;
@@ -32,5 +37,13 @@ public class JpaVoting {
 
     public void setNetwork(String network) {
         this.network = network;
+    }
+
+    public List<JpaVotingIssuer> getIssuers() {
+        return issuers;
+    }
+
+    public void setIssuers(List<JpaVotingIssuer> issuers) {
+        this.issuers = issuers;
     }
 }
