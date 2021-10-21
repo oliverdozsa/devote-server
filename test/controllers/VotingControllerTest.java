@@ -67,7 +67,7 @@ public class VotingControllerTest {
         assertThat(statusOf(getByLocationResult), equalTo(OK));
         assertThat(idOf(getByLocationResult), greaterThan(0L));
         assertThat(networkOf(getByLocationResult), equalTo("mockblockchain"));
-        assertIssuerAccountsCreatedOnBlockchain(idOf(result));
+        assertIssuerAccountsCreatedOnBlockchain(idOf(getByLocationResult));
     }
 
     private static CreateVotingRequest createValidVotingRequest() throws IOException {

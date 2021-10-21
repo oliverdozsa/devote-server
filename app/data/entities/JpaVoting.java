@@ -1,5 +1,6 @@
 package data.entities;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,7 +21,7 @@ public class JpaVoting {
     @Column(name = "network", nullable = false)
     private String network;
 
-    @OneToMany(mappedBy = "voting")
+    @OneToMany(mappedBy = "voting", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     private List<JpaVotingIssuer> issuers;
 
     public Long getId() {
