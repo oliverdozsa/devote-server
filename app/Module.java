@@ -1,4 +1,4 @@
-import data.operations.VotingBlockchainOperations;
+import devote.blockchain.operations.VotingBlockchainOperations;
 import data.operations.VotingDbOperations;
 import data.repositories.VotingRepository;
 import data.repositories.imp.EbeanVotingRepository;

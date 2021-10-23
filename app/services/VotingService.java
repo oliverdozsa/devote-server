@@ -2,7 +2,7 @@ package services;
 
 import com.typesafe.config.Config;
 import data.entities.JpaVoting;
-import data.operations.VotingBlockchainOperations;
+import devote.blockchain.operations.VotingBlockchainOperations;
 import data.operations.VotingDbOperations;
 import dto.CreateVotingRequest;
 import dto.SingleVotingResponse;
