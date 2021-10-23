@@ -35,8 +35,8 @@ public class VotingDbOperations {
         return supplyAsync(() -> votingRepository.single(id), dbExecContext);
     }
 
-    public CompletionStage<Void> issuerAccountsCreated(Long id, List<String> accounts) {
-        logger.info("issuerAccountsCreated(): id = {}, accounts = {}", id, accounts);
-        return runAsync(() -> votingRepository.issuerAccountsCreated(id, accounts), dbExecContext);
+    public CompletionStage<Void> issuerAccountsCreated(Long id, List<String> accountSecrets) {
+        logger.info("issuerAccountsCreated(): id = {}, accountSecrets = {}", id, accountSecrets);
+        return runAsync(() -> votingRepository.issuerAccountsCreated(id, accountSecrets), dbExecContext);
     }
 }

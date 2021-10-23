@@ -37,7 +37,7 @@ public class VotingService {
                 .initialize(request)
                 .thenAccept(id -> votingId.id = id)
                 .thenCompose(v -> votingBlockchainOperations.createIssuerAccounts(request))
-                .thenAccept(accounts -> votingDbOperations.issuerAccountsCreated(votingId.id, accounts))
+                .thenAccept(accountSecrets -> votingDbOperations.issuerAccountsCreated(votingId.id, accountSecrets))
                 .thenApply(o -> votingId.id);
     }
 

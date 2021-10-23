@@ -2,6 +2,8 @@ package devote.blockchain;
 
 import com.typesafe.config.Config;
 import devote.blockchain.api.BlockchainConfiguration;
+import devote.blockchain.api.BlockchainOperation;
+import devote.blockchain.api.ChannelAccount;
 import devote.blockchain.api.IssuerAccount;
 import org.reflections.Reflections;
 import play.Logger;
@@ -12,9 +14,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static devote.blockchain.BlockchainUtils.findUniqueSubtypeOfOrNull;
+
 public class Blockchains {
     private final Config config;
     private final Map<String, BlockchainFactory> factories = new HashMap<>();
+
+    private static final Class<? extends BlockchainOperation>[] requiredImplementationInterfaces = new Class[]{
+            IssuerAccount.class, ChannelAccount.class
+    };
 
     private static final Logger.ALogger logger = Logger.of(Blockchains.class);
 
@@ -76,31 +84,27 @@ public class Blockchains {
         String packageName = blockchainConfigClass.getPackage().getName();
         Reflections blockchainReflections = new Reflections(packageName);
 
-        Class<? extends IssuerAccount> issuerAccountClass =
-                findUniqueSubtypeOfOrNull(IssuerAccount.class, blockchainReflections);
-        if (issuerAccountClass == null) {
+        if(areAllRequiredImplementationsExist(blockchainReflections)) {
+            blockchainConfiguration.init(config.withOnlyPath(packageName));
+            return new BlockchainFactory(blockchainConfiguration, blockchainReflections);
+        } else {
+            logger.warn("assembleFactory(): Could not find one or more required implementation classes in package: {}", packageName);
             return null;
         }
-
-        blockchainConfiguration.init(config.withOnlyPath(packageName));
-        return new BlockchainFactory(blockchainConfiguration, issuerAccountClass);
     }
 
-    private static <T> Class<? extends T> findUniqueSubtypeOfOrNull(
-            Class<T> classToFind,
-            Reflections blockchainReflections
-    ) {
-        Set<Class<? extends T>> classes = blockchainReflections.getSubTypesOf(classToFind);
-        if (classes == null || classes.size() != 1) {
-            logger.warn("findUniqueClassOfOrNull(): Could not find unique subtype of class: {}", classToFind.getName());
-            return null;
-        } else {
-            return classes.iterator().next();
+    private static boolean areAllRequiredImplementationsExist(Reflections blockchainReflections) {
+        for (Class<? extends BlockchainOperation> requiredImplementationInterface : requiredImplementationInterfaces) {
+            if (findUniqueSubtypeOfOrNull(requiredImplementationInterface, blockchainReflections) == null) {
+                return false;
+            }
         }
+
+        return true;
     }
 
     private void putIfNotAlreadyThere(BlockchainFactory factory) {
-        if(factories.containsKey(factory.getNetworkName())) {
+        if (factories.containsKey(factory.getNetworkName())) {
             logger.warn("putIfNotAlreadyThere(): Already have a factory for network {}", factory.getNetworkName());
         } else {
             factories.put(factory.getNetworkName(), factory);
