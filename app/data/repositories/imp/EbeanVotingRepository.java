@@ -52,6 +52,7 @@ public class EbeanVotingRepository implements VotingRepository {
     private static JpaVoting fromRequest(CreateVotingRequest request) {
         JpaVoting entity = new JpaVoting();
         entity.setNetwork(request.getNetwork());
+        entity.setVotesCap(request.getVotesCap());
 
         return entity;
     }

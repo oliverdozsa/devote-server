@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class MockBlockchainIssuerAccount implements IssuerAccount {
+    public static final int NUM_OF_ISSUER_ACCOUNTS_TO_CREATE = 2;
+
     private MockBlockchainConfiguration config;
     private boolean isInitCalled = false;
 
@@ -26,7 +28,7 @@ public class MockBlockchainIssuerAccount implements IssuerAccount {
 
     @Override
     public int calcNumOfAccountsNeeded(long votesCap) {
-        return 2;
+        return NUM_OF_ISSUER_ACCOUNTS_TO_CREATE;
     }
 
     public MockBlockchainConfiguration getConfig() {

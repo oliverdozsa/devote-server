@@ -15,6 +15,7 @@ class BlockchainUtils {
                     classToFind.getName(),
                     getPackage(reflections)
             );
+
             return null;
         } else {
             return classes.iterator().next();

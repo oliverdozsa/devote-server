@@ -72,28 +72,38 @@ public class Blockchains {
     }
 
     private BlockchainFactory assembleFactory(Class<? extends BlockchainConfiguration> blockchainConfigClass) {
-        BlockchainConfiguration blockchainConfiguration;
-        try {
-            blockchainConfiguration = blockchainConfigClass.getDeclaredConstructor()
-                    .newInstance();
-        } catch (Exception e) {
-            logger.warn("assembleFactory(): Failed to create config instance!", e);
+        BlockchainConfiguration blockchainConfiguration = createConfigInstance(blockchainConfigClass);
+        if(blockchainConfiguration == null) {
             return null;
         }
 
-        String packageName = blockchainConfigClass.getPackage().getName();
-        Reflections blockchainReflections = new Reflections(packageName);
+        return createBlockchainFactory(blockchainConfiguration);
+    }
 
-        if(areAllRequiredImplementationsExist(blockchainReflections)) {
-            blockchainConfiguration.init(config.withOnlyPath(packageName));
-            return new BlockchainFactory(blockchainConfiguration, blockchainReflections);
-        } else {
-            logger.warn("assembleFactory(): Could not find one or more required implementation classes in package: {}", packageName);
+    private static BlockchainConfiguration createConfigInstance(Class<? extends BlockchainConfiguration> blockchainConfigClass) {
+        try {
+            return blockchainConfigClass.getDeclaredConstructor()
+                    .newInstance();
+        } catch (Exception e) {
+            logger.warn("createConfigInstance(): Failed to create config instance!", e);
             return null;
         }
     }
 
-    private static boolean areAllRequiredImplementationsExist(Reflections blockchainReflections) {
+    private BlockchainFactory createBlockchainFactory(BlockchainConfiguration blockchainConfiguration) {
+        String packageName = blockchainConfiguration.getClass().getPackage().getName();
+        Reflections blockchainReflections = new Reflections(packageName);
+
+        if(doAllRequiredImplementationsExist(blockchainReflections)) {
+            blockchainConfiguration.init(config.withOnlyPath(packageName));
+            return new BlockchainFactory(blockchainConfiguration, blockchainReflections);
+        } else {
+            logger.warn("createBlockchainFactory(): Could not find one or more required implementation classes in package: {}", packageName);
+            return null;
+        }
+    }
+
+    private static boolean doAllRequiredImplementationsExist(Reflections blockchainReflections) {
         for (Class<? extends BlockchainOperation> requiredImplementationInterface : requiredImplementationInterfaces) {
             if (findUniqueSubtypeOfOrNull(requiredImplementationInterface, blockchainReflections) == null) {
                 return false;

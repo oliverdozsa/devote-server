@@ -21,6 +21,9 @@ public class JpaVoting {
     @Column(name = "network", nullable = false)
     private String network;
 
+    @Column(name = "votes_cap", nullable = false)
+    private Long votesCap;
+
     @OneToMany(mappedBy = "voting", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     private List<JpaVotingIssuer> issuers;
 
@@ -46,5 +49,13 @@ public class JpaVoting {
 
     public void setIssuers(List<JpaVotingIssuer> issuers) {
         this.issuers = issuers;
+    }
+
+    public Long getVotesCap() {
+        return votesCap;
+    }
+
+    public void setVotesCap(Long votesCap) {
+        this.votesCap = votesCap;
     }
 }
