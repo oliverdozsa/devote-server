@@ -27,7 +27,7 @@ public class VotingDbOperations {
 
     public CompletionStage<Long> initialize(CreateVotingRequest createVotingRequest) {
         logger.info("initialize(): createVotingRequest = {}", createVotingRequest);
-        return supplyAsync(() -> votingRepository.initalize(createVotingRequest), dbExecContext);
+        return supplyAsync(() -> votingRepository.initialize(createVotingRequest), dbExecContext);
     }
 
     public CompletionStage<JpaVoting> single(Long id) {

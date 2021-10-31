@@ -10,7 +10,6 @@ public class MockBlockchainChannelAccount implements ChannelAccount {
 
     @Override
     public void init(BlockchainConfiguration configuration) {
-        // TODO
     }
 
     @Override

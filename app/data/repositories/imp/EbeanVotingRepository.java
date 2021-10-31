@@ -10,6 +10,7 @@ import play.Logger;
 import play.db.ebean.EbeanConfig;
 
 import javax.inject.Inject;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,11 +23,14 @@ public class EbeanVotingRepository implements VotingRepository {
     public EbeanVotingRepository(EbeanConfig ebeanConfig) {
         ebeanServer = Ebean.getServer(ebeanConfig.defaultServer());
     }
+
     @Override
-    public Long initalize(CreateVotingRequest request) {
+    public Long initialize(CreateVotingRequest request) {
         logger.info("initialize(): createVotingDto = {}", request);
 
         JpaVoting voting = fromRequest(request);
+        voting.setCreatedAt(Instant.now());
+
         ebeanServer.save(voting);
         return voting.getId();
     }

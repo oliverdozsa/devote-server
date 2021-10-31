@@ -6,7 +6,7 @@ import dto.CreateVotingRequest;
 import java.util.List;
 
 public interface VotingRepository {
-    Long initalize(CreateVotingRequest request);
+    Long initialize(CreateVotingRequest request);
     JpaVoting single(Long id);
     void issuerAccountsCreated(Long id, List<String> accounts);
 }

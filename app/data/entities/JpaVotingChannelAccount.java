@@ -8,27 +8,23 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "voting_issuer")
-public class JpaVotingIssuer {
+@Table(name = "voting_channel_account")
+public class JpaVotingChannelAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "voting_id")
-    private JpaVoting voting;
-
     @Column(name = "account_secret")
     @Lob
     private String accountSecret;
 
-    @OneToOne(mappedBy = "issuer")
-    private JpaChannelAccountProgress channelAccountProgress;
+    @ManyToOne
+    @JoinColumn(name = "voting_id")
+    private JpaVoting voting;
 
     public Long getId() {
         return id;
@@ -36,14 +32,6 @@ public class JpaVotingIssuer {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public JpaVoting getVoting() {
-        return voting;
-    }
-
-    public void setVoting(JpaVoting voting) {
-        this.voting = voting;
     }
 
     public String getAccountSecret() {
@@ -54,11 +42,11 @@ public class JpaVotingIssuer {
         this.accountSecret = accountSecret;
     }
 
-    public JpaChannelAccountProgress getChannelAccountProgress() {
-        return channelAccountProgress;
+    public JpaVoting getVoting() {
+        return voting;
     }
 
-    public void setChannelAccountProgress(JpaChannelAccountProgress channelAccountProgress) {
-        this.channelAccountProgress = channelAccountProgress;
+    public void setVoting(JpaVoting voting) {
+        this.voting = voting;
     }
 }

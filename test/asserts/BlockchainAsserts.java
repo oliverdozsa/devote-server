@@ -1,6 +1,7 @@
 package asserts;
 
 import data.entities.JpaVoting;
+import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuer;
 import devote.blockchain.mockblockchain.MockBlockchainChannelAccount;
 import devote.blockchain.mockblockchain.MockBlockchainIssuerAccount;
@@ -46,8 +47,11 @@ public class BlockchainAsserts {
     }
 
     private static List<String> channelAccountsOf(Long votingId) {
-        // TODO
-        return null;
+        JpaVoting entity = Ebean.find(JpaVoting.class, votingId);
+
+        return entity.getChannelAccounts().stream()
+                .map(JpaVotingChannelAccount::getAccountSecret)
+                .collect(Collectors.toList());
     }
 
     private static int votesCapOf(Long votingId) {

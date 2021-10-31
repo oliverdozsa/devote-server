@@ -8,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.time.Instant;
 import java.util.List;
 
 @Entity
@@ -26,6 +27,12 @@ public class JpaVoting {
 
     @OneToMany(mappedBy = "voting", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     private List<JpaVotingIssuer> issuers;
+
+    @OneToMany(mappedBy = "voting", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
+    private List<JpaVotingChannelAccount> channelAccounts;
+
+    @Column(name = "created_at")
+    private Instant createdAt;
 
     public Long getId() {
         return id;
@@ -57,5 +64,21 @@ public class JpaVoting {
 
     public void setVotesCap(Long votesCap) {
         this.votesCap = votesCap;
+    }
+
+    public List<JpaVotingChannelAccount> getChannelAccounts() {
+        return channelAccounts;
+    }
+
+    public void setChannelAccounts(List<JpaVotingChannelAccount> channelAccounts) {
+        this.channelAccounts = channelAccounts;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 }
