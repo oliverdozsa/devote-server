@@ -5,6 +5,7 @@ import data.repositories.imp.EbeanVotingRepository;
 import devote.blockchain.Blockchains;
 import com.google.inject.AbstractModule;
 import services.VotingService;
+import tasks.channelaccounts.ChannelAccountTasksOrganizer;
 
 public class Module extends AbstractModule {
     @Override
@@ -19,5 +20,8 @@ public class Module extends AbstractModule {
 
         // Services
         bind(VotingService.class).asEagerSingleton();
+
+        // Tasks
+        bind(ChannelAccountTasksOrganizer.class).asEagerSingleton();
     }
 }
