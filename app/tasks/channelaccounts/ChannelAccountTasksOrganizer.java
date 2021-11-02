@@ -12,19 +12,22 @@ public class ChannelAccountTasksOrganizer {
     private final ActorSystem actorSystem;
     private final ExecutionContext executionContext;
     private final int numberOfWorkers;
+    private final ChannelAccountBuilderTaskContext context;
 
     private static final Logger.ALogger logger = Logger.of(ChannelAccountTasksOrganizer.class);
 
     private static final int INITIAL_DELAY_SEC = 5;
-    private static final int INTERVAL_SEC = 5;
+    private static final int INTERVAL_SEC = 7;
 
     @Inject
     public ChannelAccountTasksOrganizer(
             Config config,
             ActorSystem actorSystem,
-            ExecutionContext executionContext) {
+            ExecutionContext executionContext,
+            ChannelAccountBuilderTaskContext context) {
         this.actorSystem = actorSystem;
         this.executionContext = executionContext;
+        this.context = context;
 
         numberOfWorkers = config.getInt("devote.vote.buckets");
 
@@ -39,7 +42,7 @@ public class ChannelAccountTasksOrganizer {
                     .scheduleAtFixedRate(
                             Duration.ofSeconds(INITIAL_DELAY_SEC),
                             Duration.ofSeconds(INTERVAL_SEC),
-                            new ChannelAccountBuilderTask(i),
+                            new ChannelAccountBuilderTask(i, context),
                             executionContext
                     );
         }

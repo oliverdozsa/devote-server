@@ -13,7 +13,7 @@ public class MockBlockchainChannelAccount implements ChannelAccount {
     }
 
     @Override
-    public int numOfAccountsToCreateInOneBatch() {
+    public int maxNumOfAccountsToCreateInOneBatch() {
         return NUM_OF_CHANNEL_ACCOUNTS_TO_CREATE_IN_ON_BATCH;
     }
 
