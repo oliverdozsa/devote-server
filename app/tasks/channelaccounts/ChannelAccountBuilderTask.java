@@ -64,7 +64,7 @@ public class ChannelAccountBuilderTask implements Runnable {
         Long votingId = channelProgress.getIssuer().getVoting().getId();
 
         context.votingRepository.channelAccountCreated(votingId, channelSecrets);
-        context.channelProgressRepository.channelProgressRepository(channelProgress.getId(), channelSecrets.size());
+        context.channelProgressRepository.channelAccountsCreated(channelProgress.getId(), channelSecrets.size());
     }
 
     private ChannelAccount getChannelAccount(JpaVotingIssuer issuer) {

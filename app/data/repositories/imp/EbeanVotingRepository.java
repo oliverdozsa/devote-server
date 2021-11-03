@@ -1,6 +1,7 @@
 package data.repositories.imp;
 
 import data.entities.JpaVoting;
+import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuer;
 import data.repositories.VotingRepository;
 import dto.CreateVotingRequest;
@@ -43,13 +44,29 @@ public class EbeanVotingRepository implements VotingRepository {
 
     @Override
     public void issuerAccountsCreated(Long id, List<String> accounts) {
+        logger.info("issuerAccountsCreated(): id = {}, accounts size = {}", id, accounts.size());
+
         JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
 
         List<JpaVotingIssuer> votingIssuers = accounts.stream()
-                .map(this::fromAccount)
+                .map(this::fromIssuerAccountSecret)
                 .collect(Collectors.toList());
 
         voting.setIssuers(votingIssuers);
+        ebeanServer.merge(voting);
+    }
+
+    @Override
+    public void channelAccountCreated(Long id, List<String> accounts) {
+        logger.info("channelAccountCreated(): id = {}, accounts size = {}", id, accounts.size());
+
+        JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
+
+        List<JpaVotingChannelAccount> channelAccounts = accounts.stream()
+                .map(this::fromChannelAccountSecret)
+                .collect(Collectors.toList());
+
+        voting.setChannelAccounts(channelAccounts);
         ebeanServer.merge(voting);
     }
 
@@ -61,9 +78,15 @@ public class EbeanVotingRepository implements VotingRepository {
         return entity;
     }
 
-    private JpaVotingIssuer fromAccount(String account) {
+    private JpaVotingIssuer fromIssuerAccountSecret(String account) {
         JpaVotingIssuer votingIssuer = new JpaVotingIssuer();
         votingIssuer.setAccountSecret(account);
         return votingIssuer;
+    }
+
+    private JpaVotingChannelAccount fromChannelAccountSecret(String account) {
+        JpaVotingChannelAccount votingChannelAccount = new JpaVotingChannelAccount();
+        votingChannelAccount.setAccountSecret(account);
+        return votingChannelAccount;
     }
 }
