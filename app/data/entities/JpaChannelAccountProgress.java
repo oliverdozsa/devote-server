@@ -22,7 +22,7 @@ public class JpaChannelAccountProgress {
     private JpaVotingIssuer issuer;
 
     @Column(name = "num_of_accounts_to_create")
-    private Long numOfAccountToCreate;
+    private Long numOfAccountsToCreate;
 
     @Column(name = "num_of_accounts_left_to_create")
     private Long numOfAccountsToLeftToCreate;
@@ -43,12 +43,12 @@ public class JpaChannelAccountProgress {
         this.issuer = issuer;
     }
 
-    public Long getNumOfAccountToCreate() {
-        return numOfAccountToCreate;
+    public Long getNumOfAccountsToCreate() {
+        return numOfAccountsToCreate;
     }
 
-    public void setNumOfAccountToCreate(Long numOfAccountToCreate) {
-        this.numOfAccountToCreate = numOfAccountToCreate;
+    public void setNumOfAccountsToCreate(Long numOfAccountsToCreate) {
+        this.numOfAccountsToCreate = numOfAccountsToCreate;
     }
 
     public Long getNumOfAccountsToLeftToCreate() {

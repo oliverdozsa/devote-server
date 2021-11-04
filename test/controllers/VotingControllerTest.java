@@ -16,6 +16,7 @@ import java.io.InputStream;
 
 import static asserts.BlockchainAsserts.assertChannelAccountsCreatedOnBlockchain;
 import static asserts.BlockchainAsserts.assertIssuerAccountsCreatedOnBlockchain;
+import static asserts.DbAsserts.assertChannelProgressCompletedFor;
 import static extractors.GenericDataFromResult.statusOf;
 import static extractors.VotingResponseFromResult.idOf;
 import static extractors.VotingResponseFromResult.networkOf;
@@ -66,7 +67,7 @@ public class VotingControllerTest {
 
         Thread.sleep(30 * 1000);
         assertChannelAccountsCreatedOnBlockchain(votingId);
-
+        assertChannelProgressCompletedFor(votingId);
     }
 
     private static CreateVotingRequest createValidVotingRequest() throws IOException {
