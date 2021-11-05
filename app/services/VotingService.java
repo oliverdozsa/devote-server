@@ -1,9 +1,8 @@
 package services;
 
-import com.typesafe.config.Config;
 import data.entities.JpaVoting;
-import devote.blockchain.operations.VotingBlockchainOperations;
 import data.operations.VotingDbOperations;
+import devote.blockchain.operations.VotingBlockchainOperations;
 import dto.CreateVotingRequest;
 import dto.SingleVotingResponse;
 import play.Logger;
@@ -12,7 +11,6 @@ import javax.inject.Inject;
 import java.util.concurrent.CompletionStage;
 
 public class VotingService {
-    private final Config config;
     private final VotingDbOperations votingDbOperations;
     private final VotingBlockchainOperations votingBlockchainOperations;
 
@@ -20,11 +18,9 @@ public class VotingService {
 
     @Inject
     public VotingService(
-            Config config,
             VotingDbOperations votingDbOperations,
             VotingBlockchainOperations votingBlockchainOperations
     ) {
-        this.config = config;
         this.votingDbOperations = votingDbOperations;
         this.votingBlockchainOperations = votingBlockchainOperations;
     }

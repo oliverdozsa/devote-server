@@ -59,14 +59,6 @@ public class Blockchains {
     }
 
     private static boolean isBlockchainConfigPackageValid(String packageName) {
-        if (packageName == null || packageName.length() == 0) {
-            return false;
-        }
-
-        if (!packageName.startsWith("devote.blockchain")) {
-            return false;
-        }
-
         String[] parts = packageName.split("\\.");
         return parts.length == 3;
     }

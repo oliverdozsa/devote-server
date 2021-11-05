@@ -41,6 +41,36 @@ public class BlockchainsTest {
         assertTrue(mockIssuerAccount.isInitCalled());
     }
 
+    @Test
+    public void testWithConfigInNotCorrectPackageName() {
+        // Given
+        // When
+        BlockchainFactory factoryForNotCorrectPackagename = blockchains.getFactoryByNetwork("blockchain_with_not_correct_package_name");
+
+        // Then
+        assertThat(factoryForNotCorrectPackagename, is(nullValue()));
+    }
+
+    @Test
+    public void testWithNoDefaultConstructor() {
+        // Given
+        // When
+        BlockchainFactory factory = blockchains.getFactoryByNetwork("blockchain_with_no_default_constructor");
+
+        // Then
+        assertThat(factory, is(nullValue()));
+    }
+
+    @Test
+    public void testWithMissingImplementation() {
+        // Given
+        // When
+        BlockchainFactory factory = blockchains.getFactoryByNetwork("blockchain_with_missing_implementation");
+
+        // Then
+        assertThat(factory, is(nullValue()));
+    }
+
     private void assertBlockchainConfigInitCalled(MockBlockchainIssuerAccount mockIssuerAccount) {
         assertTrue(mockIssuerAccount.getConfig().isInitCalled());
     }
