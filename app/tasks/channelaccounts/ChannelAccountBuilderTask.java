@@ -11,25 +11,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ChannelAccountBuilderTask implements Runnable {
-    private final int id;
+    private final int taskId;
     private final ChannelAccountBuilderTaskContext context;
 
     private static final Logger.ALogger logger = Logger.of(ChannelAccountBuilderTask.class);
 
-    public ChannelAccountBuilderTask(int id, ChannelAccountBuilderTaskContext context) {
-        this.id = id;
+    public ChannelAccountBuilderTask(int taskId, ChannelAccountBuilderTaskContext context) {
+        this.taskId = taskId;
         this.context = context;
 
-        logger.info("ChannelAccountBuilderTask(): created task with id = {}", id);
+        logger.info("ChannelAccountBuilderTask(): created task with id = {}", taskId);
     }
 
     @Override
     public void run() {
-        logger.info("run(): executing task {}", id);
-
         JpaChannelAccountProgress channelProgress = getAChannelAccountProgress();
         if (channelProgress == null) {
-            logger.info("[CHANNEL-TASK-{}]: run(): No suitable channel progress found.", id);
+            logger.info("[CHANNEL-TASK-{}]: run(): No suitable channel progress found.", taskId);
             return;
         }
 
@@ -45,8 +43,8 @@ public class ChannelAccountBuilderTask implements Runnable {
         int numOfAccountsToCreateInOneBatch =
                 determineNumOfAccountsToCreateInOneBatch(channelProgress, channelAccount);
 
-        logger.info("[CHANNEL-TASK-{}]: createChannelAccounts(): about to create {} channel accounts on blockchain",
-                id, numOfAccountsToCreateInOneBatch);
+        logger.info("[CHANNEL-TASK-{}]: createChannelAccounts(): about to create {} channel accounts on blockchain for progress {}",
+                taskId, numOfAccountsToCreateInOneBatch, channelProgress.getId());
 
         List<String> channelAccountSecrets = new ArrayList<>();
         for (int i = 0; i < numOfAccountsToCreateInOneBatch; i++) {
@@ -55,7 +53,7 @@ public class ChannelAccountBuilderTask implements Runnable {
         }
 
         logger.info("[CHANNEL-TASK-{}]: createChannelAccounts(): successfully created {} channel accounts on blockchain",
-                id, channelAccountSecrets.size());
+                taskId, channelAccountSecrets.size());
 
         return channelAccountSecrets;
     }
@@ -78,7 +76,7 @@ public class ChannelAccountBuilderTask implements Runnable {
                 context.channelProgressRepository.notFinishedSampleOf(context.voteBuckets);
 
         for (JpaChannelAccountProgress candidate : sampleProgresses) {
-            if (candidate.getId() % context.voteBuckets == id) {
+            if (candidate.getId() % context.voteBuckets == taskId) {
                 return candidate;
             }
         }
@@ -89,7 +87,7 @@ public class ChannelAccountBuilderTask implements Runnable {
                     .collect(Collectors.toList());
 
             logger.warn("[CHANNEL-TASK-{}]: getAChannelAccountProgress(): could not find a suitable channel progress! progress ids = {}",
-                    id, progressIds);
+                    taskId, progressIds);
         }
 
         return null;

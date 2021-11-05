@@ -3,11 +3,8 @@ package devote.blockchain.mockblockchain;
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.IssuerAccount;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class MockBlockchainIssuerAccount implements IssuerAccount {
-    public static final int NUM_OF_ISSUER_ACCOUNTS_TO_CREATE = 2;
+    public static final int NUM_OF_ISSUER_ACCOUNTS_TO_CREATE = 4;
 
     private MockBlockchainConfiguration config;
     private boolean isInitCalled = false;
