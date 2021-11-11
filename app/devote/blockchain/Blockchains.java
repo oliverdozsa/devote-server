@@ -3,8 +3,6 @@ package devote.blockchain;
 import com.typesafe.config.Config;
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.BlockchainOperation;
-import devote.blockchain.api.ChannelAccount;
-import devote.blockchain.api.IssuerAccount;
 import org.reflections.Reflections;
 import play.Logger;
 
@@ -20,9 +18,8 @@ public class Blockchains {
     private final Config config;
     private final Map<String, BlockchainFactory> factories = new HashMap<>();
 
-    private static final Class<? extends BlockchainOperation>[] requiredImplementationInterfaces = new Class[]{
-            IssuerAccount.class, ChannelAccount.class
-    };
+    private static final Set<Class<? extends BlockchainOperation>> requiredImplementationInterfaces =
+            collectRequiredImplementationInterfaces();
 
     private static final Logger.ALogger logger = Logger.of(Blockchains.class);
 
@@ -111,5 +108,10 @@ public class Blockchains {
         } else {
             factories.put(factory.getNetworkName(), factory);
         }
+    }
+
+    private static Set<Class<? extends BlockchainOperation>> collectRequiredImplementationInterfaces() {
+        Reflections apiReflections = new Reflections("devote.blockchain.api");
+        return apiReflections.getSubTypesOf(BlockchainOperation.class);
     }
 }

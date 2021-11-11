@@ -9,8 +9,8 @@ import com.typesafe.config.Config;
  * More precisely, the BlockchainConfiguration class should be placed under devote.blockchain.[blockchain-package]
  * and the rest of the classes could be placed anywhere under that package.
  *
- * Each implementation class must have a no-arg constructor, and should exactly have one implementation under
- * the mentioned package.
+ * Each implementation class must have a no-arg constructor, and there should be exactly one implementation of a
+ * blockchain operation under the mentioned package.
  *
  */
 public interface BlockchainConfiguration {

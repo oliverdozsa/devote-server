@@ -10,6 +10,10 @@ public class CreateVotingRequest {
     @Constraints.Min(2)
     private Long votesCap;
 
+    @Constraints.Required
+    @Constraints.MinLength(2)
+    private String title;
+
     public String getNetwork() {
         return network;
     }
@@ -26,11 +30,20 @@ public class CreateVotingRequest {
         this.votesCap = votesCap;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     @Override
     public String toString() {
         return "CreateVotingRequest{" +
                 "network='" + network + '\'' +
                 ", votesCap=" + votesCap +
+                ", title='" + title + '\'' +
                 '}';
     }
 }
