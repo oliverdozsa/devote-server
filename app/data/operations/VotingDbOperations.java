@@ -32,20 +32,31 @@ public class VotingDbOperations {
     }
 
     public CompletionStage<Long> initialize(CreateVotingRequest createVotingRequest) {
-        logger.info("initialize(): createVotingRequest = {}", createVotingRequest);
-        return supplyAsync(() -> votingRepository.initialize(createVotingRequest), dbExecContext);
+        return supplyAsync(() -> {
+            logger.info("initialize(): createVotingRequest = {}", createVotingRequest);
+            return votingRepository.initialize(createVotingRequest);
+        }, dbExecContext);
     }
 
     public CompletionStage<JpaVoting> single(Long id) {
-        logger.info("single(): id = {}", id);
-        return supplyAsync(() -> votingRepository.single(id), dbExecContext);
+        return supplyAsync(() -> {
+            logger.info("single(): id = {}", id);
+            return votingRepository.single(id);
+        }, dbExecContext);
     }
 
     public CompletionStage<Void> issuerAccountsCreated(Long votingId, List<String> accountSecrets) {
-        logger.info("issuerAccountsCreated(): votingId = {}, accounts size = {}", votingId, accountSecrets.size());
         return runAsync(() -> {
+            logger.info("issuerAccountsCreated(): votingId = {}, accounts size = {}", votingId, accountSecrets.size());
             votingRepository.issuerAccountsCreated(votingId, accountSecrets);
             channelProgressRepository.issuersCreated(votingId);
+        }, dbExecContext);
+    }
+
+    public CompletionStage<Void> distributionAndBallotAccountsCreated(Long votingId, String distributionSecret, String ballotSecret) {
+        return runAsync(() -> {
+            logger.info("distributionAndBallotAccountsCreated(): votingId = {}", votingId);
+            votingRepository.distributionAndBallotAccountsCreated(votingId, distributionSecret, ballotSecret);
         }, dbExecContext);
     }
 }

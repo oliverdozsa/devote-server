@@ -19,7 +19,7 @@ public class JpaChannelAccountProgress {
 
     @OneToOne
     @JoinColumn(name = "issuer_id")
-    private JpaVotingIssuer issuer;
+    private JpaVotingIssuerAccount issuer;
 
     @Column(name = "num_of_accounts_to_create")
     private Long numOfAccountsToCreate;
@@ -35,11 +35,11 @@ public class JpaChannelAccountProgress {
         this.id = id;
     }
 
-    public JpaVotingIssuer getIssuer() {
+    public JpaVotingIssuerAccount getIssuer() {
         return issuer;
     }
 
-    public void setIssuer(JpaVotingIssuer issuer) {
+    public void setIssuer(JpaVotingIssuerAccount issuer) {
         this.issuer = issuer;
     }
 

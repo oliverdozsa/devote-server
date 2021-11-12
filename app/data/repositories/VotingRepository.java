@@ -10,4 +10,5 @@ public interface VotingRepository {
     JpaVoting single(Long id);
     void issuerAccountsCreated(Long id, List<String> accounts);
     void channelAccountCreated(Long id, List<String> accounts);
+    void distributionAndBallotAccountsCreated(Long id, String distributionSecret, String ballotSecret);
 }

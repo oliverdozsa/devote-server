@@ -14,8 +14,7 @@ import rules.RuleChainForTests;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static asserts.BlockchainAsserts.assertChannelAccountsCreatedOnBlockchain;
-import static asserts.BlockchainAsserts.assertIssuerAccountsCreatedOnBlockchain;
+import static asserts.BlockchainAsserts.*;
 import static asserts.DbAsserts.assertChannelProgressCompletedFor;
 import static extractors.GenericDataFromResult.statusOf;
 import static extractors.VotingResponseFromResult.idOf;
@@ -64,6 +63,7 @@ public class VotingControllerTest {
         assertThat(votingId, greaterThan(0L));
         assertThat(networkOf(getByLocationResult), equalTo("mockblockchain"));
         assertIssuerAccountsCreatedOnBlockchain(votingId);
+        assertDistributionAndBallotAccountsCreatedOnBlockchain(votingId);
 
         Thread.sleep(30 * 1000);
         assertChannelAccountsCreatedOnBlockchain(votingId);

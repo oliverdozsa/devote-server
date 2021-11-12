@@ -3,7 +3,7 @@ package asserts;
 import data.entities.JpaChannelAccountProgress;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
-import data.entities.JpaVotingIssuer;
+import data.entities.JpaVotingIssuerAccount;
 import io.ebean.Ebean;
 
 import java.util.List;
@@ -28,8 +28,8 @@ public class DbAsserts {
 
     private static List<JpaChannelAccountProgress> channelProgressesOf(Long votingId) {
         JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
-        return voting.getIssuers().stream()
-                .map(JpaVotingIssuer::getChannelAccountProgress)
+        return voting.getIssuerAccounts().stream()
+                .map(JpaVotingIssuerAccount::getChannelAccountProgress)
                 .collect(Collectors.toList());
     }
 

@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.Instant;
@@ -26,13 +27,21 @@ public class JpaVoting {
     private Long votesCap;
 
     @OneToMany(mappedBy = "voting", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
-    private List<JpaVotingIssuer> issuers;
+    private List<JpaVotingIssuerAccount> issuerAccounts;
 
     @OneToMany(mappedBy = "voting", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     private List<JpaVotingChannelAccount> channelAccounts;
 
     @Column(name = "created_at")
     private Instant createdAt;
+
+    @Column(name = "distribution_account_secret")
+    @Lob
+    private String distributionAccountSecret;
+
+    @Column(name = "ballot_account_secret")
+    @Lob
+    private String ballotAccountSecret;
 
     public Long getId() {
         return id;
@@ -50,12 +59,12 @@ public class JpaVoting {
         this.network = network;
     }
 
-    public List<JpaVotingIssuer> getIssuers() {
-        return issuers;
+    public List<JpaVotingIssuerAccount> getIssuerAccounts() {
+        return issuerAccounts;
     }
 
-    public void setIssuers(List<JpaVotingIssuer> issuers) {
-        this.issuers = issuers;
+    public void setIssuerAccounts(List<JpaVotingIssuerAccount> issuerAccounts) {
+        this.issuerAccounts = issuerAccounts;
     }
 
     public Long getVotesCap() {
@@ -80,5 +89,21 @@ public class JpaVoting {
 
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getDistributionAccountSecret() {
+        return distributionAccountSecret;
+    }
+
+    public void setDistributionAccountSecret(String distributionAccountSecret) {
+        this.distributionAccountSecret = distributionAccountSecret;
+    }
+
+    public String getBallotAccountSecret() {
+        return ballotAccountSecret;
+    }
+
+    public void setBallotAccountSecret(String ballotAccountSecret) {
+        this.ballotAccountSecret = ballotAccountSecret;
     }
 }

@@ -12,8 +12,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "voting_issuer")
-public class JpaVotingIssuer {
+@Table(name = "voting_issuer_account")
+public class JpaVotingIssuerAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

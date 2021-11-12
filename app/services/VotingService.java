@@ -2,12 +2,14 @@ package services;
 
 import data.entities.JpaVoting;
 import data.operations.VotingDbOperations;
+import devote.blockchain.api.DistributionAndBallotAccount;
 import devote.blockchain.operations.VotingBlockchainOperations;
 import dto.CreateVotingRequest;
 import dto.SingleVotingResponse;
 import play.Logger;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.concurrent.CompletionStage;
 
 public class VotingService {
@@ -27,14 +29,17 @@ public class VotingService {
 
     public CompletionStage<Long> create(CreateVotingRequest request) {
         logger.info("create(): request = {}", request);
-        CreatedVotingId votingId = new CreatedVotingId();
+        CreatedVotingData createdVotingData = new CreatedVotingData();
 
         return votingDbOperations
                 .initialize(request)
-                .thenAccept(id -> votingId.id = id)
+                .thenAccept(id -> createdVotingData.id = id)
                 .thenCompose(v -> votingBlockchainOperations.createIssuerAccounts(request))
-                .thenAccept(accountSecrets -> votingDbOperations.issuerAccountsCreated(votingId.id, accountSecrets))
-                .thenApply(o -> votingId.id);
+                .thenAccept(issuers -> createdVotingData.issuerSecrets = issuers)
+                .thenCompose(v -> votingDbOperations.issuerAccountsCreated(createdVotingData.id, createdVotingData.issuerSecrets))
+                .thenCompose(v -> votingBlockchainOperations.createDistributionAndBallotAccounts(request, createdVotingData.issuerSecrets))
+                .thenCompose(tr -> votingDbOperations.distributionAndBallotAccountsCreated(createdVotingData.id, tr.distributionSecret, tr.ballotSecret))
+                .thenApply(v -> createdVotingData.id);
     }
 
     public CompletionStage<SingleVotingResponse> single(Long id) {
@@ -50,7 +55,8 @@ public class VotingService {
         return votingResponse;
     }
 
-    private static class CreatedVotingId {
+    private static class CreatedVotingData {
         public Long id;
+        public List<String> issuerSecrets;
     }
 }

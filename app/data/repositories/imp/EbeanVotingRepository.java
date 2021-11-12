@@ -2,7 +2,7 @@ package data.repositories.imp;
 
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
-import data.entities.JpaVotingIssuer;
+import data.entities.JpaVotingIssuerAccount;
 import data.repositories.VotingRepository;
 import dto.CreateVotingRequest;
 import io.ebean.Ebean;
@@ -48,11 +48,11 @@ public class EbeanVotingRepository implements VotingRepository {
 
         JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
 
-        List<JpaVotingIssuer> votingIssuers = accounts.stream()
+        List<JpaVotingIssuerAccount> votingIssuers = accounts.stream()
                 .map(this::fromIssuerAccountSecret)
                 .collect(Collectors.toList());
 
-        voting.setIssuers(votingIssuers);
+        voting.setIssuerAccounts(votingIssuers);
         ebeanServer.merge(voting);
     }
 
@@ -70,6 +70,15 @@ public class EbeanVotingRepository implements VotingRepository {
         ebeanServer.merge(voting);
     }
 
+    @Override
+    public void distributionAndBallotAccountsCreated(Long id, String distributionSecret, String ballotSecret) {
+        JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
+        voting.setDistributionAccountSecret(distributionSecret);
+        voting.setBallotAccountSecret(ballotSecret);
+
+        ebeanServer.update(voting);
+    }
+
     private static JpaVoting fromRequest(CreateVotingRequest request) {
         JpaVoting entity = new JpaVoting();
         entity.setNetwork(request.getNetwork());
@@ -78,8 +87,8 @@ public class EbeanVotingRepository implements VotingRepository {
         return entity;
     }
 
-    private JpaVotingIssuer fromIssuerAccountSecret(String account) {
-        JpaVotingIssuer votingIssuer = new JpaVotingIssuer();
+    private JpaVotingIssuerAccount fromIssuerAccountSecret(String account) {
+        JpaVotingIssuerAccount votingIssuer = new JpaVotingIssuerAccount();
         votingIssuer.setAccountSecret(account);
         return votingIssuer;
     }

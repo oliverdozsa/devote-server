@@ -4,6 +4,7 @@ import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.BlockchainException;
 import devote.blockchain.api.BlockchainOperation;
 import devote.blockchain.api.ChannelAccount;
+import devote.blockchain.api.DistributionAndBallotAccount;
 import devote.blockchain.api.IssuerAccount;
 import org.reflections.Reflections;
 import play.Logger;
@@ -29,6 +30,10 @@ public class BlockchainFactory {
 
     public ChannelAccount createChannelAccount() {
         return createBlockchainOperation(ChannelAccount.class);
+    }
+
+    public DistributionAndBallotAccount createDistributionAndChannelAccount() {
+        return createBlockchainOperation(DistributionAndBallotAccount.class);
     }
 
     private <T extends BlockchainOperation> T createBlockchainOperation(Class<T> blockChainOperationParentClass) {

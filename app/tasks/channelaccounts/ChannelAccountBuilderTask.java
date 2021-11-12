@@ -1,7 +1,7 @@
 package tasks.channelaccounts;
 
 import data.entities.JpaChannelAccountProgress;
-import data.entities.JpaVotingIssuer;
+import data.entities.JpaVotingIssuerAccount;
 import devote.blockchain.BlockchainFactory;
 import devote.blockchain.api.ChannelAccount;
 import play.Logger;
@@ -36,7 +36,7 @@ public class ChannelAccountBuilderTask implements Runnable {
     }
 
     private List<String> createChannelAccounts(JpaChannelAccountProgress channelProgress) {
-        JpaVotingIssuer issuer = channelProgress.getIssuer();
+        JpaVotingIssuerAccount issuer = channelProgress.getIssuer();
         ChannelAccount channelAccount = getChannelAccount(issuer);
 
         long votesCap = issuer.getVoting().getVotesCap();
@@ -65,7 +65,7 @@ public class ChannelAccountBuilderTask implements Runnable {
         context.channelProgressRepository.channelAccountsCreated(channelProgress.getId(), channelSecrets.size());
     }
 
-    private ChannelAccount getChannelAccount(JpaVotingIssuer issuer) {
+    private ChannelAccount getChannelAccount(JpaVotingIssuerAccount issuer) {
         String network = issuer.getVoting().getNetwork();
         BlockchainFactory blockchainFactory = context.blockchains.getFactoryByNetwork(network);
         return blockchainFactory.createChannelAccount();

@@ -2,8 +2,9 @@ package asserts;
 
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
-import data.entities.JpaVotingIssuer;
+import data.entities.JpaVotingIssuerAccount;
 import devote.blockchain.mockblockchain.MockBlockchainChannelAccount;
+import devote.blockchain.mockblockchain.MockBlockchainDistributionAndBallotAccount;
 import devote.blockchain.mockblockchain.MockBlockchainIssuerAccount;
 import io.ebean.Ebean;
 
@@ -31,18 +32,26 @@ public class BlockchainAsserts {
         accounts.forEach(BlockchainAsserts::assertIssuerAccountCreatedOnBlockchain);
     }
 
+    public static void assertDistributionAndBallotAccountsCreatedOnBlockchain(Long votingId) {
+        String distributionAccount = distributionAccountOf(votingId);
+        assertDistributionAccountCreated(distributionAccount);
+
+        String ballotAccount = ballotAccountOf(votingId);
+        assertBallotAccountCreated(ballotAccount);
+    }
+
     private static void assertChannelAccountCreatedOnBlockchain(String account) {
-        assertTrue(MockBlockchainChannelAccount.isCreated(account));
+        assertTrue("Channel account: " + account + " is not created!", MockBlockchainChannelAccount.isCreated(account));
     }
 
     private static void assertIssuerAccountCreatedOnBlockchain(String account) {
-        assertTrue(MockBlockchainIssuerAccount.isCreated(account));
+        assertTrue("Issuer account: " + account + " is not created!", MockBlockchainIssuerAccount.isCreated(account));
     }
 
     private static List<String> issuerAccountsOf(Long votingId) {
         JpaVoting entity = Ebean.find(JpaVoting.class, votingId);
-        return entity.getIssuers().stream()
-                .map(JpaVotingIssuer::getAccountSecret)
+        return entity.getIssuerAccounts().stream()
+                .map(JpaVotingIssuerAccount::getAccountSecret)
                 .collect(Collectors.toList());
     }
 
@@ -57,5 +66,23 @@ public class BlockchainAsserts {
     private static int votesCapOf(Long votingId) {
         JpaVoting entity = Ebean.find(JpaVoting.class, votingId);
         return entity.getVotesCap().intValue();
+    }
+
+    private static String ballotAccountOf(Long votingId) {
+        JpaVoting entity = Ebean.find(JpaVoting.class, votingId);
+        return entity.getBallotAccountSecret();
+    }
+
+    private static String distributionAccountOf(Long votingId) {
+        JpaVoting entity = Ebean.find(JpaVoting.class, votingId);
+        return entity.getDistributionAccountSecret();
+    }
+
+    private static void assertDistributionAccountCreated(String account) {
+        assertTrue("Distribution account: " + account + " is not created!", MockBlockchainDistributionAndBallotAccount.isDistributionAccountCreated(account));
+    }
+
+    private static void assertBallotAccountCreated(String account) {
+        assertTrue("Ballot account: " + account + " is not created!", MockBlockchainDistributionAndBallotAccount.isBallotAccountCreated(account));
     }
 }

@@ -14,6 +14,11 @@ public class CreateVotingRequest {
     @Constraints.MinLength(2)
     private String title;
 
+    @Constraints.Pattern("[0-9a-z]+")
+    @Constraints.MaxLength(8)
+    @Constraints.MinLength(2)
+    private String tokenIdentifier;
+
     public String getNetwork() {
         return network;
     }
@@ -38,12 +43,21 @@ public class CreateVotingRequest {
         this.title = title;
     }
 
+    public String getTokenIdentifier() {
+        return tokenIdentifier;
+    }
+
+    public void setTokenIdentifier(String tokenIdentifier) {
+        this.tokenIdentifier = tokenIdentifier;
+    }
+
     @Override
     public String toString() {
         return "CreateVotingRequest{" +
                 "network='" + network + '\'' +
                 ", votesCap=" + votesCap +
                 ", title='" + title + '\'' +
+                ", tokenIdentifier='" + tokenIdentifier + '\'' +
                 '}';
     }
 }

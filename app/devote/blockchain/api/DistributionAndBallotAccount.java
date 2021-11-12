@@ -1,8 +1,10 @@
 package devote.blockchain.api;
 
 
+import java.util.List;
+
 public interface DistributionAndBallotAccount extends BlockchainOperation {
-    TransactionResult create(IssuerData[] issuerData, Long votesCap);
+    TransactionResult create(List<IssuerData> issuerData, Long votesCap);
 
     class IssuerData {
         public final String voteTokenTitle;
@@ -15,12 +17,12 @@ public interface DistributionAndBallotAccount extends BlockchainOperation {
     }
 
     class TransactionResult {
-        public final String ballotSecret;
         public final String distributionSecret;
+        public final String ballotSecret;
 
-        public TransactionResult(String ballotSecret, String distributionSecret) {
-            this.ballotSecret = ballotSecret;
+        public TransactionResult(String distributionSecret, String ballotSecret) {
             this.distributionSecret = distributionSecret;
+            this.ballotSecret = ballotSecret;
         }
     }
 }
