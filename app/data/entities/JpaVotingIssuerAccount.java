@@ -27,6 +27,9 @@ public class JpaVotingIssuerAccount {
     @Lob
     private String accountSecret;
 
+    @Column(name = "asset_code", length = 20)
+    private String assetCode;
+
     @OneToOne(mappedBy = "issuer")
     private JpaChannelAccountProgress channelAccountProgress;
 
@@ -60,5 +63,13 @@ public class JpaVotingIssuerAccount {
 
     public void setChannelAccountProgress(JpaChannelAccountProgress channelAccountProgress) {
         this.channelAccountProgress = channelAccountProgress;
+    }
+
+    public String getAssetCode() {
+        return assetCode;
+    }
+
+    public void setAssetCode(String assetCode) {
+        this.assetCode = assetCode;
     }
 }

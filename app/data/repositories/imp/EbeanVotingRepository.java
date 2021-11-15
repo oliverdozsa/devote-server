@@ -4,6 +4,7 @@ import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
 import data.repositories.VotingRepository;
+import devote.blockchain.api.DistributionAndBallotAccount;
 import dto.CreateVotingRequest;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
@@ -12,7 +13,9 @@ import play.db.ebean.EbeanConfig;
 
 import javax.inject.Inject;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class EbeanVotingRepository implements VotingRepository {
@@ -71,12 +74,21 @@ public class EbeanVotingRepository implements VotingRepository {
     }
 
     @Override
-    public void distributionAndBallotAccountsCreated(Long id, String distributionSecret, String ballotSecret) {
+    public void distributionAndBallotAccountsCreated(Long id, DistributionAndBallotAccount.TransactionResult transactionResult) {
         JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
-        voting.setDistributionAccountSecret(distributionSecret);
-        voting.setBallotAccountSecret(ballotSecret);
+        voting.setDistributionAccountSecret(transactionResult.distributionSecret);
+        voting.setBallotAccountSecret(transactionResult.ballotSecret);
 
         ebeanServer.update(voting);
+
+        Map<String, JpaVotingIssuerAccount> votingIssuersBySecret = new HashMap<>();
+        voting.getIssuerAccounts().forEach(i -> votingIssuersBySecret.put(i.getAccountSecret(), i));
+
+        transactionResult.issuerTokens.forEach((s, t) -> {
+            JpaVotingIssuerAccount votingIssuer = votingIssuersBySecret.get(s);
+            votingIssuer.setAssetCode(t);
+            ebeanServer.update(votingIssuer);
+        });
     }
 
     private static JpaVoting fromRequest(CreateVotingRequest request) {

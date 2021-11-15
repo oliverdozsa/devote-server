@@ -3,7 +3,9 @@ package devote.blockchain.mockblockchain;
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.DistributionAndBallotAccount;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MockBlockchainDistributionAndBallotAccount implements DistributionAndBallotAccount {
     private static int currentDistributionAccountId = 0;
@@ -17,7 +19,13 @@ public class MockBlockchainDistributionAndBallotAccount implements DistributionA
     public TransactionResult create(List<IssuerData> issuerData, Long votesCap) {
         currentDistributionAccountId++;
         currentBallotAccountId++;
-        return new TransactionResult(Integer.toString(currentDistributionAccountId), Integer.toString(currentBallotAccountId));
+
+        Map<String, String> issuerTokens = new HashMap<>();
+        for(IssuerData issuerD: issuerData) {
+            issuerTokens.put(issuerD.issuerSecret, issuerD.voteTokenTitle);
+        }
+
+        return new TransactionResult(Integer.toString(currentDistributionAccountId), Integer.toString(currentBallotAccountId), issuerTokens);
     }
 
     public static boolean isDistributionAccountCreated(String account) {

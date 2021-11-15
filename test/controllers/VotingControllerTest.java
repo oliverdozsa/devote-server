@@ -16,6 +16,7 @@ import java.io.InputStream;
 
 import static asserts.BlockchainAsserts.*;
 import static asserts.DbAsserts.assertChannelProgressCompletedFor;
+import static asserts.DbAsserts.assertVoteTokensAreSavedInDb;
 import static extractors.GenericDataFromResult.statusOf;
 import static extractors.VotingResponseFromResult.idOf;
 import static extractors.VotingResponseFromResult.networkOf;
@@ -64,6 +65,7 @@ public class VotingControllerTest {
         assertThat(networkOf(getByLocationResult), equalTo("mockblockchain"));
         assertIssuerAccountsCreatedOnBlockchain(votingId);
         assertDistributionAndBallotAccountsCreatedOnBlockchain(votingId);
+        assertVoteTokensAreSavedInDb(votingId);
 
         Thread.sleep(30 * 1000);
         assertChannelAccountsCreatedOnBlockchain(votingId);

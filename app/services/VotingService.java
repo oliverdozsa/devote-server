@@ -38,7 +38,7 @@ public class VotingService {
                 .thenAccept(issuers -> createdVotingData.issuerSecrets = issuers)
                 .thenCompose(v -> votingDbOperations.issuerAccountsCreated(createdVotingData.id, createdVotingData.issuerSecrets))
                 .thenCompose(v -> votingBlockchainOperations.createDistributionAndBallotAccounts(request, createdVotingData.issuerSecrets))
-                .thenCompose(tr -> votingDbOperations.distributionAndBallotAccountsCreated(createdVotingData.id, tr.distributionSecret, tr.ballotSecret))
+                .thenCompose(tr -> votingDbOperations.distributionAndBallotAccountsCreated(createdVotingData.id, tr))
                 .thenApply(v -> createdVotingData.id);
     }
 
