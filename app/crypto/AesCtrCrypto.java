@@ -15,6 +15,7 @@ import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Arrays;
+import java.util.Base64;
 
 // Based on:
 //   - https://medium.com/lumenauts/sending-secret-and-anonymous-memos-with-stellar-8914479e949b
@@ -32,9 +33,8 @@ public class AesCtrCrypto {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    public static String encrypt(String hexKey, String message) {
-        byte[] keyBytes = hexStringToByteArray(hexKey);
-        SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, "AES");
+    public static byte[] encrypt(byte[] key, byte[] message) {
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
 
         // TODO: Move to separate function
         try {
@@ -45,14 +45,13 @@ public class AesCtrCrypto {
 
             aes.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
 
-            byte[] messageBytes = message.getBytes();
-            byte[] encryptedBytes = aes.doFinal(messageBytes);
+            byte[] encryptedBytes = aes.doFinal(message);
 
             byte[] resultBytes = new byte[randomIvBytes.length + encryptedBytes.length];
             System.arraycopy(randomIvBytes, 0, resultBytes, 0, randomIvBytes.length);
             System.arraycopy(encryptedBytes, 0, resultBytes, randomIvBytes.length, encryptedBytes.length);
 
-            return bytesToHex(resultBytes);
+            return resultBytes;
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (NoSuchProviderException e) {
@@ -72,24 +71,20 @@ public class AesCtrCrypto {
         return null;
     }
 
-    public static String decrypt(String hexKey, String hexCipher) {
-        byte[] keyBytes = hexStringToByteArray(hexKey);
-        SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, "AES");
+    public static byte[] decrypt(byte[] key, byte[] cipher) {
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
 
         try {
             Cipher aes = Cipher.getInstance("AES/CTR/NoPadding", BouncyCastleProvider.PROVIDER_NAME);
 
-            String hexRandomIv = hexCipher.substring(0, 16);
-            byte[] randomIvBytes = hexStringToByteArray(hexRandomIv);
+            byte[] randomIvBytes = Arrays.copyOfRange(cipher, 0, RANDOM_IV_LENGTH);
             IvParameterSpec ivParameterSpec = new IvParameterSpec(randomIvBytes);
 
             aes.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
 
-            String hexEncryptedMessage = hexCipher.substring(16);
-            byte[] encryptedMessageBytes = hexStringToByteArray(hexEncryptedMessage);
+            byte[] encryptedMessage = Arrays.copyOfRange(cipher, RANDOM_IV_LENGTH, cipher.length);
 
-            byte[] decrpytedBytes = aes.doFinal(encryptedMessageBytes);
-            return new String(decrpytedBytes);
+            return aes.doFinal(encryptedMessage);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (NoSuchProviderException e) {
@@ -143,14 +138,34 @@ public class AesCtrCrypto {
     }
 
     public static void main(String[] args) {
-        System.out.println(encrypt("12345678123456781234567812345678", "1"));
-        System.out.println(encrypt("12345678123456781234567812345678", "1"));
-        System.out.println(encrypt("12345678123456781234567812345678", "1"));
-        System.out.println(encrypt("12345678123456781234567812345678", "1"));
+        byte[] key = Base64.getDecoder().decode("12345678123456781234567812345678");
+        byte[] message = "Hello World".getBytes();
 
-        String secretMessageHex = encrypt("42844221428442214284422142844221", "Hello World!@#()");
-        System.out.println("Secret hex message: " + secretMessageHex);
-        String decryptedMessage = decrypt("42844221428442214284422142844221", secretMessageHex);
-        System.out.println("decryptedMessage: " + decryptedMessage);
+        byte[] encrypted;
+        byte[] decrypted;
+
+        encrypted = encrypt(key, message);
+        decrypted = decrypt(key, encrypted);
+        System.out.println(Base64.getEncoder().encodeToString(encrypted));
+        System.out.println(new String(decrypted));
+
+
+        encrypted = encrypt(key, message);
+        System.out.println(Base64.getEncoder().encodeToString(encrypted));
+        System.out.println(new String(decrypted));
+
+        encrypted = encrypt(key, message);
+        System.out.println(Base64.getEncoder().encodeToString(encrypted));
+        System.out.println(new String(decrypted));
+
+//        System.out.println(encrypt("12345678123456781234567812345678", "1"));
+//        System.out.println(encrypt("12345678123456781234567812345678", "1"));
+//        System.out.println(encrypt("12345678123456781234567812345678", "1"));
+//        System.out.println(encrypt("12345678123456781234567812345678", "1"));
+//
+//        String secretMessageHex = encrypt("42844221428442214284422142844221", "Hello World!@#()");
+//        System.out.println("Secret hex message: " + secretMessageHex);
+//        String decryptedMessage = decrypt("42844221428442214284422142844221", secretMessageHex);
+//        System.out.println("decryptedMessage: " + decryptedMessage);
     }
 }
