@@ -15,8 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static asserts.BlockchainAsserts.*;
-import static asserts.DbAsserts.assertChannelProgressCompletedFor;
-import static asserts.DbAsserts.assertVoteTokensAreSavedInDb;
+import static asserts.DbAsserts.*;
 import static extractors.GenericDataFromResult.statusOf;
 import static extractors.VotingResponseFromResult.idOf;
 import static extractors.VotingResponseFromResult.networkOf;
@@ -66,6 +65,7 @@ public class VotingControllerTest {
         assertIssuerAccountsCreatedOnBlockchain(votingId);
         assertDistributionAndBallotAccountsCreatedOnBlockchain(votingId);
         assertVoteTokensAreSavedInDb(votingId);
+        assertVotingEncryptionSavedInDb(votingId);
 
         Thread.sleep(30 * 1000);
         assertChannelAccountsCreatedOnBlockchain(votingId);

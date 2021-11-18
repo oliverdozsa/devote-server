@@ -35,6 +35,12 @@ public class JpaVoting {
     @Column(name = "created_at")
     private Instant createdAt;
 
+    @Column(name = "encryption_key")
+    private String encryptionKey;
+
+    @Column(name = "encrypted_until")
+    private Instant encryptedUntil;
+
     @Column(name = "distribution_account_secret")
     @Lob
     private String distributionAccountSecret;
@@ -105,5 +111,21 @@ public class JpaVoting {
 
     public void setBallotAccountSecret(String ballotAccountSecret) {
         this.ballotAccountSecret = ballotAccountSecret;
+    }
+
+    public String getEncryptionKey() {
+        return encryptionKey;
+    }
+
+    public void setEncryptionKey(String encryptionKey) {
+        this.encryptionKey = encryptionKey;
+    }
+
+    public Instant getEncryptedUntil() {
+        return encryptedUntil;
+    }
+
+    public void setEncryptedUntil(Instant encryptedUntil) {
+        this.encryptedUntil = encryptedUntil;
     }
 }

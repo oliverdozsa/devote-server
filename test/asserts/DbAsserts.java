@@ -6,6 +6,7 @@ import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
 import io.ebean.Ebean;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertTrue;
 
 public class DbAsserts {
     public static void assertChannelProgressCompletedFor(Long votingId) {
@@ -32,6 +34,16 @@ public class DbAsserts {
         List<String> voteTokens = voteTokensOf(votingId);
         assertThat(voteTokens, notNullValue());
         assertThat(voteTokens, hasSize(greaterThan(0)));
+    }
+
+    public static void assertVotingEncryptionSavedInDb(Long votingId) {
+        JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
+
+        assertThat(voting.getEncryptionKey(), notNullValue());
+        assertThat(voting.getEncryptionKey().length(), greaterThan(0));
+
+        boolean isEncryptedUntilInFuture = voting.getEncryptedUntil().isAfter(Instant.now());
+        assertTrue("Encrypted until is not in the future!", isEncryptedUntilInFuture);
     }
 
     private static List<JpaChannelAccountProgress> channelProgressesOf(Long votingId) {
