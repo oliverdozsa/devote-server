@@ -46,6 +46,16 @@ public class DbAsserts {
         assertTrue("Encrypted until is not in the future!", isEncryptedUntilInFuture);
     }
 
+    public static void assertVotingStartEndDateSavedInDb(Long votingId) {
+        JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
+
+        assertThat(voting.getStartDate(), notNullValue());
+        assertThat(voting.getEndDate(), notNullValue());
+
+        boolean isEndDateAfterStartDate = voting.getEndDate().isAfter(voting.getStartDate());
+        assertTrue("Voting end date is not after start date!", isEndDateAfterStartDate);
+    }
+
     private static List<JpaChannelAccountProgress> channelProgressesOf(Long votingId) {
         JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
         return voting.getIssuerAccounts().stream()

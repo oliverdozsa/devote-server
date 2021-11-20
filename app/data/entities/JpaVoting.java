@@ -41,6 +41,12 @@ public class JpaVoting {
     @Column(name = "encrypted_until")
     private Instant encryptedUntil;
 
+    @Column(name = "start_date")
+    private Instant startDate;
+
+    @Column(name = "end_date")
+    private Instant endDate;
+
     @Column(name = "distribution_account_secret")
     @Lob
     private String distributionAccountSecret;
@@ -127,5 +133,21 @@ public class JpaVoting {
 
     public void setEncryptedUntil(Instant encryptedUntil) {
         this.encryptedUntil = encryptedUntil;
+    }
+
+    public Instant getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Instant startDate) {
+        this.startDate = startDate;
+    }
+
+    public Instant getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Instant endDate) {
+        this.endDate = endDate;
     }
 }

@@ -17,7 +17,6 @@ public class VotingTestClient extends TestClient {
     }
 
     public Result createVoting(CreateVotingRequest votingRequest) {
-        // TODO: JWT auth?
         Http.RequestBuilder httpRequest = new Http.RequestBuilder()
                 .method(POST)
                 .bodyJson(Json.toJson(votingRequest))

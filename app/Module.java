@@ -6,6 +6,8 @@ import data.repositories.VotingRepository;
 import data.repositories.imp.EbeanVotingRepository;
 import devote.blockchain.Blockchains;
 import com.google.inject.AbstractModule;
+import formatters.FormattersProvider;
+import play.data.format.Formatters;
 import services.VotingService;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
 import tasks.channelaccounts.ChannelAccountTasksOrganizer;
@@ -13,6 +15,9 @@ import tasks.channelaccounts.ChannelAccountTasksOrganizer;
 public class Module extends AbstractModule {
     @Override
     protected void configure() {
+        // Formatters
+        bind(Formatters.class).toProvider(FormattersProvider.class);
+
         bind(Blockchains.class).asEagerSingleton();
 
         // Data

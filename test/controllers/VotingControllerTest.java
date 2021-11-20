@@ -13,6 +13,8 @@ import rules.RuleChainForTests;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
+import java.time.Instant;
 
 import static asserts.BlockchainAsserts.*;
 import static asserts.DbAsserts.*;
@@ -66,6 +68,7 @@ public class VotingControllerTest {
         assertDistributionAndBallotAccountsCreatedOnBlockchain(votingId);
         assertVoteTokensAreSavedInDb(votingId);
         assertVotingEncryptionSavedInDb(votingId);
+        assertVotingStartEndDateSavedInDb(votingId);
 
         Thread.sleep(30 * 1000);
         assertChannelAccountsCreatedOnBlockchain(votingId);
@@ -77,6 +80,14 @@ public class VotingControllerTest {
                 .getClassLoader().getResourceAsStream("voting-request-base.json");
         CreateVotingRequest votingRequest = Json.mapper().readValue(sampleVotingIS, CreateVotingRequest.class);
         votingRequest.setNetwork("mockblockchain");
+
+        Instant tomorrow = Instant.now().plus(Duration.ofDays(1));
+        votingRequest.setEncryptedUntil(tomorrow);
+
+        Instant startDate = Instant.now();
+        Instant endDate = Instant.now().plus(Duration.ofDays(1));
+        votingRequest.setStartDate(startDate);
+        votingRequest.setEndDate(endDate);
 
         return votingRequest;
     }

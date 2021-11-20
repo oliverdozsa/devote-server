@@ -1,5 +1,6 @@
 package data.repositories.imp;
 
+import crypto.EncryptedVoting;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
@@ -30,10 +31,18 @@ public class EbeanVotingRepository implements VotingRepository {
 
     @Override
     public Long initialize(CreateVotingRequest request) {
-        logger.info("initialize(): createVotingDto = {}", request);
+        logger.info("initialize(): request = {}", request);
 
         JpaVoting voting = fromRequest(request);
         voting.setCreatedAt(Instant.now());
+
+        if (request.getEncryptedUntil() != null) {
+            voting.setEncryptedUntil(request.getEncryptedUntil());
+            voting.setEncryptionKey(EncryptedVoting.generateKey());
+        }
+
+        voting.setStartDate(request.getStartDate());
+        voting.setEndDate(request.getEndDate());
 
         ebeanServer.save(voting);
         return voting.getId();
