@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class AesCtrCryptoTest {
@@ -44,6 +45,24 @@ public class AesCtrCryptoTest {
 
         decodedMessage = decryptToString(randomKey, cipher_b);
         assertThat(decodedMessage, equalTo("The quick brown fox jumps over the lazy dog"));
+    }
+
+    @Test
+    public void testDecryptWithInvalidKey() {
+        // Given
+        byte[] wrongKey = new byte[]{0};
+
+        // When, Then
+        assertThrows(CryptoException.class, () -> AesCtrCrypto.decrypt(wrongKey, new byte[]{1, 2, 3}));
+    }
+
+    @Test
+    public void testEncryptWithInvalidKey() {
+        // Given
+        byte[] wrongKey = new byte[]{0};
+
+        // When, Then
+        assertThrows(CryptoException.class, () -> AesCtrCrypto.encrypt(wrongKey, new byte[]{1, 2, 3}));
     }
 
     private static String decryptToString(byte[] key, byte[] cipher) {

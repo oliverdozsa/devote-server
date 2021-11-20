@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 
 import static asserts.BlockchainAsserts.*;
 import static asserts.DbAsserts.*;
@@ -48,6 +49,8 @@ public class VotingControllerTest {
     public void testCreate() throws IOException, InterruptedException {
         // Given
         CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
 
         // When
         Result result = client.createVoting(createVotingRequest);
@@ -69,6 +72,7 @@ public class VotingControllerTest {
         assertVoteTokensAreSavedInDb(votingId);
         assertVotingEncryptionSavedInDb(votingId);
         assertVotingStartEndDateSavedInDb(votingId);
+        assertAuthorizationEmailsSavedInDb(votingId, "john@mail.com", "doe@where.de", "some@one.com");
 
         Thread.sleep(30 * 1000);
         assertChannelAccountsCreatedOnBlockchain(votingId);

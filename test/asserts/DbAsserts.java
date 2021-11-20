@@ -1,7 +1,9 @@
 package asserts;
 
+import data.entities.Authorization;
 import data.entities.JpaChannelAccountProgress;
 import data.entities.JpaVoting;
+import data.entities.JpaVotingAuthorizationEmail;
 import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
 import io.ebean.Ebean;
@@ -13,8 +15,7 @@ import java.util.stream.Collectors;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertTrue;
 
 public class DbAsserts {
@@ -56,6 +57,16 @@ public class DbAsserts {
         assertTrue("Voting end date is not after start date!", isEndDateAfterStartDate);
     }
 
+    public static void assertAuthorizationEmailsSavedInDb(Long votingId, String... emails) {
+        JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
+
+        assertThat(voting.getAuthorization(), equalTo(Authorization.EMAILS));
+        assertThat(voting.getAuthOptionsEmails(), hasSize(emails.length));
+
+        List<String> storedEmailAddresses = toEmailsList(voting.getAuthOptionsEmails());
+        assertThat(storedEmailAddresses, containsInAnyOrder(emails));
+    }
+
     private static List<JpaChannelAccountProgress> channelProgressesOf(Long votingId) {
         JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
         return voting.getIssuerAccounts().stream()
@@ -72,6 +83,12 @@ public class DbAsserts {
         JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
         return voting.getIssuerAccounts().stream()
                 .map(JpaVotingIssuerAccount::getAssetCode)
+                .collect(Collectors.toList());
+    }
+
+    private static List<String> toEmailsList(List<JpaVotingAuthorizationEmail> votingAuthorizationEmails) {
+        return votingAuthorizationEmails.stream()
+                .map(v -> v.getEmailAddress())
                 .collect(Collectors.toList());
     }
 }

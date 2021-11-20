@@ -1,6 +1,5 @@
 package data.repositories.imp;
 
-import crypto.EncryptedVoting;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
@@ -13,11 +12,12 @@ import play.Logger;
 import play.db.ebean.EbeanConfig;
 
 import javax.inject.Inject;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static data.repositories.imp.EbeanVotingInit.initVotingFrom;
 
 public class EbeanVotingRepository implements VotingRepository {
     private static final Logger.ALogger logger = Logger.of(EbeanVotingRepository.class);
@@ -33,16 +33,7 @@ public class EbeanVotingRepository implements VotingRepository {
     public Long initialize(CreateVotingRequest request) {
         logger.info("initialize(): request = {}", request);
 
-        JpaVoting voting = fromRequest(request);
-        voting.setCreatedAt(Instant.now());
-
-        if (request.getEncryptedUntil() != null) {
-            voting.setEncryptedUntil(request.getEncryptedUntil());
-            voting.setEncryptionKey(EncryptedVoting.generateKey());
-        }
-
-        voting.setStartDate(request.getStartDate());
-        voting.setEndDate(request.getEndDate());
+        JpaVoting voting = initVotingFrom(request);
 
         ebeanServer.save(voting);
         return voting.getId();
@@ -98,14 +89,6 @@ public class EbeanVotingRepository implements VotingRepository {
             votingIssuer.setAssetCode(t);
             ebeanServer.update(votingIssuer);
         });
-    }
-
-    private static JpaVoting fromRequest(CreateVotingRequest request) {
-        JpaVoting entity = new JpaVoting();
-        entity.setNetwork(request.getNetwork());
-        entity.setVotesCap(request.getVotesCap());
-
-        return entity;
     }
 
     private JpaVotingIssuerAccount fromIssuerAccountSecret(String account) {

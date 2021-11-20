@@ -3,11 +3,14 @@ package data.entities;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.time.Instant;
 import java.util.List;
@@ -32,7 +35,7 @@ public class JpaVoting {
     @OneToMany(mappedBy = "voting", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     private List<JpaVotingChannelAccount> channelAccounts;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
     @Column(name = "encryption_key")
@@ -41,10 +44,10 @@ public class JpaVoting {
     @Column(name = "encrypted_until")
     private Instant encryptedUntil;
 
-    @Column(name = "start_date")
+    @Column(name = "start_date", nullable = false)
     private Instant startDate;
 
-    @Column(name = "end_date")
+    @Column(name = "end_date", nullable = false)
     private Instant endDate;
 
     @Column(name = "distribution_account_secret")
@@ -54,6 +57,16 @@ public class JpaVoting {
     @Column(name = "ballot_account_secret")
     @Lob
     private String ballotAccountSecret;
+
+    @Column(name = "authorization", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Authorization authorization;
+
+    @OneToMany(mappedBy = "voting", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
+    private List<JpaVotingAuthorizationEmail> authOptionsEmails;
+
+    @OneToOne(mappedBy = "voting")
+    private JpaVotingAuthorizationKeybase authOptionKeybase;
 
     public Long getId() {
         return id;
@@ -149,5 +162,29 @@ public class JpaVoting {
 
     public void setEndDate(Instant endDate) {
         this.endDate = endDate;
+    }
+
+    public Authorization getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(Authorization authorization) {
+        this.authorization = authorization;
+    }
+
+    public List<JpaVotingAuthorizationEmail> getAuthOptionsEmails() {
+        return authOptionsEmails;
+    }
+
+    public void setAuthOptionsEmails(List<JpaVotingAuthorizationEmail> authOptionsEmails) {
+        this.authOptionsEmails = authOptionsEmails;
+    }
+
+    public JpaVotingAuthorizationKeybase getAuthOptionKeybase() {
+        return authOptionKeybase;
+    }
+
+    public void setAuthOptionKeybase(JpaVotingAuthorizationKeybase authOptionKeybase) {
+        this.authOptionKeybase = authOptionKeybase;
     }
 }
