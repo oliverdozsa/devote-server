@@ -1,7 +1,7 @@
 package clients;
 
 import controllers.routes;
-import dto.CreateVotingRequest;
+import requests.CreateVotingRequest;
 import play.Application;
 import play.libs.Json;
 import play.mvc.Http;

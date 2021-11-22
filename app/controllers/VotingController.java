@@ -1,7 +1,7 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import dto.CreateVotingRequest;
+import requests.CreateVotingRequest;
 import play.Logger;
 import play.data.Form;
 import play.data.FormFactory;

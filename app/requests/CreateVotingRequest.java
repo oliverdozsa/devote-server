@@ -1,10 +1,11 @@
-package dto;
+package requests;
 
 import com.typesafe.config.Config;
 import play.data.validation.Constraints;
 import validation.ValidatableWithConfig;
 import validation.ValidateWithConfig;
 
+import javax.validation.Valid;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -41,6 +42,13 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
 
     @Constraints.MinLength(2)
     private String authorizationKeybaseOptions;
+
+    @Constraints.Required
+    @Valid
+    private List<CreatePollRequest> polls;
+
+    @Constraints.Required
+    private Visibility visibility;
 
     public String getNetwork() {
         return network;
@@ -127,7 +135,7 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
         Integer minTimeInterval = config.getInt("devote.vote.related.min.time.interval.sec");
 
         if (isEncryptedNotValid(minTimeInterval)) {
-            return "If encryption is turned on, encrypted until must be at least " +
+            return "If encryption is needed, encrypted until must be at least " +
                     minTimeInterval + " seconds from now!";
         }
 
@@ -160,7 +168,8 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
             return true;
         }
 
-        return authorization == Authorization.KEYBASE && authorizationKeybaseOptions == null;
+        return authorization == Authorization.KEYBASE &&
+                (authorizationKeybaseOptions == null || authorizationKeybaseOptions.length() == 0);
     }
 
     private boolean isStartEndDateNotValid(Integer minTimeIntervalSecs) {
@@ -171,6 +180,22 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
         long gapMillis = Duration.between(startDate, endDate).toMillis();
         long minTimeIntervalMillis = minTimeIntervalSecs * 1000;
         return gapMillis < minTimeIntervalMillis;
+    }
+
+    public List<CreatePollRequest> getPolls() {
+        return polls;
+    }
+
+    public void setPolls(List<CreatePollRequest> polls) {
+        this.polls = polls;
+    }
+
+    public Visibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(Visibility visibility) {
+        this.visibility = visibility;
     }
 
     @Override
@@ -186,6 +211,8 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
                 ", authorization=" + authorization +
                 ", authorizationEmailOptions=" + authorizationEmailOptions +
                 ", authorizationKeybaseOptions='" + authorizationKeybaseOptions + '\'' +
+                ", polls=" + polls +
+                ", visibility=" + visibility +
                 '}';
     }
 
@@ -197,5 +224,11 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
         COOKIE,
         CODE,
         KEYBASE
+    }
+
+    public enum Visibility {
+        PUBLIC,
+        UNLISTED,
+        PRIVATE
     }
 }

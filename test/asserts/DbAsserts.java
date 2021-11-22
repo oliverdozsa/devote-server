@@ -6,7 +6,11 @@ import data.entities.JpaVoting;
 import data.entities.JpaVotingAuthorizationEmail;
 import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
+import data.entities.JpaVotingPoll;
+import data.entities.JpaVotingPollOption;
 import io.ebean.Ebean;
+import requests.CreatePollOptionRequest;
+import requests.CreatePollRequest;
 
 import java.time.Instant;
 import java.util.List;
@@ -67,6 +71,24 @@ public class DbAsserts {
         assertThat(storedEmailAddresses, containsInAnyOrder(emails));
     }
 
+    public static void assertPollSavedInDb(Long votingId, List<CreatePollRequest> expectedPolls) {
+        JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
+
+        List<JpaVotingPoll> savedPolls = voting.getPolls();
+        assertThat(savedPolls, hasSize(expectedPolls.size()));
+
+        expectedPolls.forEach(expectedPoll -> {
+            JpaVotingPoll savedPoll = Ebean.find(JpaVotingPoll.class)
+                    .where()
+                    .eq("question", expectedPoll.getQuestion())
+                    .findOne();
+
+            assertThat(savedPoll, notNullValue());
+            assertThat(savedPoll.getOptions(), hasSize(expectedPoll.getOptions().size()));
+            assertSavedOptionAreTheSame(savedPoll.getOptions(), expectedPoll.getOptions());
+        });
+    }
+
     private static List<JpaChannelAccountProgress> channelProgressesOf(Long votingId) {
         JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
         return voting.getIssuerAccounts().stream()
@@ -91,4 +113,34 @@ public class DbAsserts {
                 .map(v -> v.getEmailAddress())
                 .collect(Collectors.toList());
     }
+
+    private static void assertSavedOptionAreTheSame(List<JpaVotingPollOption> savedOptions, List<CreatePollOptionRequest> expectedOptions) {
+        assertSavedOptionNamesAreTheSame(savedOptions, expectedOptions);
+        assertSavedOptionCodesAreTheSame(savedOptions, expectedOptions);
+    }
+
+    private static void assertSavedOptionNamesAreTheSame(List<JpaVotingPollOption> savedOptions, List<CreatePollOptionRequest> expectedOptions) {
+        List<String> savedOptionNames = savedOptions.stream()
+                .map(o -> o.getName())
+                .collect(Collectors.toList());
+        List<String> expectedOptionNames = expectedOptions.stream()
+                .map(o -> o.getName())
+                .collect(Collectors.toList());
+
+        assertThat(savedOptionNames, hasSize(expectedOptionNames.size()));
+        assertThat(savedOptionNames, containsInAnyOrder(expectedOptionNames.toArray()));
+    }
+
+    private static void assertSavedOptionCodesAreTheSame(List<JpaVotingPollOption> savedOptions, List<CreatePollOptionRequest> expectedOptions) {
+        List<Integer> savedOptionCodes = savedOptions.stream()
+                .map(o -> o.getCode())
+                .collect(Collectors.toList());
+        List<Integer> expectedOptionCodes = expectedOptions.stream()
+                .map(o -> o.getCode())
+                .collect(Collectors.toList());
+
+        assertThat(savedOptionCodes, hasSize(expectedOptionCodes.size()));
+        assertThat(savedOptionCodes, containsInAnyOrder(expectedOptionCodes.toArray()));
+    }
 }
+

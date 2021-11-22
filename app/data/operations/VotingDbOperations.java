@@ -4,7 +4,7 @@ import data.entities.JpaVoting;
 import data.repositories.ChannelProgressRepository;
 import data.repositories.VotingRepository;
 import devote.blockchain.api.DistributionAndBallotAccount;
-import dto.CreateVotingRequest;
+import requests.CreateVotingRequest;
 import executioncontexts.DatabaseExecutionContext;
 import play.Logger;
 

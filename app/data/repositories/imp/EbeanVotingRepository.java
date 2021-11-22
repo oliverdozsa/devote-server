@@ -5,7 +5,7 @@ import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
 import data.repositories.VotingRepository;
 import devote.blockchain.api.DistributionAndBallotAccount;
-import dto.CreateVotingRequest;
+import requests.CreateVotingRequest;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import play.Logger;

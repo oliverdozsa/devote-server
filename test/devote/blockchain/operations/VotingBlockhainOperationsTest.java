@@ -4,7 +4,7 @@ import devote.blockchain.BlockchainFactory;
 import devote.blockchain.Blockchains;
 import devote.blockchain.api.DistributionAndBallotAccount;
 import devote.blockchain.api.IssuerAccount;
-import dto.CreateVotingRequest;
+import requests.CreateVotingRequest;
 import executioncontexts.BlockchainExecutionContext;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;

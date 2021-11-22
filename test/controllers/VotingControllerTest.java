@@ -2,7 +2,7 @@ package controllers;
 
 import clients.VotingTestClient;
 import com.typesafe.config.Config;
-import dto.CreateVotingRequest;
+import requests.CreateVotingRequest;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,8 +27,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static play.mvc.Http.HeaderNames.LOCATION;
-import static play.mvc.Http.Status.CREATED;
-import static play.mvc.Http.Status.OK;
+import static play.mvc.Http.Status.*;
 
 public class VotingControllerTest {
     private final RuleChainForTests ruleChainForTests = new RuleChainForTests();
@@ -46,7 +45,7 @@ public class VotingControllerTest {
     }
 
     @Test
-    public void testCreate() throws IOException, InterruptedException {
+    public void testCreate() throws InterruptedException {
         // Given
         CreateVotingRequest createVotingRequest = createValidVotingRequest();
         createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
@@ -73,16 +72,41 @@ public class VotingControllerTest {
         assertVotingEncryptionSavedInDb(votingId);
         assertVotingStartEndDateSavedInDb(votingId);
         assertAuthorizationEmailsSavedInDb(votingId, "john@mail.com", "doe@where.de", "some@one.com");
+        assertPollSavedInDb(votingId, createVotingRequest.getPolls());
 
         Thread.sleep(30 * 1000);
         assertChannelAccountsCreatedOnBlockchain(votingId);
         assertChannelProgressCompletedFor(votingId);
     }
 
-    private static CreateVotingRequest createValidVotingRequest() throws IOException {
+    @Test
+    public void testBadRequestReturnedWhenCreatingVoteWithInvalidRequest() {
+        // Given
+        CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
+
+        createVotingRequest.setStartDate(Instant.now());
+        createVotingRequest.setEndDate(Instant.now().minus(Duration.ofDays(1)));
+
+        // When
+        Result result = client.createVoting(createVotingRequest);
+
+        // Then
+        assertThat(statusOf(result), equalTo(BAD_REQUEST));
+    }
+
+    private static CreateVotingRequest createValidVotingRequest() {
         InputStream sampleVotingIS = VotingControllerTest.class
                 .getClassLoader().getResourceAsStream("voting-request-base.json");
-        CreateVotingRequest votingRequest = Json.mapper().readValue(sampleVotingIS, CreateVotingRequest.class);
+
+        CreateVotingRequest votingRequest = null;
+        try {
+            votingRequest = Json.mapper().readValue(sampleVotingIS, CreateVotingRequest.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         votingRequest.setNetwork("mockblockchain");
 
         Instant tomorrow = Instant.now().plus(Duration.ofDays(1));

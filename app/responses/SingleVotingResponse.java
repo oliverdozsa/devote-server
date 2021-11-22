@@ -1,4 +1,4 @@
-package dto;
+package responses;
 
 public class SingleVotingResponse {
     private Long id;

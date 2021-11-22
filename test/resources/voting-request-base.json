@@ -17,6 +17,27 @@
           "code": 3
         }
       ]
+    },
+    {
+      "question": "Choose a fruit",
+      "options": [
+        {
+          "name": "apple",
+          "code": 4
+        },
+        {
+          "name": "banana",
+          "code": 5
+        },
+        {
+          "name": "orange",
+          "code": 6
+        },
+        {
+          "name": "plum",
+          "code": 7
+        }
+      ]
     }
   ],
   "authorization": "KEYBASE",

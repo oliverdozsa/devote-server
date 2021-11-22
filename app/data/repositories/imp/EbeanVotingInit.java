@@ -5,7 +5,12 @@ import data.entities.Authorization;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingAuthorizationEmail;
 import data.entities.JpaVotingAuthorizationKeybase;
-import dto.CreateVotingRequest;
+import data.entities.JpaVotingPoll;
+import data.entities.JpaVotingPollOption;
+import data.entities.Visibility;
+import requests.CreatePollOptionRequest;
+import requests.CreatePollRequest;
+import requests.CreateVotingRequest;
 
 import java.time.Instant;
 import java.util.List;
@@ -23,16 +28,14 @@ class EbeanVotingInit {
         setAuthorization(request, voting);
         voting.setStartDate(request.getStartDate());
         voting.setEndDate(request.getEndDate());
+        voting.setVisibility(Visibility.valueOf(request.getVisibility().name()));
+
+        List<JpaVotingPoll> polls = request.getPolls().stream()
+                .map(EbeanVotingInit::toVotingPoll)
+                .collect(Collectors.toList());
+        voting.setPolls(polls);
 
         return voting;
-    }
-
-    private static JpaVoting fromRequest(CreateVotingRequest request) {
-        JpaVoting entity = new JpaVoting();
-        entity.setNetwork(request.getNetwork());
-        entity.setVotesCap(request.getVotesCap());
-
-        return entity;
     }
 
     private static void setEncryption(CreateVotingRequest request, JpaVoting voting) {
@@ -72,5 +75,26 @@ class EbeanVotingInit {
                     return votingAuthorizationEmail;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public static JpaVotingPoll toVotingPoll(CreatePollRequest pollRequest) {
+        JpaVotingPoll votingPoll = new JpaVotingPoll();
+        votingPoll.setQuestion(pollRequest.getQuestion());
+
+        List<JpaVotingPollOption> pollOptions = pollRequest.getOptions().stream()
+                .map(EbeanVotingInit::toVotingPollOption)
+                .collect(Collectors.toList());
+        votingPoll.setOptions(pollOptions);
+
+        return votingPoll;
+    }
+
+    private static JpaVotingPollOption toVotingPollOption(CreatePollOptionRequest pollOptionRequest) {
+        JpaVotingPollOption pollOption = new JpaVotingPollOption();
+
+        pollOption.setCode(pollOptionRequest.getCode());
+        pollOption.setName(pollOptionRequest.getName());
+
+        return pollOption;
     }
 }

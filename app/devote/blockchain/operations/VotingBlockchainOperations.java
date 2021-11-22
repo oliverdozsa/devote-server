@@ -4,7 +4,7 @@ import devote.blockchain.BlockchainFactory;
 import devote.blockchain.Blockchains;
 import devote.blockchain.api.DistributionAndBallotAccount;
 import devote.blockchain.api.IssuerAccount;
-import dto.CreateVotingRequest;
+import requests.CreateVotingRequest;
 import executioncontexts.BlockchainExecutionContext;
 import play.Logger;
 

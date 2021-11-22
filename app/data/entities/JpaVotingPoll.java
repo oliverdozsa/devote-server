@@ -26,7 +26,7 @@ public class JpaVotingPoll {
     @Lob
     private String question;
 
-    @OneToMany(mappedBy = "poll", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "poll", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     private List<JpaVotingPollOption> options;
 
     @ManyToOne(optional = false)

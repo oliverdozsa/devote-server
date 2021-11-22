@@ -2,7 +2,7 @@ package data.repositories;
 
 import data.entities.JpaVoting;
 import devote.blockchain.api.DistributionAndBallotAccount;
-import dto.CreateVotingRequest;
+import requests.CreateVotingRequest;
 
 import java.util.List;
 

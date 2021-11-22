@@ -5,7 +5,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -69,8 +68,12 @@ public class JpaVoting {
     @OneToOne(mappedBy = "voting")
     private JpaVotingAuthorizationKeybase authOptionKeybase;
 
-    @OneToMany(mappedBy = "voting", cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
+    @OneToMany(mappedBy = "voting", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     private List<JpaVotingPoll> polls;
+
+    @Column(name = "visibility", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Visibility visibility;
 
     public Long getId() {
         return id;
@@ -198,5 +201,13 @@ public class JpaVoting {
 
     public void setPolls(List<JpaVotingPoll> polls) {
         this.polls = polls;
+    }
+
+    public Visibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(Visibility visibility) {
+        this.visibility = visibility;
     }
 }

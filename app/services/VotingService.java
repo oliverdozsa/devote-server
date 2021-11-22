@@ -2,10 +2,9 @@ package services;
 
 import data.entities.JpaVoting;
 import data.operations.VotingDbOperations;
-import devote.blockchain.api.DistributionAndBallotAccount;
 import devote.blockchain.operations.VotingBlockchainOperations;
-import dto.CreateVotingRequest;
-import dto.SingleVotingResponse;
+import requests.CreateVotingRequest;
+import responses.SingleVotingResponse;
 import play.Logger;
 
 import javax.inject.Inject;
