@@ -3,7 +3,7 @@ package controllers;
 import com.google.common.base.Function;
 import devote.blockchain.api.BlockchainException;
 import exceptions.BusinessLogicViolationException;
-import exceptions.ForbiddenExeption;
+import exceptions.ForbiddenException;
 import exceptions.NotFoundException;
 import play.Logger;
 import play.data.validation.ValidationError;
@@ -39,7 +39,7 @@ class DefaultExceptionMapper implements Function<Throwable, Result> {
             return notFound();
         }
 
-        if (input instanceof ForbiddenExeption) {
+        if (input instanceof ForbiddenException) {
             logger.warn("Forbidden!", input);
             return forbidden();
         }

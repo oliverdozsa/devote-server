@@ -7,6 +7,7 @@ import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Constraints.Validate
 public class CreatePollRequest implements Constraints.Validatable<String> {
     @Constraints.Required
     @Constraints.MinLength(2)
@@ -35,8 +36,12 @@ public class CreatePollRequest implements Constraints.Validatable<String> {
 
     @Override
     public String validate() {
+        if(areOptionsEmpty()) {
+            return "Options are empty!";
+        }
+
         if (areOptionCodesNotUnique()) {
-            return "Option code are not unique!";
+            return "Option codes are not unique!";
         }
 
         if (areOptionNamesNotUnique()) {
@@ -54,11 +59,15 @@ public class CreatePollRequest implements Constraints.Validatable<String> {
                 '}';
     }
 
-    private boolean areOptionCodesNotUnique() {
+    private boolean areOptionsEmpty() {
         if (options == null || options.isEmpty()) {
             return true;
         }
 
+        return false;
+    }
+
+    private boolean areOptionCodesNotUnique() {
         List<Integer> uniqueCodes = options.stream()
                 .map(CreatePollOptionRequest::getCode)
                 .distinct()
@@ -68,10 +77,6 @@ public class CreatePollRequest implements Constraints.Validatable<String> {
     }
 
     private boolean areOptionNamesNotUnique() {
-        if (options == null || options.isEmpty()) {
-            return true;
-        }
-
         List<String> uniqueNames = options.stream()
                 .map(CreatePollOptionRequest::getName)
                 .distinct()

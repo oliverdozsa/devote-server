@@ -96,6 +96,22 @@ public class VotingControllerTest {
         assertThat(statusOf(result), equalTo(BAD_REQUEST));
     }
 
+    @Test
+    public void testWithInvalidOptions() {
+        // Given
+        CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
+
+        createVotingRequest.getPolls().get(0).getOptions().get(1).setCode(1);
+
+        // When
+        Result result = client.createVoting(createVotingRequest);
+
+        // Then
+        assertThat(statusOf(result), equalTo(BAD_REQUEST));
+    }
+
     private static CreateVotingRequest createValidVotingRequest() {
         InputStream sampleVotingIS = VotingControllerTest.class
                 .getClassLoader().getResourceAsStream("voting-request-base.json");
