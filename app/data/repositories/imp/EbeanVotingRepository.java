@@ -75,6 +75,8 @@ public class EbeanVotingRepository implements VotingRepository {
 
     @Override
     public void distributionAndBallotAccountsCreated(Long id, DistributionAndBallotAccount.TransactionResult transactionResult) {
+        logger.info("distributionAndBallotAccountsCreated(): id = {}", id);
+
         JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
         voting.setDistributionAccountSecret(transactionResult.distributionSecret);
         voting.setBallotAccountSecret(transactionResult.ballotSecret);
@@ -89,6 +91,15 @@ public class EbeanVotingRepository implements VotingRepository {
             votingIssuer.setAssetCode(t);
             ebeanServer.update(votingIssuer);
         });
+    }
+
+    @Override
+    public void votingSavedToIpfs(Long id, String ipfsCid) {
+        logger.info("id = {}, ipfsCid = {}", id, ipfsCid);
+
+        JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
+        voting.setIpfsCid(ipfsCid);
+        ebeanServer.update(voting);
     }
 
     private JpaVotingIssuerAccount fromIssuerAccountSecret(String account) {

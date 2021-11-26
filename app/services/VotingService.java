@@ -3,6 +3,7 @@ package services;
 import data.entities.JpaVoting;
 import data.operations.VotingDbOperations;
 import devote.blockchain.operations.VotingBlockchainOperations;
+import ipfs.VotingIpfsOperations;
 import requests.CreateVotingRequest;
 import responses.SingleVotingResponse;
 import play.Logger;
@@ -14,16 +15,19 @@ import java.util.concurrent.CompletionStage;
 public class VotingService {
     private final VotingDbOperations votingDbOperations;
     private final VotingBlockchainOperations votingBlockchainOperations;
+    private final VotingIpfsOperations votingIpfsOperations;
 
     private static final Logger.ALogger logger = Logger.of(VotingService.class);
 
     @Inject
     public VotingService(
             VotingDbOperations votingDbOperations,
-            VotingBlockchainOperations votingBlockchainOperations
+            VotingBlockchainOperations votingBlockchainOperations,
+            VotingIpfsOperations votingIpfsOperations
     ) {
         this.votingDbOperations = votingDbOperations;
         this.votingBlockchainOperations = votingBlockchainOperations;
+        this.votingIpfsOperations = votingIpfsOperations;
     }
 
     public CompletionStage<Long> create(CreateVotingRequest request) {
@@ -38,6 +42,8 @@ public class VotingService {
                 .thenCompose(v -> votingDbOperations.issuerAccountsCreated(createdVotingData.id, createdVotingData.issuerSecrets))
                 .thenCompose(v -> votingBlockchainOperations.createDistributionAndBallotAccounts(request, createdVotingData.issuerSecrets))
                 .thenCompose(tr -> votingDbOperations.distributionAndBallotAccountsCreated(createdVotingData.id, tr))
+                .thenCompose(v -> votingIpfsOperations.saveVotingToIpfs(createdVotingData.id))
+                .thenCompose(cid -> votingDbOperations.votingSavedToIpfs(createdVotingData.id, cid))
                 .thenApply(v -> createdVotingData.id);
     }
 

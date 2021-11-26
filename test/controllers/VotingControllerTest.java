@@ -19,6 +19,7 @@ import java.util.Arrays;
 
 import static asserts.BlockchainAsserts.*;
 import static asserts.DbAsserts.*;
+import static asserts.IpfsAsserts.assertVotingSavedToIpfs;
 import static extractors.GenericDataFromResult.statusOf;
 import static extractors.VotingResponseFromResult.idOf;
 import static extractors.VotingResponseFromResult.networkOf;
@@ -45,7 +46,7 @@ public class VotingControllerTest {
     }
 
     @Test
-    public void testCreate() throws InterruptedException {
+    public void testCreate() throws InterruptedException, IOException {
         // Given
         CreateVotingRequest createVotingRequest = createValidVotingRequest();
         createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
@@ -73,6 +74,7 @@ public class VotingControllerTest {
         assertVotingStartEndDateSavedInDb(votingId);
         assertAuthorizationEmailsSavedInDb(votingId, "john@mail.com", "doe@where.de", "some@one.com");
         assertPollSavedInDb(votingId, createVotingRequest.getPolls());
+        assertVotingSavedToIpfs(votingId);
 
         Thread.sleep(30 * 1000);
         assertChannelAccountsCreatedOnBlockchain(votingId);

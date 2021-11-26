@@ -28,6 +28,16 @@ public class MockBlockchainDistributionAndBallotAccount implements DistributionA
         return new TransactionResult(Integer.toString(currentDistributionAccountId), Integer.toString(currentBallotAccountId), issuerTokens);
     }
 
+    @Override
+    public String toPublicBallotAccountId(String ballotSecret) {
+        return "MOCK_PUBLIC_BALLOT_" + ballotSecret;
+    }
+
+    @Override
+    public String toPublicDistributionAccountId(String distributionSecret) {
+        return "MOCK_PUBLIC_BALLOT_" + distributionSecret;
+    }
+
     public static boolean isDistributionAccountCreated(String account) {
         int accountValue = Integer.parseInt(account);
         return accountValue <= currentDistributionAccountId;

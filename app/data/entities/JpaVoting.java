@@ -23,6 +23,10 @@ public class JpaVoting {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Column(name = "title")
+    @Lob
+    private String title;
+
     @Column(name = "network", nullable = false)
     private String network;
 
@@ -74,6 +78,9 @@ public class JpaVoting {
     @Column(name = "visibility", nullable = false)
     @Enumerated(EnumType.STRING)
     private Visibility visibility;
+
+    @Column(name = "ipfs_cid")
+    private String ipfsCid;
 
     public Long getId() {
         return id;
@@ -209,5 +216,21 @@ public class JpaVoting {
 
     public void setVisibility(Visibility visibility) {
         this.visibility = visibility;
+    }
+
+    public String getIpfsCid() {
+        return ipfsCid;
+    }
+
+    public void setIpfsCid(String ipfsCid) {
+        this.ipfsCid = ipfsCid;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

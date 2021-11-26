@@ -6,6 +6,8 @@ import java.util.Map;
 
 public interface DistributionAndBallotAccount extends BlockchainOperation {
     TransactionResult create(List<IssuerData> issuerData, Long votesCap);
+    String toPublicBallotAccountId(String ballotSecret);
+    String toPublicDistributionAccountId(String distributionSecret);
 
     class IssuerData {
         public final String voteTokenTitle;

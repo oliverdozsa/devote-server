@@ -28,6 +28,11 @@ public class MockBlockchainIssuerAccount implements IssuerAccount {
         return NUM_OF_ISSUER_ACCOUNTS_TO_CREATE;
     }
 
+    @Override
+    public String toPublicAccountId(String secret) {
+        return "MOCK_ISSUER_" + secret;
+    }
+
     public MockBlockchainConfiguration getConfig() {
         return config;
     }

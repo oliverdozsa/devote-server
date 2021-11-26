@@ -69,5 +69,10 @@ public class BlockchainFactoryTest {
         public int calcNumOfAccountsNeeded(long votesCap) {
             return 0;
         }
+
+        @Override
+        public String toPublicAccountId(String secret) {
+            return null;
+        }
     }
 }

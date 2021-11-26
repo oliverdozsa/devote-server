@@ -21,6 +21,7 @@ class EbeanVotingInit {
         JpaVoting voting = new JpaVoting();
 
         voting.setNetwork(request.getNetwork());
+        voting.setTitle(request.getTitle());
         voting.setVotesCap(request.getVotesCap());
         voting.setCreatedAt(Instant.now());
 

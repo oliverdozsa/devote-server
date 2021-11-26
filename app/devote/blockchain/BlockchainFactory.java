@@ -32,7 +32,7 @@ public class BlockchainFactory {
         return createBlockchainOperation(ChannelAccount.class);
     }
 
-    public DistributionAndBallotAccount createDistributionAndChannelAccount() {
+    public DistributionAndBallotAccount createDistributionAndBallotAccount() {
         return createBlockchainOperation(DistributionAndBallotAccount.class);
     }
 

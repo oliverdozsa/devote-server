@@ -12,4 +12,5 @@ public interface VotingRepository {
     void issuerAccountsCreated(Long id, List<String> accounts);
     void channelAccountCreated(Long id, List<String> accounts);
     void distributionAndBallotAccountsCreated(Long id, DistributionAndBallotAccount.TransactionResult transactionResult);
+    void votingSavedToIpfs(Long id, String ipfsCid);
 }

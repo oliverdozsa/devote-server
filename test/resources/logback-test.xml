@@ -35,6 +35,7 @@
     <logger name="devote" level="INFO"/>
     <logger name="smokes" level="INFO"/>
     <logger name="tasks" level="INFO"/>
+    <logger name="ipfs" level="INFO"/>
 
     <!-- Off these ones as they are annoying, and anyway we manage configuration ourselves -->
     <logger name="com.avaje.ebean.config.PropertyMapLoader" level="OFF"/>

@@ -60,4 +60,12 @@ public class VotingDbOperations {
             votingRepository.distributionAndBallotAccountsCreated(votingId, transactionResult);
         }, dbExecContext);
     }
+
+    public CompletionStage<Void> votingSavedToIpfs(Long votingId, String cid) {
+        return runAsync(() -> {
+            logger.info("votingSavedToIpfs(): votingId = {}, cid = {}", votingId, cid);
+            votingRepository.votingSavedToIpfs(votingId, cid);
+        }, dbExecContext);
+
+    }
 }

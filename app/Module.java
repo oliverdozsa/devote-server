@@ -7,6 +7,7 @@ import data.repositories.imp.EbeanVotingRepository;
 import devote.blockchain.Blockchains;
 import com.google.inject.AbstractModule;
 import formatters.FormattersProvider;
+import ipfs.VotingIpfsOperations;
 import play.data.format.Formatters;
 import services.VotingService;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
@@ -26,6 +27,7 @@ public class Module extends AbstractModule {
 
         bind(VotingDbOperations.class).asEagerSingleton();
         bind(VotingBlockchainOperations.class).asEagerSingleton();
+        bind(VotingIpfsOperations.class).asEagerSingleton();
 
         // Services
         bind(VotingService.class).asEagerSingleton();

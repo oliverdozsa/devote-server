@@ -60,7 +60,7 @@ public class VotingBlockchainOperations {
             logger.info("createDistributionAndBallotAccounts(): request = {}, issuers.size = {}", request, issuers.size());
 
             BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(request.getNetwork());
-            DistributionAndBallotAccount distributionAndBallotAccount = blockchainFactory.createDistributionAndChannelAccount();
+            DistributionAndBallotAccount distributionAndBallotAccount = blockchainFactory.createDistributionAndBallotAccount();
 
             List<DistributionAndBallotAccount.IssuerData> issuerData = issuers.stream()
                     .map(is -> new DistributionAndBallotAccount.IssuerData(generateTokenTitle(request), is))
