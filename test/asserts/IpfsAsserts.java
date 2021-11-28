@@ -28,9 +28,9 @@ public class IpfsAsserts {
         assertThat(content.length, greaterThan(0));
 
         String ipfsVotingJsonStr = new String(content);
-        System.out.println(ipfsVotingJsonStr);
         JsonNode ipfsVotingJson = Json.parse(ipfsVotingJsonStr);
 
-        assertThat(ipfsVotingJson.get("network"), equalTo(voting.getNetwork()));
+        // TODO: more asserts
+        assertThat(ipfsVotingJson.get("network").asText(), equalTo(voting.getNetwork()));
     }
 }

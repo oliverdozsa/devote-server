@@ -9,6 +9,7 @@ import devote.blockchain.api.BlockchainException;
 import executioncontexts.BlockchainExecutionContext;
 import io.ipfs.api.IPFS;
 import io.ipfs.api.MerkleNode;
+import io.ipfs.api.NamedStreamable;
 import io.ipfs.cid.Cid;
 import io.ipfs.multiaddr.MultiAddress;
 import ipfs.data.IpfsVoting;
@@ -60,7 +61,8 @@ public class VotingIpfsOperations {
             String ipfsVotingJsonStr = ipfsVotingJson.toString();
             try {
                 MerkleNode node = ipfs.dag.put("json", ipfsVotingJsonStr.getBytes());
-                Cid cid = Cid.buildV0(node.hash);
+
+                Cid cid = Cid.buildCidV1(Cid.Codec.DagCbor, node.hash.getType(), node.hash.getHash());
                 return cid.toString();
             } catch (IOException e) {
                 throw new BlockchainException("Failed to store voting in IPFS.", e);
