@@ -30,7 +30,7 @@ public class MockBlockchainIssuerAccount implements IssuerAccount {
 
     @Override
     public String toPublicAccountId(String secret) {
-        return "MOCK_ISSUER_" + secret;
+        return "MOCK_ISSUER_PUBLIC_" + secret;
     }
 
     public MockBlockchainConfiguration getConfig() {

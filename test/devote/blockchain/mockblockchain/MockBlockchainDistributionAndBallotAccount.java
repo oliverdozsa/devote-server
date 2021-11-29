@@ -30,12 +30,12 @@ public class MockBlockchainDistributionAndBallotAccount implements DistributionA
 
     @Override
     public String toPublicBallotAccountId(String ballotSecret) {
-        return "MOCK_PUBLIC_BALLOT_" + ballotSecret;
+        return "MOCK_BALLOT_PUBLIC_" + ballotSecret;
     }
 
     @Override
     public String toPublicDistributionAccountId(String distributionSecret) {
-        return "MOCK_PUBLIC_BALLOT_" + distributionSecret;
+        return "MOCK_BALLOT_PUBLIC_" + distributionSecret;
     }
 
     public static boolean isDistributionAccountCreated(String account) {
