@@ -13,7 +13,6 @@ import java.security.Security;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Arrays;
 import java.util.Base64;
 
 // https://www.baeldung.com/java-rsa
@@ -63,16 +62,18 @@ public class RsaCrypto {
             String message = "Hello World!";
             byte[] messageBytes = message.getBytes();
 
-            Cipher encryptCipher = Cipher.getInstance("RSA");
+            Cipher encryptCipher = Cipher.getInstance("RSA/None/OAEPWITHSHA-256ANDMGF1PADDING");
             encryptCipher.init(Cipher.ENCRYPT_MODE, publicKey);
 
             byte[] encryptedMessageBytes = encryptCipher.doFinal(messageBytes);
             System.out.println("Message bytes 1:" + Base64.getEncoder().encodeToString(encryptedMessageBytes));
+            System.out.println("Message bytes 1 size:" + encryptedMessageBytes.length);
 
             encryptCipher = Cipher.getInstance("RSA");
             encryptCipher.init(Cipher.ENCRYPT_MODE, publicKey);
             encryptedMessageBytes = encryptCipher.doFinal(messageBytes);
             System.out.println("Message bytes 2:" + Base64.getEncoder().encodeToString(encryptedMessageBytes));
+            System.out.println("Message bytes 2 size:" + encryptedMessageBytes.length);
 
 
         } catch (Exception e) {
