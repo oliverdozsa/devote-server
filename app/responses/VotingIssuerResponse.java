@@ -1,6 +1,6 @@
-package ipfs.data;
+package responses;
 
-public class IpfsVotingIssuer {
+public class VotingIssuerResponse {
     private String issuerAccountId;
     private String assetCode;
 
@@ -22,7 +22,7 @@ public class IpfsVotingIssuer {
 
     @Override
     public String toString() {
-        return "IpfsVotingIssuer{" +
+        return "VotingIssuerResponse{" +
                 "issuerAccountId='" + issuerAccountId + '\'' +
                 ", assetCode='" + assetCode + '\'' +
                 '}';

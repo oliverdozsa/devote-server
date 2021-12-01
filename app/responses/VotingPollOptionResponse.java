@@ -1,6 +1,6 @@
-package ipfs.data;
+package responses;
 
-public class IpfsPollOption {
+public class VotingPollOptionResponse {
     private String name;
     private Integer code;
 
@@ -22,7 +22,7 @@ public class IpfsPollOption {
 
     @Override
     public String toString() {
-        return "IpfsPollOption{" +
+        return "VotingPollOptionResponse{" +
                 "name='" + name + '\'' +
                 ", code=" + code +
                 '}';

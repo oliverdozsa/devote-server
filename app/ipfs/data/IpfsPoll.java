@@ -21,4 +21,12 @@ public class IpfsPoll {
     public void setPollOptions(List<IpfsPollOption> pollOptions) {
         this.pollOptions = pollOptions;
     }
+
+    @Override
+    public String toString() {
+        return "IpfsPoll{" +
+                "question='" + question + '\'' +
+                ", pollOptions=" + pollOptions +
+                '}';
+    }
 }

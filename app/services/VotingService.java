@@ -2,11 +2,13 @@ package services;
 
 import data.entities.JpaVoting;
 import data.operations.VotingDbOperations;
+import devote.blockchain.Blockchains;
 import devote.blockchain.operations.VotingBlockchainOperations;
 import ipfs.VotingIpfsOperations;
 import requests.CreateVotingRequest;
-import responses.SingleVotingResponse;
+import responses.VotingResponse;
 import play.Logger;
+import responses.VotingResponseFromJpaVoting;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -16,6 +18,7 @@ public class VotingService {
     private final VotingDbOperations votingDbOperations;
     private final VotingBlockchainOperations votingBlockchainOperations;
     private final VotingIpfsOperations votingIpfsOperations;
+    private final VotingResponseFromJpaVoting votingResponseFromJpaVoting;
 
     private static final Logger.ALogger logger = Logger.of(VotingService.class);
 
@@ -23,11 +26,13 @@ public class VotingService {
     public VotingService(
             VotingDbOperations votingDbOperations,
             VotingBlockchainOperations votingBlockchainOperations,
-            VotingIpfsOperations votingIpfsOperations
+            VotingIpfsOperations votingIpfsOperations,
+            Blockchains blockchains
     ) {
         this.votingDbOperations = votingDbOperations;
         this.votingBlockchainOperations = votingBlockchainOperations;
         this.votingIpfsOperations = votingIpfsOperations;
+        votingResponseFromJpaVoting = new VotingResponseFromJpaVoting(blockchains);
     }
 
     public CompletionStage<Long> create(CreateVotingRequest request) {
@@ -47,17 +52,10 @@ public class VotingService {
                 .thenApply(v -> createdVotingData.id);
     }
 
-    public CompletionStage<SingleVotingResponse> single(Long id) {
+    public CompletionStage<VotingResponse> single(Long id) {
         logger.info("single(): id = {}", id);
         return votingDbOperations.single(id)
-                .thenApply(VotingService::toSingleVotingResponse);
-    }
-
-    private static SingleVotingResponse toSingleVotingResponse(JpaVoting entity) {
-        SingleVotingResponse votingResponse = new SingleVotingResponse();
-        votingResponse.setId(entity.getId());
-        votingResponse.setNetwork(entity.getNetwork());
-        return votingResponse;
+                .thenApply(votingResponseFromJpaVoting::convert);
     }
 
     private static class CreatedVotingData {

@@ -44,13 +44,6 @@ public class IpfsVotingFromJpaVoting {
         ipfsVoting.setVisibility(jpaVoting.getVisibility().name());
     }
 
-    private static void setPollData(IpfsVoting ipfsVoting, JpaVoting jpaVoting) {
-        List<IpfsPoll> ipfsPolls = jpaVoting.getPolls().stream()
-                .map(IpfsVotingFromJpaVoting::toIpfsPoll)
-                .collect(Collectors.toList());
-        ipfsVoting.setPolls(ipfsPolls);
-    }
-
     private void setIssuers(IpfsVoting ipfsVoting, JpaVoting jpaVoting) {
         List<IpfsVotingIssuer> ipfsVotingIssuers = jpaVoting.getIssuerAccounts().stream()
                 .map(this::toIpfsVotingIssuer)
@@ -85,6 +78,19 @@ public class IpfsVotingFromJpaVoting {
         ipfsVoting.setBallotAccountId(ballotAccountPublic);
     }
 
+    private static void setAuthOptionKeybase(IpfsVoting ipfsVoting, JpaVoting jpaVoting) {
+        if(jpaVoting.getAuthorization() == Authorization.KEYBASE) {
+            ipfsVoting.setAuthOptionKeybase(jpaVoting.getAuthOptionKeybase().getTeamName());
+        }
+    }
+
+    private static void setPollData(IpfsVoting ipfsVoting, JpaVoting jpaVoting) {
+        List<IpfsPoll> ipfsPolls = jpaVoting.getPolls().stream()
+                .map(IpfsVotingFromJpaVoting::toIpfsPoll)
+                .collect(Collectors.toList());
+        ipfsVoting.setPolls(ipfsPolls);
+    }
+
     private static IpfsPoll toIpfsPoll(JpaVotingPoll jpaVotingPoll) {
         IpfsPoll ipfsPoll = new IpfsPoll();
 
@@ -105,11 +111,5 @@ public class IpfsVotingFromJpaVoting {
         ipfsPollOption.setName(jpaPollOption.getName());
 
         return ipfsPollOption;
-    }
-
-    private static void setAuthOptionKeybase(IpfsVoting ipfsVoting, JpaVoting jpaVoting) {
-        if(jpaVoting.getAuthorization() == Authorization.KEYBASE) {
-            ipfsVoting.setAuthOptionKeybase(jpaVoting.getAuthOptionKeybase().getTeamName());
-        }
     }
 }
