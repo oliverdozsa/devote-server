@@ -49,7 +49,7 @@ public class VotingController extends Controller {
         }
     }
 
-    public CompletionStage<Result> single(Long id) {
+    public CompletionStage<Result> single(String id) {
         logger.info("single(): id = {}", id);
 
         return votingService.single(id)
@@ -57,7 +57,7 @@ public class VotingController extends Controller {
                 .exceptionally(mapExceptionWithUnpack);
     }
 
-    private static Result toCreatedVotingResult(Http.Request request, Long votingId) {
+    private static Result toCreatedVotingResult(Http.Request request, String votingId) {
         String location = routes.VotingController
                 .single(votingId)
                 .absoluteURL(request);

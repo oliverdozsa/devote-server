@@ -35,13 +35,13 @@ public class VotingService {
         votingResponseFromJpaVoting = new VotingResponseFromJpaVoting(blockchains);
     }
 
-    public CompletionStage<Long> create(CreateVotingRequest request) {
+    public CompletionStage<String> create(CreateVotingRequest request) {
         logger.info("create(): request = {}", request);
         CreatedVotingData createdVotingData = new CreatedVotingData();
 
         return votingDbOperations
                 .initialize(request)
-                .thenAccept(id -> createdVotingData.id = id)
+                .thenAccept(createdVotingData::setId)
                 .thenCompose(v -> votingBlockchainOperations.createIssuerAccounts(request))
                 .thenAccept(issuers -> createdVotingData.issuerSecrets = issuers)
                 .thenCompose(v -> votingDbOperations.issuerAccountsCreated(createdVotingData.id, createdVotingData.issuerSecrets))
@@ -49,17 +49,27 @@ public class VotingService {
                 .thenCompose(tr -> votingDbOperations.distributionAndBallotAccountsCreated(createdVotingData.id, tr))
                 .thenCompose(v -> votingIpfsOperations.saveVotingToIpfs(createdVotingData.id))
                 .thenCompose(cid -> votingDbOperations.votingSavedToIpfs(createdVotingData.id, cid))
-                .thenApply(v -> createdVotingData.id);
+                .thenApply(v -> createdVotingData.encodedId);
     }
 
-    public CompletionStage<VotingResponse> single(Long id) {
+    public CompletionStage<VotingResponse> single(String id) {
         logger.info("single(): id = {}", id);
-        return votingDbOperations.single(id)
+
+        Long decodedId = Base62Conversions.decode(id);
+        logger.info("single(): decodedId = " + decodedId);
+
+        return votingDbOperations.single(decodedId)
                 .thenApply(votingResponseFromJpaVoting::convert);
     }
 
     private static class CreatedVotingData {
         public Long id;
         public List<String> issuerSecrets;
+        public String encodedId;
+
+        public void setId(Long id) {
+            this.id = id;
+            encodedId = Base62Conversions.encode(id);
+        }
     }
 }
