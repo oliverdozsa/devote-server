@@ -1,18 +1,15 @@
 package controllers;
 
 import clients.VotingTestClient;
-import com.typesafe.config.Config;
-import requests.CreateVotingRequest;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-import play.libs.Json;
 import play.mvc.Result;
+import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -20,10 +17,11 @@ import java.util.Arrays;
 import static asserts.BlockchainAsserts.*;
 import static asserts.DbAsserts.*;
 import static asserts.IpfsAsserts.assertVotingSavedToIpfs;
+import static controllers.VotingRequestMaker.createValidVotingRequest;
 import static extractors.GenericDataFromResult.statusOf;
 import static extractors.VotingResponseFromResult.idOf;
 import static extractors.VotingResponseFromResult.networkOf;
-import static matchers.ResultHasLocationHeader.hasLocationHeader;
+import static matchers.ResultHasHeader.hasLocationHeader;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
@@ -37,12 +35,10 @@ public class VotingControllerTest {
     public RuleChain chain = ruleChainForTests.getRuleChain();
 
     private VotingTestClient client;
-    private Config config;
 
     @Before
     public void setup() {
         client = new VotingTestClient(ruleChainForTests.getApplication());
-        config = ruleChainForTests.getApplication().config();
     }
 
     @Test
@@ -112,29 +108,5 @@ public class VotingControllerTest {
 
         // Then
         assertThat(statusOf(result), equalTo(BAD_REQUEST));
-    }
-
-    private static CreateVotingRequest createValidVotingRequest() {
-        InputStream sampleVotingIS = VotingControllerTest.class
-                .getClassLoader().getResourceAsStream("voting-request-base.json");
-
-        CreateVotingRequest votingRequest = null;
-        try {
-            votingRequest = Json.mapper().readValue(sampleVotingIS, CreateVotingRequest.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        votingRequest.setNetwork("mockblockchain");
-
-        Instant tomorrow = Instant.now().plus(Duration.ofDays(1));
-        votingRequest.setEncryptedUntil(tomorrow);
-
-        Instant startDate = Instant.now();
-        Instant endDate = Instant.now().plus(Duration.ofDays(1));
-        votingRequest.setStartDate(startDate);
-        votingRequest.setEndDate(endDate);
-
-        return votingRequest;
     }
 }

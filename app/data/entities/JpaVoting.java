@@ -43,6 +43,7 @@ public class JpaVoting {
     private Instant createdAt;
 
     @Column(name = "encryption_key")
+    @Lob
     private String encryptionKey;
 
     @Column(name = "encrypted_until")

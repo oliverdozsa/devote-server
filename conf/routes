@@ -1,2 +1,3 @@
 POST    /voting                   controllers.VotingController.create(request: Request)
 GET     /voting/:id               controllers.VotingController.single(id: String)
+POST    /castvote/init            controllers.CastVoteController.init(request: Request)
