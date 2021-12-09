@@ -9,6 +9,7 @@ import com.google.inject.AbstractModule;
 import formatters.FormattersProvider;
 import ipfs.VotingIpfsOperations;
 import play.data.format.Formatters;
+import services.CastVoteService;
 import services.VotingService;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
 import tasks.channelaccounts.ChannelAccountTasksOrganizer;
@@ -31,6 +32,7 @@ public class Module extends AbstractModule {
 
         // Services
         bind(VotingService.class).asEagerSingleton();
+        bind(CastVoteService.class).asEagerSingleton();
 
         // Tasks
         bind(ChannelAccountTasksOrganizer.class).asEagerSingleton();

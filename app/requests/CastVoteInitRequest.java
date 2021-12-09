@@ -1,6 +1,9 @@
 package requests;
 
+import play.data.validation.Constraints;
+
 public class CastVoteInitRequest {
+    @Constraints.Required
     private String votingId;
 
     public String getVotingId() {
