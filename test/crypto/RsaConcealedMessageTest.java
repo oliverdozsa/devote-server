@@ -16,7 +16,10 @@ import org.bouncycastle.util.io.pem.PemObject;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Scanner;
 
@@ -46,14 +49,14 @@ public class RsaConcealedMessageTest {
             System.out.println("Revealed message is: " + new String(revealedMessageBytes));
             byte[] revealedSignatureBytes = Base64.getDecoder().decode(revealedSignatureBase64);
 
-            PSSSigner signer = new PSSSigner(new RSAEngine(), new SHA256Digest(), 0);
-            signer.init(false, rsaKeyPair.getPublic());
-
-            signer.update(revealedMessageBytes, 0, revealedMessageBytes.length);
-            boolean isVerified = signer.verifySignature(revealedSignatureBytes);
-            System.out.println("Revealed signature is verified on revealed message: " + isVerified);
-
+            RSAEngine rsaEngine = new RSAEngine();
+            rsaEngine.init(false, rsaKeyPair.getPublic());
+            byte[] signatureDecrypted = rsaEngine.processBlock(revealedSignatureBytes, 0, revealedSignatureBytes.length);
+            byte[] messageHashed = MessageDigest.getInstance("SHA-256").digest(revealedMessageBytes);
+            System.out.println("Revealed signature is verified on revealed message: " + Arrays.equals(messageHashed, signatureDecrypted));
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
     }
