@@ -1,5 +1,6 @@
 package crypto;
 
+import exceptions.CryptoException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.Cipher;

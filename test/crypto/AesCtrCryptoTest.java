@@ -1,5 +1,6 @@
 package crypto;
 
+import exceptions.CryptoException;
 import org.junit.Test;
 
 import java.util.Arrays;

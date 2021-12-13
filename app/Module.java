@@ -1,3 +1,4 @@
+import com.google.inject.name.Names;
 import data.repositories.ChannelProgressRepository;
 import data.repositories.imp.EbeanChannelProgressRepository;
 import devote.blockchain.operations.VotingBlockchainOperations;
@@ -8,13 +9,22 @@ import devote.blockchain.Blockchains;
 import com.google.inject.AbstractModule;
 import formatters.FormattersProvider;
 import ipfs.VotingIpfsOperations;
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import play.data.format.Formatters;
-import services.CastVoteService;
+import services.CommissionService;
+import services.EnvelopKeyPairProvider;
 import services.VotingService;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
 import tasks.channelaccounts.ChannelAccountTasksOrganizer;
 
+import java.security.Security;
+
 public class Module extends AbstractModule {
+    static {
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
     @Override
     protected void configure() {
         // Formatters
@@ -26,16 +36,22 @@ public class Module extends AbstractModule {
         bind(VotingRepository.class).to(EbeanVotingRepository.class).asEagerSingleton();
         bind(ChannelProgressRepository.class).to(EbeanChannelProgressRepository.class).asEagerSingleton();
 
+        // Operations
         bind(VotingDbOperations.class).asEagerSingleton();
         bind(VotingBlockchainOperations.class).asEagerSingleton();
         bind(VotingIpfsOperations.class).asEagerSingleton();
 
         // Services
         bind(VotingService.class).asEagerSingleton();
-        bind(CastVoteService.class).asEagerSingleton();
+        bind(CommissionService.class).asEagerSingleton();
 
         // Tasks
         bind(ChannelAccountTasksOrganizer.class).asEagerSingleton();
         bind(ChannelAccountBuilderTaskContext.class).asEagerSingleton();
+
+        // Other
+        bind(AsymmetricCipherKeyPair.class).annotatedWith(Names.named("envelope"))
+                .toProvider(EnvelopKeyPairProvider.class)
+                .asEagerSingleton();
     }
 }

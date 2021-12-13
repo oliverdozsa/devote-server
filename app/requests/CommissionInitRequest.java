@@ -2,7 +2,7 @@ package requests;
 
 import play.data.validation.Constraints;
 
-public class CastVoteInitRequest {
+public class CommissionInitRequest {
     @Constraints.Required
     private String votingId;
 

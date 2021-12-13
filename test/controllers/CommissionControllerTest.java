@@ -1,13 +1,13 @@
 package controllers;
 
-import clients.CastVoteTestClient;
+import clients.CommissionTestClient;
 import clients.VotingTestClient;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import play.mvc.Result;
-import requests.CastVoteInitRequest;
+import requests.CommissionInitRequest;
 import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
 
@@ -22,18 +22,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static play.mvc.Http.HeaderNames.LOCATION;
 import static play.mvc.Http.Status.CREATED;
 
-public class CastVoteControllerTest {
+public class CommissionControllerTest {
     private final RuleChainForTests ruleChainForTests = new RuleChainForTests();
 
     @Rule
     public RuleChain chain = ruleChainForTests.getRuleChain();
 
-    private CastVoteTestClient testClient;
+    private CommissionTestClient testClient;
     private VotingTestClient votingTestClient;
 
     @Before
     public void setup() {
-        testClient = new CastVoteTestClient(ruleChainForTests.getApplication());
+        testClient = new CommissionTestClient(ruleChainForTests.getApplication());
         votingTestClient = new VotingTestClient(ruleChainForTests.getApplication());
     }
 
@@ -41,7 +41,7 @@ public class CastVoteControllerTest {
     public void testInit() {
         // Given
         String votingId = createValidVoting();
-        CastVoteInitRequest initRequest = new CastVoteInitRequest();
+        CommissionInitRequest initRequest = new CommissionInitRequest();
         initRequest.setVotingId(votingId);
 
         // When
