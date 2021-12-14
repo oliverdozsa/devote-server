@@ -14,6 +14,7 @@ public class EnvelopKeyPairProvider implements Provider<AsymmetricCipherKeyPair>
     @Inject
     public EnvelopKeyPairProvider(Config config) {
         password = config.getString("play.http.secret.key");
+        // Used only for blind signature! https://en.wikipedia.org/wiki/Blind_signature#Dangers_of_RSA_blind_signing
         path = config.getString("devote.commission.envelope.rsa.key.file");
     }
 

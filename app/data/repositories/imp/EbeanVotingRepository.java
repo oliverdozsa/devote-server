@@ -41,6 +41,7 @@ public class EbeanVotingRepository implements VotingRepository {
 
     @Override
     public JpaVoting single(Long id) {
+        // TODO: return optional
         logger.info("single(): id = {}", id);
         return ebeanServer.find(JpaVoting.class, id);
     }

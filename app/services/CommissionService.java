@@ -1,10 +1,13 @@
 package services;
 
-import com.typesafe.config.Config;
+import data.entities.JpaCommissionInitSession;
+import data.operations.CommissionDbOperations;
+import exceptions.ForbiddenException;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import play.Logger;
 import requests.CommissionInitRequest;
 import responses.CommissionInitResponse;
+import security.JwtMaker;
 import security.VerifiedJwt;
 
 import javax.inject.Inject;
@@ -12,16 +15,23 @@ import javax.inject.Named;
 import java.util.concurrent.CompletionStage;
 
 import static crypto.RsaKeyUtils.publicKeyToPemString;
-import static java.util.concurrent.CompletableFuture.runAsync;
 
 public class CommissionService {
     private static final Logger.ALogger logger = Logger.of(CommissionService.class);
 
     private final AsymmetricCipherKeyPair envelopeKeyPair;
+    private final CommissionDbOperations commissionDbOperations;
+    private JwtMaker jwtMaker;
 
     @Inject
-    public CommissionService(@Named("envelope") AsymmetricCipherKeyPair envelopeKeyPair) {
+    public CommissionService(
+            @Named("envelope") AsymmetricCipherKeyPair envelopeKeyPair,
+            CommissionDbOperations commissionDbOperations,
+            JwtMaker jwtMaker
+    ) {
         this.envelopeKeyPair = envelopeKeyPair;
+        this.commissionDbOperations = commissionDbOperations;
+        this.jwtMaker = jwtMaker;
     }
 
     public CompletionStage<CommissionInitResponse> init(CommissionInitRequest request, VerifiedJwt jwt) {
@@ -31,29 +41,27 @@ public class CommissionService {
         logger.info("init(): decodedId = " + decodedVotingId);
 
         return checkIfUserIsAuthorizedToInitSession(decodedVotingId, jwt.getUserId())
-                .thenCompose(v -> createSession(decodedVotingId, jwt.getUserId()));
-
-        // TODO: Get voting by id
-        // TODO: Determine user id, and whether user is authorized to vote
-        // TODO: Create session
-        // TODO: Create session token
-        // return null;
+                .thenCompose(v -> commissionDbOperations.createSession(decodedVotingId, jwt.getUserId()))
+                .thenApply(this::toInitResponse);
     }
-
 
     private CompletionStage<Void> checkIfUserIsAuthorizedToInitSession(Long votingId, String userId) {
-        // TODO: Store sessions in DB, and check whether a session exists for the voting and that user
-        //       has not initialized before.
-        // TODO: if not authorized, throw exception (ForbiddenException)
-        return runAsync(() -> {});
+        logger.info("checkIfUserIsAuthorizedToInitSession()");
+        return commissionDbOperations.doesSessionExistForUserInVoting(votingId, userId)
+                .thenAccept(doesExist -> {
+                    if (doesExist) {
+                        throw new ForbiddenException("User " + userId + " has already started a session in voting " + votingId);
+                    }
+                });
     }
 
-    private CompletionStage<CommissionInitResponse> createSession(Long votingId, String userId) {
-        logger.info("createSession(): public: " + publicKeyToPemString(envelopeKeyPair));
+    private CommissionInitResponse toInitResponse(JpaCommissionInitSession entity) {
+        CommissionInitResponse initResponse = new CommissionInitResponse();
 
-        // TODO: Also add session token to response
-        return null;
+        String sessionJwt = jwtMaker.create(entity.getVoting().getId(), entity.getUserId());
+        initResponse.setSessionToken(sessionJwt);
+        initResponse.setPublicKey(publicKeyToPemString(envelopeKeyPair));
+
+        return initResponse;
     }
-
-
 }

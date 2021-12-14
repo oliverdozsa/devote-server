@@ -1,7 +1,11 @@
 package responses;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class CommissionInitResponse {
     private String publicKey;
+
+    @JsonIgnore
     private String sessionToken;
 
     public String getPublicKey() {

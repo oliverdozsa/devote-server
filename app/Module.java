@@ -1,5 +1,8 @@
 import com.google.inject.name.Names;
+import data.operations.CommissionDbOperations;
 import data.repositories.ChannelProgressRepository;
+import data.repositories.CommissionRepository;
+import data.repositories.imp.CommissionRepositoryImp;
 import data.repositories.imp.EbeanChannelProgressRepository;
 import devote.blockchain.operations.VotingBlockchainOperations;
 import data.operations.VotingDbOperations;
@@ -12,6 +15,7 @@ import ipfs.VotingIpfsOperations;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import play.data.format.Formatters;
+import security.JwtMaker;
 import services.CommissionService;
 import services.EnvelopKeyPairProvider;
 import services.VotingService;
@@ -35,9 +39,11 @@ public class Module extends AbstractModule {
         // Data
         bind(VotingRepository.class).to(EbeanVotingRepository.class).asEagerSingleton();
         bind(ChannelProgressRepository.class).to(EbeanChannelProgressRepository.class).asEagerSingleton();
+        bind(CommissionRepository.class).to(CommissionRepositoryImp.class).asEagerSingleton();
 
         // Operations
         bind(VotingDbOperations.class).asEagerSingleton();
+        bind(CommissionDbOperations.class).asEagerSingleton();
         bind(VotingBlockchainOperations.class).asEagerSingleton();
         bind(VotingIpfsOperations.class).asEagerSingleton();
 
@@ -53,5 +59,6 @@ public class Module extends AbstractModule {
         bind(AsymmetricCipherKeyPair.class).annotatedWith(Names.named("envelope"))
                 .toProvider(EnvelopKeyPairProvider.class)
                 .asEagerSingleton();
+        bind(JwtMaker.class).asEagerSingleton();
     }
 }
