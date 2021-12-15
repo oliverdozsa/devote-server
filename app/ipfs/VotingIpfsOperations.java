@@ -1,23 +1,17 @@
 package ipfs;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.typesafe.config.Config;
 import data.entities.JpaVoting;
 import data.operations.VotingDbOperations;
 import devote.blockchain.Blockchains;
-import devote.blockchain.api.BlockchainException;
 import executioncontexts.BlockchainExecutionContext;
-import io.ipfs.api.IPFS;
-import io.ipfs.api.MerkleNode;
-import io.ipfs.cid.Cid;
-import io.ipfs.multiaddr.MultiAddress;
+import ipfs.api.IpfsApi;
 import ipfs.data.IpfsVoting;
 import ipfs.data.IpfsVotingFromJpaVoting;
 import play.Logger;
 import play.libs.Json;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.concurrent.CompletionStage;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
@@ -27,7 +21,7 @@ public class VotingIpfsOperations {
     private final BlockchainExecutionContext executionContext;
     private final IpfsVotingFromJpaVoting ipfsVotingFromJpaVoting;
 
-    private final IPFS ipfs;
+    private final IpfsApi ipfsApi;
 
     private static final Logger.ALogger logger = Logger.of(VotingIpfsOperations.class);
 
@@ -35,13 +29,11 @@ public class VotingIpfsOperations {
     public VotingIpfsOperations(
             VotingDbOperations votingDbOperations,
             BlockchainExecutionContext executionContext,
-            Config config,
-            Blockchains blockchains) {
+            Blockchains blockchains,
+            IpfsApi ipfsApi) {
         this.votingDbOperations = votingDbOperations;
         this.executionContext = executionContext;
-
-        String ipfsNodeAddress = config.getString("devote.ipfs.node.address");
-        ipfs = new IPFS(new MultiAddress(ipfsNodeAddress));
+        this.ipfsApi = ipfsApi;
 
         ipfsVotingFromJpaVoting = new IpfsVotingFromJpaVoting(blockchains);
     }
@@ -57,15 +49,7 @@ public class VotingIpfsOperations {
 
             IpfsVoting ipfsVoting = ipfsVotingFromJpaVoting.convert(voting);
             JsonNode ipfsVotingJson = Json.toJson(ipfsVoting);
-            String ipfsVotingJsonStr = ipfsVotingJson.toString();
-            try {
-                MerkleNode node = ipfs.dag.put("json", ipfsVotingJsonStr.getBytes());
-
-                Cid cid = Cid.buildCidV1(Cid.Codec.DagCbor, node.hash.getType(), node.hash.getHash());
-                return cid.toString();
-            } catch (IOException e) {
-                throw new BlockchainException("Failed to store voting in IPFS.", e);
-            }
+            return ipfsApi.saveJson(ipfsVotingJson);
         }, executionContext);
     }
 }

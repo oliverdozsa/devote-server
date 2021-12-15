@@ -12,6 +12,8 @@ import devote.blockchain.Blockchains;
 import com.google.inject.AbstractModule;
 import formatters.FormattersProvider;
 import ipfs.VotingIpfsOperations;
+import ipfs.api.IpfsApi;
+import ipfs.api.imp.IpfsApiImp;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import play.data.format.Formatters;
@@ -60,5 +62,6 @@ public class Module extends AbstractModule {
                 .toProvider(EnvelopKeyPairProvider.class)
                 .asEagerSingleton();
         bind(JwtCenter.class).asEagerSingleton();
+        bind(IpfsApi.class).to(IpfsApiImp.class).asEagerSingleton();
     }
 }

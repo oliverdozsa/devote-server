@@ -1,0 +1,49 @@
+package ipfs.api.imp;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.typesafe.config.Config;
+import devote.blockchain.api.BlockchainException;
+import io.ipfs.api.IPFS;
+import io.ipfs.api.MerkleNode;
+import io.ipfs.cid.Cid;
+import io.ipfs.multiaddr.MultiAddress;
+import ipfs.api.IpfsApi;
+import play.libs.Json;
+
+import javax.inject.Inject;
+import java.io.IOException;
+
+public class IpfsApiImp implements IpfsApi {
+    private final IPFS ipfs;
+
+    @Inject
+    public IpfsApiImp(Config config) {
+        String ipfsNodeAddress = config.getString("devote.ipfs.node.address");
+        ipfs = new IPFS(new MultiAddress(ipfsNodeAddress));
+    }
+
+    @Override
+    public String saveJson(JsonNode json) {
+        try {
+            String jsonStr = json.toString();
+            MerkleNode node = ipfs.dag.put("json", jsonStr.getBytes());
+            Cid cid = Cid.buildCidV1(Cid.Codec.DagCbor, node.hash.getType(), node.hash.getHash());
+            return cid.toString();
+        } catch (IOException e) {
+            throw new BlockchainException("Failed to store json in IPFS.", e);
+        }
+    }
+
+    @Override
+    public JsonNode retrieveJson(String cidStr) {
+
+        try {
+            Cid cid = Cid.decode(cidStr);
+            byte[] content = ipfs.dag.get(cid);
+            String jsonStr = new String(content);
+            return Json.parse(jsonStr);
+        } catch (IOException e) {
+            throw new BlockchainException("Failed to read json with cid = " + cidStr + " from IPFS.", e);
+        }
+    }
+}

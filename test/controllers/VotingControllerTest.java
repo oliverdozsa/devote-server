@@ -1,10 +1,14 @@
 package controllers;
 
+import asserts.IpfsAsserts;
 import clients.VotingTestClient;
+import ipfs.api.IpfsApi;
+import ipfs.api.imp.MockIpfsApi;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import play.inject.guice.GuiceApplicationBuilder;
 import play.mvc.Result;
 import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
@@ -16,7 +20,6 @@ import java.util.Arrays;
 
 import static asserts.BlockchainAsserts.*;
 import static asserts.DbAsserts.*;
-import static asserts.IpfsAsserts.assertVotingSavedToIpfs;
 import static controllers.VotingRequestMaker.createValidVotingRequest;
 import static extractors.GenericDataFromResult.statusOf;
 import static extractors.VotingResponseFromResult.idOf;
@@ -25,20 +28,31 @@ import static matchers.ResultHasHeader.hasLocationHeader;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
+import static play.inject.Bindings.bind;
 import static play.mvc.Http.HeaderNames.LOCATION;
 import static play.mvc.Http.Status.*;
 
 public class VotingControllerTest {
-    private final RuleChainForTests ruleChainForTests = new RuleChainForTests();
+    private final RuleChainForTests ruleChainForTests;
 
     @Rule
-    public RuleChain chain = ruleChainForTests.getRuleChain();
+    public RuleChain chain;
 
     private VotingTestClient client;
+    private IpfsAsserts ipfsAsserts;
+
+    public VotingControllerTest() {
+        GuiceApplicationBuilder applicationBuilder = new GuiceApplicationBuilder()
+                .overrides(bind(IpfsApi.class).to(MockIpfsApi.class));
+
+        ruleChainForTests = new RuleChainForTests(applicationBuilder);
+        chain = ruleChainForTests.getRuleChain();
+    }
 
     @Before
     public void setup() {
         client = new VotingTestClient(ruleChainForTests.getApplication());
+        ipfsAsserts = new IpfsAsserts(ruleChainForTests.getApplication());
     }
 
     @Test
@@ -70,7 +84,7 @@ public class VotingControllerTest {
         assertVotingStartEndDateSavedInDb(votingId);
         assertAuthorizationEmailsSavedInDb(votingId, "john@mail.com", "doe@where.de", "some@one.com");
         assertPollSavedInDb(votingId, createVotingRequest.getPolls());
-        assertVotingSavedToIpfs(votingId);
+        ipfsAsserts.assertVotingSavedToIpfs(votingId);
 
         Thread.sleep(30 * 1000);
         assertChannelAccountsCreatedOnBlockchain(votingId);
