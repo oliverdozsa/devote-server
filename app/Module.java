@@ -15,7 +15,7 @@ import ipfs.VotingIpfsOperations;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import play.data.format.Formatters;
-import security.JwtMaker;
+import security.JwtCenter;
 import services.CommissionService;
 import services.EnvelopKeyPairProvider;
 import services.VotingService;
@@ -59,6 +59,6 @@ public class Module extends AbstractModule {
         bind(AsymmetricCipherKeyPair.class).annotatedWith(Names.named("envelope"))
                 .toProvider(EnvelopKeyPairProvider.class)
                 .asEagerSingleton();
-        bind(JwtMaker.class).asEagerSingleton();
+        bind(JwtCenter.class).asEagerSingleton();
     }
 }

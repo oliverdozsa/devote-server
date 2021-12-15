@@ -2,6 +2,7 @@ package controllers;
 
 import clients.CommissionTestClient;
 import clients.VotingTestClient;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,13 +15,17 @@ import rules.RuleChainForTests;
 import java.util.Arrays;
 
 import static controllers.VotingRequestMaker.createValidVotingRequest;
+import static extractors.CommissionInitResponseFromResult.publicKeyOf;
+import static extractors.GenericDataFromResult.jsonOf;
 import static extractors.GenericDataFromResult.statusOf;
 import static matchers.ResultHasHeader.hasLocationHeader;
 import static matchers.ResultHasHeader.hasSessionTokenHeader;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static play.mvc.Http.HeaderNames.LOCATION;
 import static play.mvc.Http.Status.CREATED;
+import static play.mvc.Http.Status.OK;
 
 public class CommissionControllerTest {
     private final RuleChainForTests ruleChainForTests = new RuleChainForTests();
@@ -45,12 +50,13 @@ public class CommissionControllerTest {
         initRequest.setVotingId(votingId);
 
         // When
-        Result result = testClient.init(initRequest);
+        Result result = testClient.init(initRequest, "Alice");
 
         // Then
-        assertThat(statusOf(result), equalTo(CREATED));
+        assertThat(statusOf(result), equalTo(OK));
         assertThat(result, hasSessionTokenHeader());
-        // TODO: Other asserts
+
+        assertThat(publicKeyOf(result), notNullValue());
     }
 
     private String createValidVoting() {

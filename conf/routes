@@ -1,3 +1,7 @@
+# Voting administration
 POST    /voting                   controllers.VotingController.create(request: Request)
 GET     /voting/:id               controllers.VotingController.single(id: String)
+
+# Cast vote
++ jwtFilter
 POST    /castvote/init            controllers.CommissionController.init(request: Request)

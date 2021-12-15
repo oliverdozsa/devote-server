@@ -16,7 +16,7 @@ public class CommissionInitRequest {
 
     @Override
     public String toString() {
-        return "CastVoteInitRequest{" +
+        return "CommissionInitRequest{" +
                 "votingId='" + votingId + '\'' +
                 '}';
     }

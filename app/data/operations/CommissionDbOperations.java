@@ -3,6 +3,7 @@ package data.operations;
 import data.entities.JpaCommissionInitSession;
 import data.repositories.CommissionRepository;
 import executioncontexts.DatabaseExecutionContext;
+import play.Logger;
 
 import javax.inject.Inject;
 import java.util.Optional;
@@ -14,6 +15,8 @@ public class CommissionDbOperations {
     private final CommissionRepository commissionRepository;
     private final DatabaseExecutionContext dbExecContext;
 
+    private static final Logger.ALogger logger = Logger.of(CommissionDbOperations.class);
+
     @Inject
     public CommissionDbOperations(CommissionRepository commissionRepository, DatabaseExecutionContext dbExecContext) {
         this.commissionRepository = commissionRepository;
@@ -21,15 +24,17 @@ public class CommissionDbOperations {
     }
 
     public CompletionStage<Boolean> doesSessionExistForUserInVoting(Long votingId, String userId) {
+        logger.info("doesSessionExistForUserInVoting(): votingId = {}, userId = {}", votingId, userId);
         return supplyAsync(() -> {
             Optional<JpaCommissionInitSession> optionalEntity =
-                    commissionRepository.getByVotingAndUserId(votingId, userId);
+                    commissionRepository.getByVotingIdAndUserId(votingId, userId);
             return optionalEntity.isPresent();
         }, dbExecContext);
     }
 
     public CompletionStage<JpaCommissionInitSession> createSession(Long votingId, String userId) {
-        return supplyAsync(() -> commissionRepository.create(votingId, userId), dbExecContext);
+        logger.info("createSession(): votingId = {}, userId = {}", votingId, userId);
+        return supplyAsync(() -> commissionRepository.createSession(votingId, userId), dbExecContext);
     }
 }
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import play.Logger;
 import play.data.Form;
 import play.data.FormFactory;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -53,14 +54,8 @@ public class CommissionController extends Controller {
         }
     }
 
-    public CompletionStage<Result> envelop(Http.Request request) {
-        // TODO: Put a message in a envelope preparing it for signing. This call
-        //       should be used anonymously
-        return null;
-    }
-
     private Result toResult(CommissionInitResponse initResponse) {
-        // TODO
-        return null;
+        Result result = ok(Json.toJson(initResponse));
+        return result.withHeader("SESSION-TOKEN", initResponse.getSessionToken());
     }
 }
