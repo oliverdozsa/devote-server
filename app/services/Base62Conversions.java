@@ -3,8 +3,11 @@ package services;
 import io.seruco.encoding.base62.Base62;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.CompletionStage;
 
-class Base62Conversions {
+import static java.util.concurrent.CompletableFuture.supplyAsync;
+
+public class Base62Conversions {
     private static Base62 base62 = Base62.createInstance();
 
     public static String encode(Long value) {
@@ -32,5 +35,9 @@ class Base62Conversions {
         longBytes.flip();
 
         return longBytes.getLong();
+    }
+
+    public static CompletionStage<Long> decodeAsStage(String value) {
+        return supplyAsync(() -> decode(value));
     }
 }

@@ -1,18 +1,18 @@
 package services;
 
-import data.entities.JpaVoting;
 import data.operations.VotingDbOperations;
 import devote.blockchain.Blockchains;
 import devote.blockchain.operations.VotingBlockchainOperations;
 import ipfs.VotingIpfsOperations;
+import play.Logger;
 import requests.CreateVotingRequest;
 import responses.VotingResponse;
-import play.Logger;
 import responses.VotingResponseFromJpaVoting;
 
 import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
+
 
 public class VotingService {
     private final VotingDbOperations votingDbOperations;
@@ -55,10 +55,8 @@ public class VotingService {
     public CompletionStage<VotingResponse> single(String id) {
         logger.info("single(): id = {}", id);
 
-        Long decodedId = Base62Conversions.decode(id);
-        logger.info("single(): decodedId = " + decodedId);
-
-        return votingDbOperations.single(decodedId)
+        return Base62Conversions.decodeAsStage(id)
+                .thenCompose(votingDbOperations::single)
                 .thenApply(votingResponseFromJpaVoting::convert);
     }
 

@@ -13,7 +13,7 @@ import play.mvc.Result;
 import static play.mvc.Results.*;
 
 
-class DefaultExceptionMapper implements Function<Throwable, Result> {
+public class DefaultExceptionMapper implements Function<Throwable, Result> {
     private Logger.ALogger logger;
 
     public DefaultExceptionMapper(Logger.ALogger logger) {

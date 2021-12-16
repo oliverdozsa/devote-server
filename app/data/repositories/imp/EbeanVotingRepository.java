@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static data.repositories.imp.EbeanRepositoryUtils.assertEntityExists;
 import static data.repositories.imp.EbeanVotingInit.initVotingFrom;
 
 public class EbeanVotingRepository implements VotingRepository {
@@ -41,8 +42,8 @@ public class EbeanVotingRepository implements VotingRepository {
 
     @Override
     public JpaVoting single(Long id) {
-        // TODO: return optional
         logger.info("single(): id = {}", id);
+        assertEntityExists(ebeanServer, JpaVoting.class, id);
         return ebeanServer.find(JpaVoting.class, id);
     }
 

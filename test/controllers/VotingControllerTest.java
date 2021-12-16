@@ -12,6 +12,7 @@ import play.inject.guice.GuiceApplicationBuilder;
 import play.mvc.Result;
 import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
+import services.Base62Conversions;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -124,5 +125,27 @@ public class VotingControllerTest {
         assertThat(statusOf(result), equalTo(BAD_REQUEST));
     }
 
-    // TODO: Test single with non existing ID -> not found expected
+    @Test
+    public void testSingle_NonExistingId() {
+        // Given
+        String nonExistingVotingId = Base62Conversions.encode(42L);
+
+        // When
+        Result result = client.single(nonExistingVotingId);
+
+        // Then
+        assertThat(statusOf(result), equalTo(NOT_FOUND));
+    }
+
+    @Test
+    public void testSingle_IdNotEncodedInBase62() {
+        // Given
+        String wrongEncoding = "+=";
+
+        // When
+        Result result = client.single(wrongEncoding);
+
+        // Then
+        assertThat(statusOf(result), equalTo(BAD_REQUEST));
+    }
 }

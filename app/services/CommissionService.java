@@ -38,25 +38,23 @@ public class CommissionService {
 
     public CompletionStage<CommissionInitResponse> init(CommissionInitRequest request, VerifiedJwt jwt) {
         logger.info("init(): request = {}, userId = {}", request.toString(), jwt.getUserId());
-
-        Long decodedVotingId = Base62Conversions.decode(request.getVotingId());
-        logger.info("init(): decodedId = {}", decodedVotingId);
-
-        return checkIfUserIsAuthorizedToInitSession(decodedVotingId, jwt.getUserId())
-                .thenCompose(v -> commissionDbOperations.createSession(decodedVotingId, jwt.getUserId()))
+        return Base62Conversions.decodeAsStage(request.getVotingId())
+                .thenCompose(decodedVotingId -> checkIfUserIsAuthorizedToInitSession(decodedVotingId, jwt.getUserId()))
+                .thenCompose(votingId -> commissionDbOperations.createSession(votingId, jwt.getUserId()))
                 .thenApply(this::toInitResponse);
     }
 
-    private CompletionStage<Void> checkIfUserIsAuthorizedToInitSession(Long votingId, String userId) {
+    private CompletionStage<Long> checkIfUserIsAuthorizedToInitSession(Long votingId, String userId) {
         logger.info("checkIfUserIsAuthorizedToInitSession(): votingId = {}, userId = {}", votingId, userId);
         return commissionDbOperations.doesSessionExistForUserInVoting(votingId, userId)
-                .thenAccept(doesExist -> {
+                .thenApply(doesExist -> {
                     if (doesExist) {
                         String message = "User " + userId + " has already started a session in voting " + votingId;
                         logger.warn("checkIfUserIsAuthorizedToInitSession(): " + message);
                         throw new ForbiddenException(message);
                     } else {
                         logger.info("checkIfUserIsAuthorizedToInitSession(): User is authorized.");
+                        return votingId;
                     }
                 });
     }
