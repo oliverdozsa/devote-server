@@ -9,12 +9,18 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import play.inject.guice.GuiceApplicationBuilder;
+import play.libs.Json;
+import play.mvc.Http;
 import play.mvc.Result;
 import requests.CommissionInitRequest;
 import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
+import utils.JwtTestUtils;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Date;
 
 import static controllers.VotingRequestMaker.createValidVotingRequest;
 import static extractors.CommissionInitResponseFromResult.publicKeyOf;
@@ -25,9 +31,12 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static play.inject.Bindings.bind;
+import static play.mvc.Http.HeaderNames.CONTENT_TYPE;
 import static play.mvc.Http.HeaderNames.LOCATION;
-import static play.mvc.Http.Status.CREATED;
-import static play.mvc.Http.Status.OK;
+import static play.mvc.Http.Status.*;
+import static play.test.Helpers.POST;
+import static play.test.Helpers.route;
+import static utils.JwtTestUtils.addJwtTokenTo;
 
 public class CommissionControllerTest {
     @Rule
@@ -67,6 +76,49 @@ public class CommissionControllerTest {
         assertThat(result, hasSessionTokenHeader());
 
         assertThat(publicKeyOf(result), notNullValue());
+    }
+
+    @Test
+    public void testJwtNotPresent() {
+        // Given
+        CommissionInitRequest initRequest = new CommissionInitRequest();
+        initRequest.setVotingId("Some Voting");
+
+        Http.RequestBuilder httpRequest = new Http.RequestBuilder()
+                .method(POST)
+                .bodyJson(Json.toJson(initRequest))
+                .header(CONTENT_TYPE, Http.MimeTypes.JSON)
+                .uri(routes.CommissionController.init().url());
+
+        // When
+        Result result = route(ruleChainForTests.getApplication(), httpRequest);
+
+        // Then
+        assertThat(statusOf(result), equalTo(FORBIDDEN));
+    }
+
+    @Test
+    public void testJwtExpired() {
+        // Given
+        CommissionInitRequest initRequest = new CommissionInitRequest();
+        initRequest.setVotingId("Some Voting");
+
+        Http.RequestBuilder httpRequest = new Http.RequestBuilder()
+                .method(POST)
+                .bodyJson(Json.toJson(initRequest))
+                .header(CONTENT_TYPE, Http.MimeTypes.JSON)
+                .uri(routes.CommissionController.init().url());
+
+        JwtTestUtils jwtTestUtils = new JwtTestUtils(ruleChainForTests.getApplication().config());
+        Date expiresAt = Date.from(Instant.now().minus(5, ChronoUnit.SECONDS));
+        String jwt = jwtTestUtils.createToken(expiresAt, "Some user");
+        addJwtTokenTo(httpRequest, jwt);
+
+        // When
+        Result result = route(ruleChainForTests.getApplication(), httpRequest);
+
+        // Then
+        assertThat(statusOf(result), equalTo(FORBIDDEN));
     }
 
     private String createValidVoting() {

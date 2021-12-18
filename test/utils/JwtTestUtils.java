@@ -26,9 +26,14 @@ public class JwtTestUtils {
     }
 
     public String createToken(int expirySeconds, String userId) {
+        Date expiresAt = Date.from(Instant.now().plus(expirySeconds, ChronoUnit.SECONDS));
+        return createToken(expiresAt, userId);
+    }
+
+    public String createToken(Date expiresAt, String userId) {
         String userIdClaim = config.getString("devote.jwt.useridclaim");
 
-        return prepareBuilder(expirySeconds)
+        return prepareBuilder(expiresAt)
                 .withClaim(userIdClaim, userId)
                 .sign(algorithm);
     }
@@ -37,10 +42,10 @@ public class JwtTestUtils {
         httpRequest.header("Authorization", "Bearer " + token);
     }
 
-    private JWTCreator.Builder prepareBuilder(int expirySeconds) {
+    private JWTCreator.Builder prepareBuilder(Date expiresAt) {
         String issuer = config.getString("devote.jwt.issuer");
         return JWT.create()
                 .withIssuer(issuer)
-                .withExpiresAt(Date.from(Instant.now().plus(expirySeconds, ChronoUnit.SECONDS)));
+                .withExpiresAt(expiresAt);
     }
 }
