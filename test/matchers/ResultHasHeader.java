@@ -29,8 +29,4 @@ public class ResultHasHeader extends TypeSafeMatcher<Result> {
     public static ResultHasHeader hasLocationHeader() {
         return new ResultHasHeader("Location");
     }
-
-    public static ResultHasHeader hasSessionTokenHeader() {
-        return new ResultHasHeader("SESSION-TOKEN");
-    }
 }

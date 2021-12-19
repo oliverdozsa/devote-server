@@ -23,13 +23,13 @@ import java.util.Arrays;
 import java.util.Date;
 
 import static controllers.VotingRequestMaker.createValidVotingRequest;
-import static extractors.CommissionInitResponseFromResult.publicKeyOf;
+import static extractors.CommissionResponseFromResult.*;
 import static extractors.GenericDataFromResult.statusOf;
 import static matchers.ResultHasHeader.hasLocationHeader;
-import static matchers.ResultHasHeader.hasSessionTokenHeader;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static play.inject.Bindings.bind;
 import static play.mvc.Http.HeaderNames.CONTENT_TYPE;
 import static play.mvc.Http.HeaderNames.LOCATION;
@@ -73,8 +73,8 @@ public class CommissionControllerTest {
 
         // Then
         assertThat(statusOf(result), equalTo(OK));
-        assertThat(result, hasSessionTokenHeader());
 
+        assertThat(sessionJwtOf(result), notNullValue());
         assertThat(publicKeyOf(result), notNullValue());
     }
 
@@ -121,6 +121,21 @@ public class CommissionControllerTest {
         assertThat(statusOf(result), equalTo(FORBIDDEN));
     }
 
+    @Test
+    public void testSignOnEnvelope() {
+        // Given
+        InitData votingInitData = initVotingFor("Bob");
+        String envelope = createEnvelope(votingInitData.votingId, votingInitData.publicKey);
+
+        // When
+        Result result = testClient.signOnEnvelope(votingInitData.sessionJwt, envelope);
+
+        // Then
+        assertThat(statusOf(result), equalTo(OK));
+        assertThat(envelopeSignatureOf(result), notNullValue());
+        assertThat(envelopeSignatureOf(result).length(), greaterThan(0));
+    }
+
     private String createValidVoting() {
         CreateVotingRequest createVotingRequest = createValidVotingRequest();
         createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
@@ -135,5 +150,36 @@ public class CommissionControllerTest {
 
         return votingId;
         // TODO: some sleep might be needed for channel accounts to be present
+    }
+
+    private InitData initVotingFor(String userId) {
+        // Given
+        String votingId = createValidVoting();
+        CommissionInitRequest initRequest = new CommissionInitRequest();
+        initRequest.setVotingId(votingId);
+
+        // When
+        Result result = testClient.init(initRequest, userId);
+
+        // Then
+        assertThat(statusOf(result), equalTo(OK));
+
+        InitData initData = new InitData();
+        initData.votingId = votingId;
+        initData.publicKey = publicKeyOf(result);
+        initData.sessionJwt = sessionJwtOf(result);
+
+        return initData;
+    }
+
+    private String createEnvelope(String votingId, String publicKey) {
+        // TODO: Create message: publicKey|votingId (concat as bytes)
+        return null;
+    }
+
+    private static class InitData {
+        public String votingId;
+        public String publicKey;
+        public String sessionJwt;
     }
 }

@@ -56,6 +56,6 @@ public class CommissionController extends Controller {
 
     private Result toResult(CommissionInitResponse initResponse) {
         Result result = ok(Json.toJson(initResponse));
-        return result.withHeader("SESSION-TOKEN", initResponse.getSessionToken());
+        return result.withHeader("SESSION-TOKEN", initResponse.getSessionJwt());
     }
 }

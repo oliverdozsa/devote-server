@@ -63,7 +63,7 @@ public class CommissionService {
         CommissionInitResponse initResponse = new CommissionInitResponse();
 
         String sessionJwt = jwtCenter.create(entity.getVoting().getId(), entity.getUserId());
-        initResponse.setSessionToken(sessionJwt);
+        initResponse.setSessionJwt(sessionJwt);
         initResponse.setPublicKey(envelopePublicKeyPem);
 
         return initResponse;

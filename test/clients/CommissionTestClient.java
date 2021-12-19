@@ -1,6 +1,5 @@
 package clients;
 
-import com.typesafe.config.Config;
 import controllers.routes;
 import play.Application;
 import play.libs.Json;
@@ -33,5 +32,10 @@ public class CommissionTestClient extends TestClient {
         addJwtTokenTo(httpRequest, jwt);
 
         return route(application, httpRequest);
+    }
+
+    public Result signOnEnvelope(String sessionJwt, String envelope) {
+        // TODO
+        return null;
     }
 }

@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Scanner;
 
+// TODO: Remove this once envelope signing is complete
 public class RsaConcealedMessageTest {
     public static void main(String[] args) {
         AsymmetricCipherKeyPair rsaKeyPair = generateKeyPair();

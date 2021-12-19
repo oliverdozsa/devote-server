@@ -1,12 +1,9 @@
 package responses;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class CommissionInitResponse {
     private String publicKey;
 
-    @JsonIgnore
-    private String sessionToken;
+    private String sessionJwt;
 
     public String getPublicKey() {
         return publicKey;
@@ -16,19 +13,19 @@ public class CommissionInitResponse {
         this.publicKey = publicKey;
     }
 
-    public String getSessionToken() {
-        return sessionToken;
+    public String getSessionJwt() {
+        return sessionJwt;
     }
 
-    public void setSessionToken(String sessionToken) {
-        this.sessionToken = sessionToken;
+    public void setSessionJwt(String sessionJwt) {
+        this.sessionJwt = sessionJwt;
     }
 
     @Override
     public String toString() {
-        return "CastVoteInitResponse{" +
+        return "CommissionInitResponse{" +
                 "publicKey='" + publicKey + '\'' +
-                ", sessionToken='" + sessionToken + '\'' +
+                ", sessionJwt='" + sessionJwt + '\'' +
                 '}';
     }
 }
