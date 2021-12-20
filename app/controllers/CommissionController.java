@@ -54,6 +54,11 @@ public class CommissionController extends Controller {
         }
     }
 
+    public CompletionStage<Result> signEnvelope(Http.Request request) {
+        // TODO
+        return null;
+    }
+
     private Result toResult(CommissionInitResponse initResponse) {
         Result result = ok(Json.toJson(initResponse));
         return result.withHeader("SESSION-TOKEN", initResponse.getSessionJwt());

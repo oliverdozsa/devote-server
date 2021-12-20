@@ -47,9 +47,13 @@ public class RsaEnvelope {
         }
     }
 
-    // TODO: produce revealed signature too. Revealed signature: RSABlindingEngine blindingEngine = new RSABlindingEngine(); blindingEngine.init(false, blindingParams);
+    public byte[] revealedSignature(byte[] signatureOnEnvelope) {
+        RSABlindingEngine engine = new RSABlindingEngine();
+        engine.init(false, blindingParameters);
+        return engine.processBlock(signatureOnEnvelope, 0, signatureOnEnvelope.length);
+    }
 
-    private static RSAKeyParameters toRsaPublicKey(String pem) {
+    public static RSAKeyParameters toRsaPublicKey(String pem) {
         String replacedPem = pem.replace("-----BEGIN PUBLIC KEY-----", "-----BEGIN PUBLIC KEY-----\n");
         replacedPem = replacedPem.replace("-----END PUBLIC KEY-----", "\n-----END PUBLIC KEY-----");
 

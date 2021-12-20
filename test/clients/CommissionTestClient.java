@@ -1,12 +1,16 @@
 package clients;
 
 import controllers.routes;
+import crypto.RsaEnvelope;
 import play.Application;
 import play.libs.Json;
 import play.mvc.Http;
 import play.mvc.Result;
 import requests.CommissionInitRequest;
+import requests.CommissionSignEnvelopeRequest;
 import utils.JwtTestUtils;
+
+import java.util.Base64;
 
 import static play.mvc.Http.HeaderNames.CONTENT_TYPE;
 import static play.test.Helpers.POST;
@@ -34,8 +38,21 @@ public class CommissionTestClient extends TestClient {
         return route(application, httpRequest);
     }
 
-    public Result signOnEnvelope(String sessionJwt, String envelope) {
-        // TODO
-        return null;
+    public Result signOnEnvelope(String publicKeyPem, String sessionJwt, String message) {
+        RsaEnvelope envelopeCreator = new RsaEnvelope(publicKeyPem);
+        byte[] envelopeAsBytes = envelopeCreator.create(message.getBytes());
+        String envelopeAsString = Base64.getEncoder().encodeToString(envelopeAsBytes);
+
+        CommissionSignEnvelopeRequest signEnvelopeRequest = new CommissionSignEnvelopeRequest();
+        signEnvelopeRequest.setEnvelope(envelopeAsString);
+
+        Http.RequestBuilder httpRequest = new Http.RequestBuilder()
+                .method(POST)
+                .bodyJson(Json.toJson(signEnvelopeRequest))
+                .header(CONTENT_TYPE, Http.MimeTypes.JSON)
+                .uri(routes.CommissionController.signEnvelope().url());
+
+        addJwtTokenTo(httpRequest, sessionJwt);
+        return route(application, httpRequest);
     }
 }

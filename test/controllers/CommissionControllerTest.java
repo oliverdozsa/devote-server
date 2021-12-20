@@ -125,10 +125,10 @@ public class CommissionControllerTest {
     public void testSignOnEnvelope() {
         // Given
         InitData votingInitData = initVotingFor("Bob");
-        String envelope = createEnvelope(votingInitData.votingId, votingInitData.publicKey);
+        String message = createMessage(votingInitData.votingId, votingInitData.publicKey);
 
         // When
-        Result result = testClient.signOnEnvelope(votingInitData.sessionJwt, envelope);
+        Result result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
 
         // Then
         assertThat(statusOf(result), equalTo(OK));
@@ -149,7 +149,6 @@ public class CommissionControllerTest {
         String votingId = locationUrlParts[locationUrlParts.length - 1];
 
         return votingId;
-        // TODO: some sleep might be needed for channel accounts to be present
     }
 
     private InitData initVotingFor(String userId) {
@@ -172,9 +171,8 @@ public class CommissionControllerTest {
         return initData;
     }
 
-    private String createEnvelope(String votingId, String publicKey) {
-        // TODO: Create message: publicKey|votingId (concat as bytes)
-        return null;
+    private String createMessage(String votingId, String publicKey) {
+        return votingId + "|" + publicKey;
     }
 
     private static class InitData {

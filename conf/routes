@@ -5,3 +5,5 @@ GET     /voting/:id               controllers.VotingController.single(id: String
 # Cast vote
 + jwtFilter
 POST    /castvote/init            controllers.CommissionController.init(request: Request)
++ jwtFilter
+POST    /castvote/signEnvelope    controllers.CommissionController.signEnvelope(request: Request)
