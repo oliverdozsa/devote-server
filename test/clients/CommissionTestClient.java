@@ -41,10 +41,10 @@ public class CommissionTestClient extends TestClient {
     public Result signOnEnvelope(String publicKeyPem, String sessionJwt, String message) {
         RsaEnvelope envelopeCreator = new RsaEnvelope(publicKeyPem);
         byte[] envelopeAsBytes = envelopeCreator.create(message.getBytes());
-        String envelopeAsString = Base64.getEncoder().encodeToString(envelopeAsBytes);
+        String envelopeAsBase64 = Base64.getEncoder().encodeToString(envelopeAsBytes);
 
         CommissionSignEnvelopeRequest signEnvelopeRequest = new CommissionSignEnvelopeRequest();
-        signEnvelopeRequest.setEnvelope(envelopeAsString);
+        signEnvelopeRequest.setEnvelopeBase64(envelopeAsBase64);
 
         Http.RequestBuilder httpRequest = new Http.RequestBuilder()
                 .method(POST)

@@ -9,7 +9,9 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import requests.CommissionInitRequest;
+import requests.CommissionSignEnvelopeRequest;
 import responses.CommissionInitResponse;
+import responses.CommissionSignEnvelopeResponse;
 import security.SecurityUtils;
 import security.VerifiedJwt;
 import services.CommissionService;
@@ -55,12 +57,31 @@ public class CommissionController extends Controller {
     }
 
     public CompletionStage<Result> signEnvelope(Http.Request request) {
-        // TODO
-        return null;
+        logger.info("signEnvelope()");
+
+        Form<CommissionSignEnvelopeRequest> signEnvelopeRequestForm = formFactory.form(CommissionSignEnvelopeRequest.class)
+                .bindFromRequest(request);
+
+        if (signEnvelopeRequestForm.hasErrors()) {
+            JsonNode errorJson = signEnvelopeRequestForm.errorsAsJson();
+            logger.warn("signEnvelope(): Form has errors! error json:\n{}", errorJson.toPrettyString());
+
+            return completedFuture(badRequest(errorJson));
+        } else {
+            VerifiedJwt jwt = SecurityUtils.getFromRequest(request);
+
+            return commissionService.signEnvelope(signEnvelopeRequestForm.get(), jwt)
+                    .thenApply(this::toResult)
+                    .exceptionally(mapExceptionWithUnpack);
+        }
     }
 
     private Result toResult(CommissionInitResponse initResponse) {
         Result result = ok(Json.toJson(initResponse));
         return result.withHeader("SESSION-TOKEN", initResponse.getSessionJwt());
+    }
+
+    private Result toResult(CommissionSignEnvelopeResponse signEnvelopeResponse) {
+        return ok(Json.toJson(signEnvelopeResponse));
     }
 }
