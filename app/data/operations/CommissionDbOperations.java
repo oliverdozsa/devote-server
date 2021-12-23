@@ -1,6 +1,6 @@
 package data.operations;
 
-import data.entities.JpaCommissionInitSession;
+import data.entities.JpaCommissionSession;
 import data.repositories.CommissionRepository;
 import executioncontexts.DatabaseExecutionContext;
 import play.Logger;
@@ -26,15 +26,28 @@ public class CommissionDbOperations {
     public CompletionStage<Boolean> doesSessionExistForUserInVoting(Long votingId, String userId) {
         logger.info("doesSessionExistForUserInVoting(): votingId = {}, userId = {}", votingId, userId);
         return supplyAsync(() -> {
-            Optional<JpaCommissionInitSession> optionalEntity =
+            Optional<JpaCommissionSession> optionalEntity =
                     commissionRepository.getByVotingIdAndUserId(votingId, userId);
             return optionalEntity.isPresent();
         }, dbExecContext);
     }
 
-    public CompletionStage<JpaCommissionInitSession> createSession(Long votingId, String userId) {
+    public CompletionStage<JpaCommissionSession> createSession(Long votingId, String userId) {
         logger.info("createSession(): votingId = {}, userId = {}", votingId, userId);
         return supplyAsync(() -> commissionRepository.createSession(votingId, userId), dbExecContext);
+    }
+
+    public CompletionStage<Boolean> hasAlreadySignedAnEnvelope(String userId, Long votingId) {
+        logger.info("hasAlreadySignedAnEnvelope(): userId = {}, votingId = {}", userId, votingId);
+        return supplyAsync(() -> commissionRepository.hasAlreadySignedAnEnvelope(userId, votingId), dbExecContext);
+    }
+
+    public CompletionStage<String> storeEnvelopeSignature(String userId, Long votingId, String signature) {
+        logger.info("storeEnvelopeSignature(): userId = {}, votingId = {}", userId, votingId);
+        return supplyAsync(() -> {
+            commissionRepository.storeEnvelopeSignature(userId, votingId, signature);
+            return signature;
+        }, dbExecContext);
     }
 }
 

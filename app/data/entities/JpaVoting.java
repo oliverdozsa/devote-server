@@ -84,7 +84,7 @@ public class JpaVoting {
     private String ipfsCid;
 
     @OneToMany(mappedBy = "voting", cascade = {CascadeType.REMOVE})
-    private List<JpaCommissionInitSession> initSessions;
+    private List<JpaCommissionSession> initSessions;
 
     public Long getId() {
         return id;
@@ -238,11 +238,11 @@ public class JpaVoting {
         this.title = title;
     }
 
-    public List<JpaCommissionInitSession> getInitSessions() {
+    public List<JpaCommissionSession> getInitSessions() {
         return initSessions;
     }
 
-    public void setInitSessions(List<JpaCommissionInitSession> initSessions) {
+    public void setInitSessions(List<JpaCommissionSession> initSessions) {
         this.initSessions = initSessions;
     }
 }

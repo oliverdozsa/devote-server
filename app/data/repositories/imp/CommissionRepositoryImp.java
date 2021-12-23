@@ -1,6 +1,6 @@
 package data.repositories.imp;
 
-import data.entities.JpaCommissionInitSession;
+import data.entities.JpaCommissionSession;
 import data.entities.JpaVoting;
 import data.repositories.CommissionRepository;
 import io.ebean.Ebean;
@@ -24,10 +24,10 @@ public class CommissionRepositoryImp implements CommissionRepository {
     }
 
     @Override
-    public Optional<JpaCommissionInitSession> getByVotingIdAndUserId(Long votingId, String userId) {
+    public Optional<JpaCommissionSession> getByVotingIdAndUserId(Long votingId, String userId) {
         logger.info("getByVotingAndUserId(): votingId = {}, userId = {}", votingId, userId);
 
-        JpaCommissionInitSession entity = ebeanServer.createQuery(JpaCommissionInitSession.class)
+        JpaCommissionSession entity = ebeanServer.createQuery(JpaCommissionSession.class)
                 .where()
                 .eq("voting.id", votingId)
                 .eq("userId", userId)
@@ -37,17 +37,28 @@ public class CommissionRepositoryImp implements CommissionRepository {
     }
 
     @Override
-    public JpaCommissionInitSession createSession(Long votingId, String userId) {
+    public JpaCommissionSession createSession(Long votingId, String userId) {
         logger.info("createSession(): votingId = {}, userId = {}", votingId, userId);
 
         assertEntityExists(ebeanServer, JpaVoting.class, votingId);
 
-        JpaCommissionInitSession initSession = new JpaCommissionInitSession();
+        JpaCommissionSession initSession = new JpaCommissionSession();
         JpaVoting voting = ebeanServer.find(JpaVoting.class, votingId);
         initSession.setVoting(voting);
         initSession.setUserId(userId);
 
         ebeanServer.save(initSession);
         return initSession;
+    }
+
+    @Override
+    public Boolean hasAlreadySignedAnEnvelope(String userId, Long votingId) {
+        // TODO
+        return null;
+    }
+
+    @Override
+    public void storeEnvelopeSignature(String userId, Long votingId, String signature) {
+        // TODO
     }
 }

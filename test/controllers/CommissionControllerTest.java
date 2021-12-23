@@ -125,7 +125,7 @@ public class CommissionControllerTest {
     public void testSignOnEnvelope() {
         // Given
         InitData votingInitData = initVotingFor("Bob");
-        String message = createMessage(votingInitData.votingId, votingInitData.publicKey);
+        String message = createMessage(votingInitData.votingId, "someAccountId");
 
         // When
         Result result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
@@ -135,6 +135,30 @@ public class CommissionControllerTest {
         assertThat(envelopeSignatureOf(result), notNullValue());
         assertThat(envelopeSignatureOf(result).length(), greaterThan(0));
     }
+
+    @Test
+    public void testDoubleEnvelope() {
+        // Given
+        InitData votingInitData = initVotingFor("Bob");
+        String message = createMessage(votingInitData.votingId, "someAccountId");
+
+        Result result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
+        assertThat(statusOf(result), equalTo(OK));
+        assertThat(envelopeSignatureOf(result), notNullValue());
+        assertThat(envelopeSignatureOf(result).length(), greaterThan(0));
+
+        String newMessage = createMessage(votingInitData.votingId, "anotherAccountId");
+
+        // When
+        Result newResult = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, newMessage);
+
+        // Then
+        assertThat(statusOf(newResult), equalTo(FORBIDDEN));
+    }
+
+    // TODO: test for retrieving envelope signature for user in voting
+
+    // TODO: Create tests for account creation similar to envelope tests.
 
     private String createValidVoting() {
         CreateVotingRequest createVotingRequest = createValidVotingRequest();
@@ -171,8 +195,8 @@ public class CommissionControllerTest {
         return initData;
     }
 
-    private String createMessage(String votingId, String publicKey) {
-        return votingId + "|" + publicKey;
+    private String createMessage(String votingId, String voterPublicAccountId) {
+        return votingId + "|" + voterPublicAccountId;
     }
 
     private static class InitData {

@@ -12,12 +12,12 @@ import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(
-        name = "commission_init_session",
+        name = "commission_session",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"voting_id", "user_id"})
         }
 )
-public class JpaCommissionInitSession {
+public class JpaCommissionSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -29,6 +29,9 @@ public class JpaCommissionInitSession {
 
     @Column(name = "user_id")
     private String userId;
+
+    @Column(name = "envelope_signature")
+    private String envelopeSignature;
 
     public JpaVoting getVoting() {
         return voting;
@@ -44,5 +47,21 @@ public class JpaCommissionInitSession {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getEnvelopeSignature() {
+        return envelopeSignature;
+    }
+
+    public void setEnvelopeSignature(String envelopeSignature) {
+        this.envelopeSignature = envelopeSignature;
     }
 }
