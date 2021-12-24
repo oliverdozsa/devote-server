@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -31,6 +32,7 @@ public class JpaCommissionSession {
     private String userId;
 
     @Column(name = "envelope_signature")
+    @Lob
     private String envelopeSignature;
 
     public JpaVoting getVoting() {

@@ -3,6 +3,7 @@ package data.repositories.imp;
 import data.entities.JpaCommissionSession;
 import data.entities.JpaVoting;
 import data.repositories.CommissionRepository;
+import exceptions.NotFoundException;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import play.Logger;
@@ -53,12 +54,23 @@ public class CommissionRepositoryImp implements CommissionRepository {
 
     @Override
     public Boolean hasAlreadySignedAnEnvelope(String userId, Long votingId) {
-        // TODO
-        return null;
+        JpaCommissionSession commissionSession = find(userId, votingId);
+        return commissionSession.getEnvelopeSignature() != null;
     }
 
     @Override
     public void storeEnvelopeSignature(String userId, Long votingId, String signature) {
-        // TODO
+        JpaCommissionSession commissionSession = find(userId, votingId);
+
+        commissionSession.setEnvelopeSignature(signature);
+        ebeanServer.update(commissionSession);
+    }
+
+    private JpaCommissionSession find(String userId, Long votingId) {
+        return ebeanServer.createQuery(JpaCommissionSession.class)
+                .where()
+                .eq("userId", userId)
+                .eq("voting.id", votingId)
+                .findOne();
     }
 }

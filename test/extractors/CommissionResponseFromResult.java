@@ -17,7 +17,7 @@ public class CommissionResponseFromResult {
     }
 
     public static String envelopeSignatureOf(Result result) {
-        // TODO
-        return null;
+        JsonNode signEnveloperResponse = jsonOf(result);
+        return signEnveloperResponse.get("envelopeSignatureBase64").asText();
     }
 }
