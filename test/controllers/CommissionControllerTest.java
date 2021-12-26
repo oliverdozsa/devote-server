@@ -156,6 +156,44 @@ public class CommissionControllerTest {
         assertThat(statusOf(newResult), equalTo(FORBIDDEN));
     }
 
+    @Test
+    public void testInitFormError() {
+        // Given
+        Http.RequestBuilder httpRequest = new Http.RequestBuilder()
+                .method(POST)
+                .header(CONTENT_TYPE, Http.MimeTypes.JSON)
+                .uri(routes.CommissionController.init().url());
+
+        JwtTestUtils jwtTestUtils = new JwtTestUtils(ruleChainForTests.getApplication().config());
+        String jwt = jwtTestUtils.createToken("Alice");
+        addJwtTokenTo(httpRequest, jwt);
+
+        // When
+        Result result = route(ruleChainForTests.getApplication(), httpRequest);
+
+        // Then
+        assertThat(statusOf(result), equalTo(BAD_REQUEST));
+    }
+
+    @Test
+    public void testSignEnveloperFormError() {
+        // Given
+        Http.RequestBuilder httpRequest = new Http.RequestBuilder()
+                .method(POST)
+                .header(CONTENT_TYPE, Http.MimeTypes.JSON)
+                .uri(routes.CommissionController.signEnvelope().url());
+
+        JwtTestUtils jwtTestUtils = new JwtTestUtils(ruleChainForTests.getApplication().config());
+        String jwt = jwtTestUtils.createToken("Alice");
+        addJwtTokenTo(httpRequest, jwt);
+
+        // When
+        Result result = route(ruleChainForTests.getApplication(), httpRequest);
+
+        // Then
+        assertThat(statusOf(result), equalTo(BAD_REQUEST));
+    }
+
     // TODO: test for retrieving envelope signature for user in voting
 
     // TODO: Create tests for account creation similar to envelope tests.
