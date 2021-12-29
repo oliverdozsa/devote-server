@@ -128,12 +128,12 @@ public class CommissionControllerTest {
         String message = createMessage(votingInitData.votingId, "someAccountId");
 
         // When
-        Result result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
 
         // Then
-        assertThat(statusOf(result), equalTo(OK));
-        assertThat(envelopeSignatureOf(result), notNullValue());
-        assertThat(envelopeSignatureOf(result).length(), greaterThan(0));
+        assertThat(statusOf(result.http), equalTo(OK));
+        assertThat(envelopeSignatureOf(result.http), notNullValue());
+        assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
     }
 
     @Test
@@ -142,18 +142,18 @@ public class CommissionControllerTest {
         InitData votingInitData = initVotingFor("Bob");
         String message = createMessage(votingInitData.votingId, "someAccountId");
 
-        Result result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
-        assertThat(statusOf(result), equalTo(OK));
-        assertThat(envelopeSignatureOf(result), notNullValue());
-        assertThat(envelopeSignatureOf(result).length(), greaterThan(0));
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
+        assertThat(statusOf(result.http), equalTo(OK));
+        assertThat(envelopeSignatureOf(result.http), notNullValue());
+        assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
 
         String newMessage = createMessage(votingInitData.votingId, "anotherAccountId");
 
         // When
-        Result newResult = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, newMessage);
+        CommissionTestClient.SignOnEnvelopeResult newResult = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, newMessage);
 
         // Then
-        assertThat(statusOf(newResult), equalTo(FORBIDDEN));
+        assertThat(statusOf(newResult.http), equalTo(FORBIDDEN));
     }
 
     @Test
@@ -176,7 +176,7 @@ public class CommissionControllerTest {
     }
 
     @Test
-    public void testSignEnveloperFormError() {
+    public void testSignEnvelopeFormError() {
         // Given
         Http.RequestBuilder httpRequest = new Http.RequestBuilder()
                 .method(POST)
@@ -196,7 +196,31 @@ public class CommissionControllerTest {
 
     // TODO: test for retrieving envelope signature for user in voting
 
-    // TODO: Create tests for account creation similar to envelope tests.
+    @Test
+    public void testAccountCreationRequest() {
+        // TODO
+        // Given
+        InitData votingInitData = initVotingFor("Bob");
+        String message = createMessage(votingInitData.votingId, "someAccountId");
+
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
+        assertThat(statusOf(result.http), equalTo(OK));
+        assertThat(envelopeSignatureOf(result.http), notNullValue());
+        assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
+
+        // When
+        // Then
+    }
+
+    @Test
+    public void testDoubleAccountCreationRequest() {
+        // TODO: This should be forbidden. There should be a separate API for getting the public account key
+        //       By presenting the original message and revealed signature.
+        // Given
+        // When
+        // Then
+    }
+
 
     private String createValidVoting() {
         CreateVotingRequest createVotingRequest = createValidVotingRequest();

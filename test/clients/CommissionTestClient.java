@@ -38,9 +38,9 @@ public class CommissionTestClient extends TestClient {
         return route(application, httpRequest);
     }
 
-    public Result signOnEnvelope(String publicKeyPem, String sessionJwt, String message) {
-        RsaEnvelope envelopeCreator = new RsaEnvelope(publicKeyPem);
-        byte[] envelopeAsBytes = envelopeCreator.create(message.getBytes());
+    public SignOnEnvelopeResult signOnEnvelope(String publicKeyPem, String sessionJwt, String message) {
+        RsaEnvelope rsaEnvelope = new RsaEnvelope(publicKeyPem);
+        byte[] envelopeAsBytes = rsaEnvelope.create(message.getBytes());
         String envelopeAsBase64 = Base64.getEncoder().encodeToString(envelopeAsBytes);
 
         CommissionSignEnvelopeRequest signEnvelopeRequest = new CommissionSignEnvelopeRequest();
@@ -53,6 +53,27 @@ public class CommissionTestClient extends TestClient {
                 .uri(routes.CommissionController.signEnvelope().url());
 
         addJwtTokenTo(httpRequest, sessionJwt);
-        return route(application, httpRequest);
+        Result httpResult = route(application, httpRequest);
+        return new SignOnEnvelopeResult(httpResult, rsaEnvelope);
+    }
+
+    public Result requestAccountCreation(String message, String envelopeSignatureBase64, RsaEnvelope rsaEnvelope) {
+        byte[] envelopeSignature = Base64.getDecoder().decode(envelopeSignatureBase64);
+
+        byte[] revealedSignature = rsaEnvelope.revealedSignature(envelopeSignature);
+        String revealedSignatureBase64 = Base64.getEncoder().encodeToString(revealedSignature);
+
+        // TODO
+        return null;
+    }
+
+    public static class SignOnEnvelopeResult {
+        public Result http;
+        public RsaEnvelope envelope;
+
+        public SignOnEnvelopeResult(Result result, RsaEnvelope envelope) {
+            this.http = result;
+            this.envelope = envelope;
+        }
     }
 }
