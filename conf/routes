@@ -7,3 +7,4 @@ GET     /voting/:id               controllers.VotingController.single(id: String
 POST    /castvote/init            controllers.CommissionController.init(request: Request)
 + jwtFilter
 POST    /castvote/signEnvelope    controllers.CommissionController.signEnvelope(request: Request)
+POST    /castvote/createAccount   controllers.CommissionController.createAccount(request: Request)

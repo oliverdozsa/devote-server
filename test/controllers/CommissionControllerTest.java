@@ -209,7 +209,12 @@ public class CommissionControllerTest {
         assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
 
         // When
+        String envelopeSignatureBase64 = envelopeSignatureOf(result.http);
+        Result accountCreationRequestResult = testClient.requestAccountCreation(message, envelopeSignatureBase64, result.envelope);
+
         // Then
+        assertThat(statusOf(accountCreationRequestResult), equalTo(OK));
+        // TODO: more asserts
     }
 
     @Test

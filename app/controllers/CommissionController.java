@@ -76,6 +76,12 @@ public class CommissionController extends Controller {
         }
     }
 
+    public CompletionStage<Result> createAccount(Http.Request request) {
+        logger.info("createAccount()");
+        // TODO
+        return completedFuture(notFound());
+    }
+
     private Result toResult(CommissionInitResponse initResponse) {
         Result result = ok(Json.toJson(initResponse));
         return result.withHeader("SESSION-TOKEN", initResponse.getSessionJwt());

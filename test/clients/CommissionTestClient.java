@@ -6,6 +6,7 @@ import play.Application;
 import play.libs.Json;
 import play.mvc.Http;
 import play.mvc.Result;
+import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
 import utils.JwtTestUtils;
@@ -63,8 +64,17 @@ public class CommissionTestClient extends TestClient {
         byte[] revealedSignature = rsaEnvelope.revealedSignature(envelopeSignature);
         String revealedSignatureBase64 = Base64.getEncoder().encodeToString(revealedSignature);
 
-        // TODO
-        return null;
+        CommissionAccountCreationRequest accountCreationRequest = new CommissionAccountCreationRequest();
+        accountCreationRequest.setMessage(message);
+        accountCreationRequest.setRevealedSignatureBase64(revealedSignatureBase64);
+
+        Http.RequestBuilder httpRequest = new Http.RequestBuilder()
+                .method(POST)
+                .bodyJson(Json.toJson(accountCreationRequest))
+                .header(CONTENT_TYPE, Http.MimeTypes.JSON)
+                .uri(routes.CommissionController.createAccount().url());
+
+        return route(application, httpRequest);
     }
 
     public static class SignOnEnvelopeResult {
