@@ -20,4 +20,9 @@ public class CommissionResponseFromResult {
         JsonNode signEnveloperResponse = jsonOf(result);
         return signEnveloperResponse.get("envelopeSignatureBase64").asText();
     }
+
+    public static String accountCreationPayloadOf(Result result) {
+        JsonNode accountCreationResponse = jsonOf(result);
+        return accountCreationResponse.get("payload").asText();
+    }
 }

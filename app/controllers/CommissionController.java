@@ -8,8 +8,10 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
+import responses.CommissionAccountCreationResponse;
 import responses.CommissionInitResponse;
 import responses.CommissionSignEnvelopeResponse;
 import security.SecurityUtils;
@@ -78,8 +80,20 @@ public class CommissionController extends Controller {
 
     public CompletionStage<Result> createAccount(Http.Request request) {
         logger.info("createAccount()");
-        // TODO
-        return completedFuture(notFound());
+
+        Form<CommissionAccountCreationRequest> accountCreationRequestForm = formFactory
+                .form(CommissionAccountCreationRequest.class).bindFromRequest(request);
+
+        if (accountCreationRequestForm.hasErrors()) {
+            JsonNode errorJson = accountCreationRequestForm.errorsAsJson();
+            logger.warn("createAccount(): Form has errors! error json:\n{}", errorJson.toPrettyString());
+
+            return completedFuture(badRequest(errorJson));
+        } else {
+            CommissionAccountCreationRequest accountCreationRequest = accountCreationRequestForm.get();
+            return commissionService.createAccount(accountCreationRequest)
+                    .thenApply(this::toResult);
+        }
     }
 
     private Result toResult(CommissionInitResponse initResponse) {
@@ -89,5 +103,9 @@ public class CommissionController extends Controller {
 
     private Result toResult(CommissionSignEnvelopeResponse signEnvelopeResponse) {
         return ok(Json.toJson(signEnvelopeResponse));
+    }
+
+    private Result toResult(CommissionAccountCreationResponse accountCreationResponse) {
+        return ok(Json.toJson(accountCreationResponse));
     }
 }

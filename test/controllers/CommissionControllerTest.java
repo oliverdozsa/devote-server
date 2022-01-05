@@ -26,10 +26,10 @@ import static controllers.VotingRequestMaker.createValidVotingRequest;
 import static extractors.CommissionResponseFromResult.*;
 import static extractors.GenericDataFromResult.statusOf;
 import static matchers.ResultHasHeader.hasLocationHeader;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.isEmptyString;
 import static play.inject.Bindings.bind;
 import static play.mvc.Http.HeaderNames.CONTENT_TYPE;
 import static play.mvc.Http.HeaderNames.LOCATION;
@@ -214,7 +214,8 @@ public class CommissionControllerTest {
 
         // Then
         assertThat(statusOf(accountCreationRequestResult), equalTo(OK));
-        // TODO: more asserts
+        assertThat(accountCreationPayloadOf(accountCreationRequestResult), notNullValue());
+        assertThat(accountCreationPayloadOf(accountCreationRequestResult), not(isEmptyString()));
     }
 
     @Test

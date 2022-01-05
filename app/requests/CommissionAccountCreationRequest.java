@@ -19,4 +19,12 @@ public class CommissionAccountCreationRequest {
     public void setRevealedSignatureBase64(String revealedSignatureBase64) {
         this.revealedSignatureBase64 = revealedSignatureBase64;
     }
+
+    @Override
+    public String toString() {
+        return "CommissionAccountCreationRequest{" +
+                "message='" + message + '\'' +
+                ", revealedSignatureBase64='" + revealedSignatureBase64 + '\'' +
+                '}';
+    }
 }
