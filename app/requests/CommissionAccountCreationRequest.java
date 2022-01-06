@@ -1,6 +1,9 @@
 package requests;
 
 public class CommissionAccountCreationRequest {
+    // TODO: Validation:
+    //         - message: should be non-empty string containing |
+    //         - revealedSignatureBase64: should be non-empty string
     private String message;
     private String revealedSignatureBase64;
 
@@ -23,8 +26,8 @@ public class CommissionAccountCreationRequest {
     @Override
     public String toString() {
         return "CommissionAccountCreationRequest{" +
-                "message='" + message + '\'' +
-                ", revealedSignatureBase64='" + revealedSignatureBase64 + '\'' +
+                "message='" + message.substring(0, 10) + "...'" +
+                ", revealedSignatureBase64 length='" + revealedSignatureBase64.substring(0, 10) + "...'" +
                 '}';
     }
 }

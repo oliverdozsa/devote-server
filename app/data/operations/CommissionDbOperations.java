@@ -1,6 +1,7 @@
 package data.operations;
 
 import data.entities.JpaCommissionSession;
+import data.entities.JpaVotingChannelAccount;
 import data.repositories.CommissionRepository;
 import executioncontexts.DatabaseExecutionContext;
 import play.Logger;
@@ -48,6 +49,11 @@ public class CommissionDbOperations {
             commissionRepository.storeEnvelopeSignature(userId, votingId, signature);
             return signature;
         }, dbExecContext);
+    }
+
+    public CompletionStage<JpaVotingChannelAccount> consumeOneChannel(Long votingId) {
+        // TODO
+        return null;
     }
 }
 
