@@ -2,6 +2,7 @@ package data.entities;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -59,9 +60,17 @@ public class JpaVoting {
     @Lob
     private String distributionAccountSecret;
 
+    @Column(name = "distribution_account_public")
+    @Lob
+    private String distributionAccountPublic;
+
     @Column(name = "ballot_account_secret")
     @Lob
     private String ballotAccountSecret;
+
+    @Column(name = "ballot_account_public")
+    @Lob
+    private String ballotAccountPublic;
 
     @Column(name = "authorization", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -244,5 +253,21 @@ public class JpaVoting {
 
     public void setInitSessions(List<JpaCommissionSession> initSessions) {
         this.initSessions = initSessions;
+    }
+
+    public String getDistributionAccountPublic() {
+        return distributionAccountPublic;
+    }
+
+    public void setDistributionAccountPublic(String distributionAccountPublic) {
+        this.distributionAccountPublic = distributionAccountPublic;
+    }
+
+    public String getBallotAccountPublic() {
+        return ballotAccountPublic;
+    }
+
+    public void setBallotAccountPublic(String ballotAccountPublic) {
+        this.ballotAccountPublic = ballotAccountPublic;
     }
 }

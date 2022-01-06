@@ -6,27 +6,25 @@ import java.util.Map;
 
 public interface DistributionAndBallotAccount extends BlockchainOperation {
     TransactionResult create(List<IssuerData> issuerData, Long votesCap);
-    String toPublicBallotAccountId(String ballotSecret);
-    String toPublicDistributionAccountId(String distributionSecret);
 
     class IssuerData {
         public final String voteTokenTitle;
-        public final String issuerSecret;
+        public final KeyPair issuerKeyPair;
 
-        public IssuerData(String voteTokenTitle, String issuerSecret) {
+        public IssuerData(String voteTokenTitle, KeyPair issuerKeyPair) {
             this.voteTokenTitle = voteTokenTitle;
-            this.issuerSecret = issuerSecret;
+            this.issuerKeyPair = issuerKeyPair;
         }
     }
 
     class TransactionResult {
-        public final String distributionSecret;
-        public final String ballotSecret;
+        public final KeyPair distribution;
+        public final KeyPair ballot;
         public final Map<String, String> issuerTokens;
 
-        public TransactionResult(String distributionSecret, String ballotSecret, Map<String, String> issuerTokens) {
-            this.distributionSecret = distributionSecret;
-            this.ballotSecret = ballotSecret;
+        public TransactionResult(KeyPair distribution, KeyPair ballot, Map<String, String> issuerTokens) {
+            this.distribution = distribution;
+            this.ballot = ballot;
             this.issuerTokens = issuerTokens;
         }
     }

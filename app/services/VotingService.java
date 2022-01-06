@@ -1,7 +1,7 @@
 package services;
 
 import data.operations.VotingDbOperations;
-import devote.blockchain.Blockchains;
+import devote.blockchain.api.KeyPair;
 import devote.blockchain.operations.VotingBlockchainOperations;
 import ipfs.VotingIpfsOperations;
 import play.Logger;
@@ -26,13 +26,12 @@ public class VotingService {
     public VotingService(
             VotingDbOperations votingDbOperations,
             VotingBlockchainOperations votingBlockchainOperations,
-            VotingIpfsOperations votingIpfsOperations,
-            Blockchains blockchains
+            VotingIpfsOperations votingIpfsOperations
     ) {
         this.votingDbOperations = votingDbOperations;
         this.votingBlockchainOperations = votingBlockchainOperations;
         this.votingIpfsOperations = votingIpfsOperations;
-        votingResponseFromJpaVoting = new VotingResponseFromJpaVoting(blockchains);
+        votingResponseFromJpaVoting = new VotingResponseFromJpaVoting();
     }
 
     public CompletionStage<String> create(CreateVotingRequest request) {
@@ -43,9 +42,9 @@ public class VotingService {
                 .initialize(request)
                 .thenAccept(createdVotingData::setId)
                 .thenCompose(v -> votingBlockchainOperations.createIssuerAccounts(request))
-                .thenAccept(issuers -> createdVotingData.issuerSecrets = issuers)
-                .thenCompose(v -> votingDbOperations.issuerAccountsCreated(createdVotingData.id, createdVotingData.issuerSecrets))
-                .thenCompose(v -> votingBlockchainOperations.createDistributionAndBallotAccounts(request, createdVotingData.issuerSecrets))
+                .thenAccept(issuerKeyPairs -> createdVotingData.issuerKeyPairs = issuerKeyPairs)
+                .thenCompose(v -> votingDbOperations.issuerAccountsCreated(createdVotingData.id, createdVotingData.issuerKeyPairs))
+                .thenCompose(v -> votingBlockchainOperations.createDistributionAndBallotAccounts(request, createdVotingData.issuerKeyPairs))
                 .thenCompose(tr -> votingDbOperations.distributionAndBallotAccountsCreated(createdVotingData.id, tr))
                 .thenCompose(v -> votingIpfsOperations.saveVotingToIpfs(createdVotingData.id))
                 .thenCompose(cid -> votingDbOperations.votingSavedToIpfs(createdVotingData.id, cid))
@@ -62,7 +61,7 @@ public class VotingService {
 
     private static class CreatedVotingData {
         public Long id;
-        public List<String> issuerSecrets;
+        public List<KeyPair> issuerKeyPairs;
         public String encodedId;
 
         public void setId(Long id) {

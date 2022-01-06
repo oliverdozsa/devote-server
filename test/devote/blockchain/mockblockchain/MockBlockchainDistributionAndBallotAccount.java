@@ -2,6 +2,7 @@ package devote.blockchain.mockblockchain;
 
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.DistributionAndBallotAccount;
+import devote.blockchain.api.KeyPair;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,21 +22,17 @@ public class MockBlockchainDistributionAndBallotAccount implements DistributionA
         currentBallotAccountId++;
 
         Map<String, String> issuerTokens = new HashMap<>();
-        for(IssuerData issuerD: issuerData) {
-            issuerTokens.put(issuerD.issuerSecret, issuerD.voteTokenTitle);
+        for (IssuerData issuerD : issuerData) {
+            issuerTokens.put(issuerD.issuerKeyPair.secretKey, issuerD.voteTokenTitle);
         }
 
-        return new TransactionResult(Integer.toString(currentDistributionAccountId), Integer.toString(currentBallotAccountId), issuerTokens);
-    }
+        String currentDistributionAccountIdAsString = Integer.toString(currentDistributionAccountId);
+        String currentBallotAccountIdAsString = Integer.toString(currentBallotAccountId);
 
-    @Override
-    public String toPublicBallotAccountId(String ballotSecret) {
-        return "MOCK_BALLOT_PUBLIC_" + ballotSecret;
-    }
+        KeyPair distributionKeyPair = new KeyPair(currentDistributionAccountIdAsString, currentDistributionAccountIdAsString);
+        KeyPair ballotKeyPair = new KeyPair(currentBallotAccountIdAsString, currentBallotAccountIdAsString);
 
-    @Override
-    public String toPublicDistributionAccountId(String distributionSecret) {
-        return "MOCK_BALLOT_PUBLIC_" + distributionSecret;
+        return new TransactionResult(distributionKeyPair, ballotKeyPair, issuerTokens);
     }
 
     public static boolean isDistributionAccountCreated(String account) {

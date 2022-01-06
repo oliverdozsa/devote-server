@@ -3,7 +3,6 @@ package ipfs;
 import com.fasterxml.jackson.databind.JsonNode;
 import data.entities.JpaVoting;
 import data.operations.VotingDbOperations;
-import devote.blockchain.Blockchains;
 import executioncontexts.BlockchainExecutionContext;
 import ipfs.api.IpfsApi;
 import ipfs.data.IpfsVoting;
@@ -29,13 +28,12 @@ public class VotingIpfsOperations {
     public VotingIpfsOperations(
             VotingDbOperations votingDbOperations,
             BlockchainExecutionContext executionContext,
-            Blockchains blockchains,
             IpfsApi ipfsApi) {
         this.votingDbOperations = votingDbOperations;
         this.executionContext = executionContext;
         this.ipfsApi = ipfsApi;
 
-        ipfsVotingFromJpaVoting = new IpfsVotingFromJpaVoting(blockchains);
+        ipfsVotingFromJpaVoting = new IpfsVotingFromJpaVoting();
     }
 
     public CompletionStage<String> saveVotingToIpfs(Long votingId) {

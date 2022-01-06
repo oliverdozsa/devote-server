@@ -4,6 +4,7 @@ import data.entities.JpaChannelAccountProgress;
 import data.entities.JpaVotingIssuerAccount;
 import devote.blockchain.BlockchainFactory;
 import devote.blockchain.api.ChannelAccount;
+import devote.blockchain.api.KeyPair;
 import play.Logger;
 
 import java.util.ArrayList;
@@ -31,11 +32,11 @@ public class ChannelAccountBuilderTask implements Runnable {
             return;
         }
 
-        List<String> channelAccountSecrets = createChannelAccounts(channelProgress);
-        channelAccountsCreated(channelProgress, channelAccountSecrets);
+        List<KeyPair> channelAccountKeyPairs = createChannelAccounts(channelProgress);
+        channelAccountsCreated(channelProgress, channelAccountKeyPairs);
     }
 
-    private List<String> createChannelAccounts(JpaChannelAccountProgress channelProgress) {
+    private List<KeyPair> createChannelAccounts(JpaChannelAccountProgress channelProgress) {
         JpaVotingIssuerAccount issuer = channelProgress.getIssuer();
         ChannelAccount channelAccount = getChannelAccount(issuer);
 
@@ -46,23 +47,23 @@ public class ChannelAccountBuilderTask implements Runnable {
         logger.info("[CHANNEL-TASK-{}]: createChannelAccounts(): about to create {} channel accounts on blockchain for progress {}",
                 taskId, numOfAccountsToCreateInOneBatch, channelProgress.getId());
 
-        List<String> channelAccountSecrets = new ArrayList<>();
+        List<KeyPair> channelAccountKeyPairs = new ArrayList<>();
         for (int i = 0; i < numOfAccountsToCreateInOneBatch; i++) {
-            String accountSecret = channelAccount.create(votesCap, issuer.getAccountSecret());
-            channelAccountSecrets.add(accountSecret);
+            KeyPair accountKeyPair = channelAccount.create(votesCap, issuer.getAccountSecret());
+            channelAccountKeyPairs.add(accountKeyPair);
         }
 
         logger.info("[CHANNEL-TASK-{}]: createChannelAccounts(): successfully created {} channel accounts on blockchain",
-                taskId, channelAccountSecrets.size());
+                taskId, channelAccountKeyPairs.size());
 
-        return channelAccountSecrets;
+        return channelAccountKeyPairs;
     }
 
-    private void channelAccountsCreated(JpaChannelAccountProgress channelProgress, List<String> channelSecrets) {
+    private void channelAccountsCreated(JpaChannelAccountProgress channelProgress, List<KeyPair> channelKeyPairs) {
         Long votingId = channelProgress.getIssuer().getVoting().getId();
 
-        context.votingRepository.channelAccountCreated(votingId, channelSecrets);
-        context.channelProgressRepository.channelAccountsCreated(channelProgress.getId(), channelSecrets.size());
+        context.votingRepository.channelAccountCreated(votingId, channelKeyPairs);
+        context.channelProgressRepository.channelAccountsCreated(channelProgress.getId(), channelKeyPairs.size());
     }
 
     private ChannelAccount getChannelAccount(JpaVotingIssuerAccount issuer) {

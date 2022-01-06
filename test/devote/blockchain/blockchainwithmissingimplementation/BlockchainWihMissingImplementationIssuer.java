@@ -2,6 +2,7 @@ package devote.blockchain.blockchainwithmissingimplementation;
 
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.IssuerAccount;
+import devote.blockchain.api.KeyPair;
 
 public class BlockchainWihMissingImplementationIssuer implements IssuerAccount {
     @Override
@@ -10,17 +11,12 @@ public class BlockchainWihMissingImplementationIssuer implements IssuerAccount {
     }
 
     @Override
-    public String create(long votesCap) {
-        return "42";
+    public KeyPair create(long votesCap) {
+        return new KeyPair("42", "84");
     }
 
     @Override
     public int calcNumOfAccountsNeeded(long votesCap) {
         return 0;
-    }
-
-    @Override
-    public String toPublicAccountId(String secret) {
-        return "";
     }
 }

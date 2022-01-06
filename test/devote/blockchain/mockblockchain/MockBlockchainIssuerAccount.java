@@ -2,6 +2,7 @@ package devote.blockchain.mockblockchain;
 
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.IssuerAccount;
+import devote.blockchain.api.KeyPair;
 
 public class MockBlockchainIssuerAccount implements IssuerAccount {
     public static final int NUM_OF_ISSUER_ACCOUNTS_TO_CREATE = 4;
@@ -18,19 +19,15 @@ public class MockBlockchainIssuerAccount implements IssuerAccount {
     }
 
     @Override
-    public String create(long votesCap) {
+    public KeyPair create(long votesCap) {
         currentIssuerAccountId++;
-        return Integer.toString(currentIssuerAccountId);
+        String currentIssuerAccountIdAsString = Integer.toString(currentIssuerAccountId);
+        return new KeyPair(currentIssuerAccountIdAsString, currentIssuerAccountIdAsString);
     }
 
     @Override
     public int calcNumOfAccountsNeeded(long votesCap) {
         return NUM_OF_ISSUER_ACCOUNTS_TO_CREATE;
-    }
-
-    @Override
-    public String toPublicAccountId(String secret) {
-        return "MOCK_ISSUER_PUBLIC_" + secret;
     }
 
     public MockBlockchainConfiguration getConfig() {

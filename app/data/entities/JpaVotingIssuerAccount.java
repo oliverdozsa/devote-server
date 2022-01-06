@@ -27,6 +27,10 @@ public class JpaVotingIssuerAccount {
     @Lob
     private String accountSecret;
 
+    @Column(name = "account_public")
+    @Lob
+    private String accountPublic;
+
     @Column(name = "asset_code", length = 20)
     private String assetCode;
 
@@ -71,5 +75,13 @@ public class JpaVotingIssuerAccount {
 
     public void setAssetCode(String assetCode) {
         this.assetCode = assetCode;
+    }
+
+    public String getAccountPublic() {
+        return accountPublic;
+    }
+
+    public void setAccountPublic(String accountPublic) {
+        this.accountPublic = accountPublic;
     }
 }

@@ -5,21 +5,11 @@ import data.entities.JpaVoting;
 import data.entities.JpaVotingIssuerAccount;
 import data.entities.JpaVotingPoll;
 import data.entities.JpaVotingPollOption;
-import devote.blockchain.BlockchainFactory;
-import devote.blockchain.Blockchains;
-import devote.blockchain.api.DistributionAndBallotAccount;
-import devote.blockchain.api.IssuerAccount;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class IpfsVotingFromJpaVoting {
-    private final Blockchains blockchains;
-
-    public IpfsVotingFromJpaVoting(Blockchains blockchains) {
-        this.blockchains = blockchains;
-    }
-
     public IpfsVoting convert(JpaVoting jpaVoting) {
         IpfsVoting ipfsVoting = new IpfsVoting();
 
@@ -52,11 +42,7 @@ public class IpfsVotingFromJpaVoting {
     }
 
     private IpfsVotingIssuer toIpfsVotingIssuer(JpaVotingIssuerAccount jpaVotingIssuer) {
-        String network = jpaVotingIssuer.getVoting().getNetwork();
-        BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(network);
-
-        IssuerAccount issuerAccount = blockchainFactory.createIssuerAccount();
-        String issuerPublic = issuerAccount.toPublicAccountId(jpaVotingIssuer.getAccountSecret());
+        String issuerPublic = jpaVotingIssuer.getAccountPublic();
 
         IpfsVotingIssuer ipfsVotingIssuer = new IpfsVotingIssuer();
         ipfsVotingIssuer.setIssuerAccountId(issuerPublic);
@@ -66,15 +52,10 @@ public class IpfsVotingFromJpaVoting {
     }
 
     private void setDistributionAndBallotAccountId(IpfsVoting ipfsVoting, JpaVoting jpaVoting) {
-        BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(jpaVoting.getNetwork());
-        DistributionAndBallotAccount distributionAndBallotAccount = blockchainFactory.createDistributionAndBallotAccount();
-
-        String distributionAccountSecret = jpaVoting.getDistributionAccountSecret();
-        String distributionAccountPublic = distributionAndBallotAccount.toPublicDistributionAccountId(distributionAccountSecret);
+        String distributionAccountPublic = jpaVoting.getDistributionAccountPublic();
         ipfsVoting.setDistributionAccountId(distributionAccountPublic);
 
-        String ballotAccountSecret = jpaVoting.getBallotAccountSecret();
-        String ballotAccountPublic = distributionAndBallotAccount.toPublicBallotAccountId(ballotAccountSecret);
+        String ballotAccountPublic = jpaVoting.getBallotAccountPublic();
         ipfsVoting.setBallotAccountId(ballotAccountPublic);
     }
 

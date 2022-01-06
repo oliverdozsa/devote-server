@@ -22,6 +22,10 @@ public class JpaVotingChannelAccount {
     @Lob
     private String accountSecret;
 
+    @Column(name = "account_public")
+    @Lob
+    private String accountPublic;
+
     @ManyToOne
     @JoinColumn(name = "voting_id")
     private JpaVoting voting;
@@ -48,5 +52,13 @@ public class JpaVotingChannelAccount {
 
     public void setVoting(JpaVoting voting) {
         this.voting = voting;
+    }
+
+    public String getAccountPublic() {
+        return accountPublic;
+    }
+
+    public void setAccountPublic(String accountPublic) {
+        this.accountPublic = accountPublic;
     }
 }

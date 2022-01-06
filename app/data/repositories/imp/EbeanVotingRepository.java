@@ -5,6 +5,7 @@ import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
 import data.repositories.VotingRepository;
 import devote.blockchain.api.DistributionAndBallotAccount;
+import devote.blockchain.api.KeyPair;
 import requests.CreateVotingRequest;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
@@ -48,13 +49,13 @@ public class EbeanVotingRepository implements VotingRepository {
     }
 
     @Override
-    public void issuerAccountsCreated(Long id, List<String> accounts) {
-        logger.info("issuerAccountsCreated(): id = {}, accounts size = {}", id, accounts.size());
+    public void issuerAccountsCreated(Long id, List<KeyPair> keyPairs) {
+        logger.info("issuerAccountsCreated(): id = {}, accounts size = {}", id, keyPairs.size());
 
         JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
 
-        List<JpaVotingIssuerAccount> votingIssuers = accounts.stream()
-                .map(this::fromIssuerAccountSecret)
+        List<JpaVotingIssuerAccount> votingIssuers = keyPairs.stream()
+                .map(this::fromIssuerKeyPair)
                 .collect(Collectors.toList());
 
         voting.setIssuerAccounts(votingIssuers);
@@ -62,13 +63,13 @@ public class EbeanVotingRepository implements VotingRepository {
     }
 
     @Override
-    public void channelAccountCreated(Long id, List<String> accounts) {
-        logger.info("channelAccountCreated(): id = {}, accounts size = {}", id, accounts.size());
+    public void channelAccountCreated(Long id, List<KeyPair> keyPairs) {
+        logger.info("channelAccountCreated(): id = {}, accounts size = {}", id, keyPairs.size());
 
         JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
 
-        List<JpaVotingChannelAccount> channelAccounts = accounts.stream()
-                .map(this::fromChannelAccountSecret)
+        List<JpaVotingChannelAccount> channelAccounts = keyPairs.stream()
+                .map(this::fromChannelKeyPair)
                 .collect(Collectors.toList());
 
         voting.setChannelAccounts(channelAccounts);
@@ -80,8 +81,10 @@ public class EbeanVotingRepository implements VotingRepository {
         logger.info("distributionAndBallotAccountsCreated(): id = {}", id);
 
         JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
-        voting.setDistributionAccountSecret(transactionResult.distributionSecret);
-        voting.setBallotAccountSecret(transactionResult.ballotSecret);
+        voting.setDistributionAccountSecret(transactionResult.distribution.secretKey);
+        voting.setDistributionAccountPublic(transactionResult.distribution.publicKey);
+        voting.setBallotAccountSecret(transactionResult.ballot.secretKey);
+        voting.setBallotAccountPublic(transactionResult.ballot.publicKey);
 
         ebeanServer.update(voting);
 
@@ -104,15 +107,17 @@ public class EbeanVotingRepository implements VotingRepository {
         ebeanServer.update(voting);
     }
 
-    private JpaVotingIssuerAccount fromIssuerAccountSecret(String account) {
+    private JpaVotingIssuerAccount fromIssuerKeyPair(KeyPair keyPair) {
         JpaVotingIssuerAccount votingIssuer = new JpaVotingIssuerAccount();
-        votingIssuer.setAccountSecret(account);
+        votingIssuer.setAccountSecret(keyPair.secretKey);
+        votingIssuer.setAccountPublic(keyPair.publicKey);
         return votingIssuer;
     }
 
-    private JpaVotingChannelAccount fromChannelAccountSecret(String account) {
+    private JpaVotingChannelAccount fromChannelKeyPair(KeyPair keyPair) {
         JpaVotingChannelAccount votingChannelAccount = new JpaVotingChannelAccount();
-        votingChannelAccount.setAccountSecret(account);
+        votingChannelAccount.setAccountSecret(keyPair.secretKey);
+        votingChannelAccount.setAccountPublic(keyPair.publicKey);
         return votingChannelAccount;
     }
 }
