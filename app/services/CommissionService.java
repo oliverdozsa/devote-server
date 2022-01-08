@@ -2,6 +2,7 @@ package services;
 
 import data.operations.CommissionDbOperations;
 import data.operations.VotingDbOperations;
+import devote.blockchain.operations.CommissionBlockchainOperations;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import play.Logger;
 import requests.CommissionAccountCreationRequest;
@@ -31,11 +32,12 @@ public class CommissionService {
             @Named("envelope") AsymmetricCipherKeyPair envelopeKeyPair,
             CommissionDbOperations commissionDbOperations,
             VotingDbOperations votingDbOperations,
+            CommissionBlockchainOperations commissionBlockchainOperations,
             JwtCenter jwtCenter
     ) {
         initSubService = new CommissionInitSubService(publicKeyToPemString(envelopeKeyPair), jwtCenter, commissionDbOperations);
         signEnvelopeSubService = new CommissionSignEnvelopeSubService(envelopeKeyPair, commissionDbOperations);
-        createAccountSubService = new CommissionCreateAccountSubService(commissionDbOperations, votingDbOperations);
+        createAccountSubService = new CommissionCreateAccountSubService(commissionDbOperations, votingDbOperations, commissionBlockchainOperations);
     }
 
     public CompletionStage<CommissionInitResponse> init(CommissionInitRequest request, VerifiedJwt jwt) {

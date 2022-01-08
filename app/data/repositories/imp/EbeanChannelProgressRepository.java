@@ -29,11 +29,11 @@ public class EbeanChannelProgressRepository implements ChannelProgressRepository
 
         JpaChannelAccountProgress channelProgress = ebeanServer.find(JpaChannelAccountProgress.class, id);
 
-        channelProgress.setNumOfAccountsToLeftToCreate(
-                channelProgress.getNumOfAccountsToLeftToCreate() - numOfAccountsCreated
+        channelProgress.setNumOfAccountsLeftToCreate(
+                channelProgress.getNumOfAccountsLeftToCreate() - numOfAccountsCreated
         );
 
-        if (channelProgress.getNumOfAccountsToLeftToCreate() == 0) {
+        if (channelProgress.getNumOfAccountsLeftToCreate() == 0) {
             logger.info("channelAccountsCreated(): channel progress with id = {} finished!", id);
         }
 
@@ -70,7 +70,7 @@ public class EbeanChannelProgressRepository implements ChannelProgressRepository
                 .collect(Collectors.toList());
 
         JpaChannelAccountProgress last = progresses.get(progresses.size() - 1);
-        last.setNumOfAccountsToLeftToCreate(numOfChannelAccountsToCreateForOneIssuer + remainderChannelAccountsToCreate);
+        last.setNumOfAccountsLeftToCreate(numOfChannelAccountsToCreateForOneIssuer + remainderChannelAccountsToCreate);
         last.setNumOfAccountsToCreate(numOfChannelAccountsToCreateForOneIssuer + remainderChannelAccountsToCreate);
 
         progresses.forEach(ebeanServer::save);
@@ -80,7 +80,7 @@ public class EbeanChannelProgressRepository implements ChannelProgressRepository
         JpaChannelAccountProgress progress = new JpaChannelAccountProgress();
         progress.setIssuer(issuer);
         progress.setNumOfAccountsToCreate(numOfAccountsToCreate);
-        progress.setNumOfAccountsToLeftToCreate(numOfAccountsToCreate);
+        progress.setNumOfAccountsLeftToCreate(numOfAccountsToCreate);
         return progress;
     }
 }

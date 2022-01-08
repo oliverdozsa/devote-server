@@ -1,7 +1,7 @@
 package devote.blockchain.api;
 
 public interface VoterAccount {
-    String create(CreationData creationData);
+    String createTransaction(CreationData creationData);
 
     class CreationData {
         public String channelSecret;

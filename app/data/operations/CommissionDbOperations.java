@@ -2,6 +2,7 @@ package data.operations;
 
 import data.entities.JpaCommissionSession;
 import data.entities.JpaVotingChannelAccount;
+import data.entities.JpaVotingIssuerAccount;
 import data.repositories.CommissionRepository;
 import executioncontexts.DatabaseExecutionContext;
 import play.Logger;
@@ -53,6 +54,11 @@ public class CommissionDbOperations {
 
     public CompletionStage<JpaVotingChannelAccount> consumeOneChannel(Long votingId) {
         // TODO
+        return null;
+    }
+
+    public CompletionStage<JpaVotingIssuerAccount> selectAnIssuer(Long votingId) {
+        // TODO: randomly select one
         return null;
     }
 }

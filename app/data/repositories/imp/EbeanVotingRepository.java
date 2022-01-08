@@ -118,6 +118,7 @@ public class EbeanVotingRepository implements VotingRepository {
         JpaVotingChannelAccount votingChannelAccount = new JpaVotingChannelAccount();
         votingChannelAccount.setAccountSecret(keyPair.secretKey);
         votingChannelAccount.setAccountPublic(keyPair.publicKey);
+        votingChannelAccount.setConsumed(false);
         return votingChannelAccount;
     }
 }

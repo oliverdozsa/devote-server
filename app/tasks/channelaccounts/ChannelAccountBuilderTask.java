@@ -95,10 +95,10 @@ public class ChannelAccountBuilderTask implements Runnable {
     }
 
     private static int determineNumOfAccountsToCreateInOneBatch(JpaChannelAccountProgress progress, ChannelAccount channelAccount) {
-        if (progress.getNumOfAccountsToLeftToCreate() >= channelAccount.maxNumOfAccountsToCreateInOneBatch()) {
+        if (progress.getNumOfAccountsLeftToCreate() >= channelAccount.maxNumOfAccountsToCreateInOneBatch()) {
             return channelAccount.maxNumOfAccountsToCreateInOneBatch();
         } else {
-            return progress.getNumOfAccountsToLeftToCreate().intValue();
+            return progress.getNumOfAccountsLeftToCreate().intValue();
         }
     }
 }

@@ -26,6 +26,9 @@ public class JpaVotingChannelAccount {
     @Lob
     private String accountPublic;
 
+    @Column(name = "is_consumed")
+    private boolean isConsumed;
+
     @ManyToOne
     @JoinColumn(name = "voting_id")
     private JpaVoting voting;
@@ -60,5 +63,13 @@ public class JpaVotingChannelAccount {
 
     public void setAccountPublic(String accountPublic) {
         this.accountPublic = accountPublic;
+    }
+
+    public boolean isConsumed() {
+        return isConsumed;
+    }
+
+    public void setConsumed(boolean consumed) {
+        isConsumed = consumed;
     }
 }

@@ -25,7 +25,7 @@ public class JpaChannelAccountProgress {
     private Long numOfAccountsToCreate;
 
     @Column(name = "num_of_accounts_left_to_create")
-    private Long numOfAccountsToLeftToCreate;
+    private Long numOfAccountsLeftToCreate;
 
     public Long getId() {
         return id;
@@ -51,11 +51,11 @@ public class JpaChannelAccountProgress {
         this.numOfAccountsToCreate = numOfAccountsToCreate;
     }
 
-    public Long getNumOfAccountsToLeftToCreate() {
-        return numOfAccountsToLeftToCreate;
+    public Long getNumOfAccountsLeftToCreate() {
+        return numOfAccountsLeftToCreate;
     }
 
-    public void setNumOfAccountsToLeftToCreate(Long numOfAccountsToLeftToCreate) {
-        this.numOfAccountsToLeftToCreate = numOfAccountsToLeftToCreate;
+    public void setNumOfAccountsLeftToCreate(Long numOfAccountsLeftToCreate) {
+        this.numOfAccountsLeftToCreate = numOfAccountsLeftToCreate;
     }
 }

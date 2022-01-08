@@ -1,13 +1,13 @@
 package responses;
 
 public class CommissionAccountCreationResponse {
-    private String payload;
+    private String transaction;
 
-    public String getPayload() {
-        return payload;
+    public String getTransaction() {
+        return transaction;
     }
 
-    public void setPayload(String payload) {
-        this.payload = payload;
+    public void setTransaction(String transaction) {
+        this.transaction = transaction;
     }
 }

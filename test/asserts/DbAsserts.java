@@ -28,7 +28,7 @@ public class DbAsserts {
 
         List<JpaChannelAccountProgress> channelProgresses = channelProgressesOf(votingId);
         for(JpaChannelAccountProgress p: channelProgresses) {
-            assertThat("accounts left to create", p.getNumOfAccountsToLeftToCreate(), equalTo(0L));
+            assertThat("accounts left to create", p.getNumOfAccountsLeftToCreate(), equalTo(0L));
             totalChannelAccounts += p.getNumOfAccountsToCreate();
         }
 
