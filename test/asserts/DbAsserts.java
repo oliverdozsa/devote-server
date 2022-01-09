@@ -21,6 +21,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class DbAsserts {
     public static void assertChannelProgressCompletedFor(Long votingId) {
@@ -87,6 +88,11 @@ public class DbAsserts {
             assertThat(savedPoll.getOptions(), hasSize(expectedPoll.getOptions().size()));
             assertSavedOptionAreTheSame(savedPoll.getOptions(), expectedPoll.getOptions());
         });
+    }
+
+    public static void assertThatTransactionIsStoredFor(Long votingId, String voterPublic) {
+        // TODO
+        fail("Implement this!");
     }
 
     private static List<JpaChannelAccountProgress> channelProgressesOf(Long votingId) {

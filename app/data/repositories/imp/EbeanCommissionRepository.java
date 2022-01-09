@@ -1,6 +1,5 @@
 package data.repositories.imp;
 
-import data.entities.JpaChannelAccountProgress;
 import data.entities.JpaCommissionSession;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
@@ -71,6 +70,7 @@ public class EbeanCommissionRepository implements CommissionRepository {
 
     @Override
     public JpaVotingChannelAccount consumeOneChannel(Long votingId) {
+        logger.info("consumeOneChannel(): votingId = {}", votingId);
         Optional<JpaVotingChannelAccount> optionalJpaVotingChannelAccount = ebeanServer.createQuery(JpaVotingChannelAccount.class)
                 .where()
                 .eq("isConsumed", false)
@@ -78,8 +78,13 @@ public class EbeanCommissionRepository implements CommissionRepository {
                 .findOneOrEmpty();
 
         if (optionalJpaVotingChannelAccount.isPresent()) {
-            // TODO:
-            return null;
+            JpaVotingChannelAccount channelAccount = optionalJpaVotingChannelAccount.get();
+            channelAccount.setConsumed(true);
+            ebeanServer.update(channelAccount);
+
+            logger.info("consumeOneChannel(): success consumed a channel! id = {}", channelAccount.getId());
+
+            return channelAccount;
         } else if (areAllChannelAccountsCreated(votingId)) {
             throw new InternalErrorException("Could not find a free channel account!");
         } else {
@@ -89,6 +94,7 @@ public class EbeanCommissionRepository implements CommissionRepository {
 
     @Override
     public JpaVotingIssuerAccount selectAnIssuer(Long votingId) {
+        // TODO
         return null;
     }
 
@@ -104,15 +110,12 @@ public class EbeanCommissionRepository implements CommissionRepository {
         assertEntityExists(ebeanServer, JpaVoting.class, votingId);
         JpaVoting voting = ebeanServer.find(JpaVoting.class, votingId);
 
-        Long numOfAccountsLeftToCreate = 0L;
         for (JpaVotingIssuerAccount issuer : voting.getIssuerAccounts()) {
-            numOfAccountsLeftToCreate += issuer.getChannelAccountProgress().getNumOfAccountsLeftToCreate();
-            if (numOfAccountsLeftToCreate > 0) {
-                // To save DB query
-                break;
+            if (issuer.getChannelAccountProgress().getNumOfAccountsLeftToCreate() > 0) {
+                return false;
             }
         }
 
-        return numOfAccountsLeftToCreate == 0;
+        return true;
     }
 }

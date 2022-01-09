@@ -15,6 +15,7 @@ import play.mvc.Result;
 import requests.CommissionInitRequest;
 import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
+import services.Base62Conversions;
 import utils.JwtTestUtils;
 
 import java.time.Instant;
@@ -22,6 +23,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
 
+import static asserts.DbAsserts.assertThatTransactionIsStoredFor;
 import static controllers.VotingRequestMaker.createValidVotingRequest;
 import static extractors.CommissionResponseFromResult.*;
 import static extractors.GenericDataFromResult.statusOf;
@@ -198,7 +200,6 @@ public class CommissionControllerTest {
 
     @Test
     public void testAccountCreationRequest() {
-        // TODO
         // Given
         InitData votingInitData = initVotingFor("Bob");
         String message = createMessage(votingInitData.votingId, "someAccountId");
@@ -216,6 +217,7 @@ public class CommissionControllerTest {
         assertThat(statusOf(accountCreationRequestResult), equalTo(OK));
         assertThat(accountCreationPayloadOf(accountCreationRequestResult), notNullValue());
         assertThat(accountCreationPayloadOf(accountCreationRequestResult), not(isEmptyString()));
+        assertThatTransactionIsStoredFor(Base62Conversions.decode(votingInitData.votingId), "someAccountId");
     }
 
     @Test
@@ -225,6 +227,10 @@ public class CommissionControllerTest {
         // Given
         // When
         // Then
+    }
+
+    public void testGetAccountCreationTransaction() {
+        // TODO: Present the same account creation request to obtain the stored transaction
     }
 
 

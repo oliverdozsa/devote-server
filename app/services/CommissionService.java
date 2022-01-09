@@ -52,6 +52,7 @@ public class CommissionService {
 
     public CompletionStage<CommissionAccountCreationResponse> createAccount(CommissionAccountCreationRequest request) {
         logger.info("createAccount(): request = {}", request);
+        // TODO: Store transaction for presented signature in DB.
         return createAccountSubService.createAccount(request);
     }
 
