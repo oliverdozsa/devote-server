@@ -8,25 +8,38 @@ import data.operations.VotingDbOperations;
 import devote.blockchain.api.KeyPair;
 import devote.blockchain.api.VoterAccount;
 import devote.blockchain.operations.CommissionBlockchainOperations;
+import exceptions.ForbiddenException;
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+import org.bouncycastle.crypto.engines.RSAEngine;
+import org.postgresql.util.Base64;
 import play.Logger;
 import requests.CommissionAccountCreationRequest;
 import responses.CommissionAccountCreationResponse;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.concurrent.CompletionStage;
+
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static java.util.concurrent.CompletableFuture.runAsync;
 
 class CommissionCreateAccountSubService {
     private final CommissionDbOperations commissionDbOperations;
     private final VotingDbOperations votingDbOperations;
     private final CommissionBlockchainOperations commissionBlockchainOperations;
+    private final AsymmetricCipherKeyPair envelopeKeyPair;
 
     public CommissionCreateAccountSubService(
             CommissionDbOperations commissionDbOperations,
             VotingDbOperations votingDbOperations,
-            CommissionBlockchainOperations commissionBlockchainOperations
+            CommissionBlockchainOperations commissionBlockchainOperations,
+            AsymmetricCipherKeyPair envelopeKeyPair
     ) {
         this.commissionDbOperations = commissionDbOperations;
         this.votingDbOperations = votingDbOperations;
         this.commissionBlockchainOperations = commissionBlockchainOperations;
+        this.envelopeKeyPair = envelopeKeyPair;
     }
 
     private static final Logger.ALogger logger = Logger.of(CommissionCreateAccountSubService.class);
@@ -39,12 +52,40 @@ class CommissionCreateAccountSubService {
         AccountCreationCollectedData accountCreationData = new AccountCreationCollectedData();
         accountCreationData.voterPublic = parsedMessage.voterPublic;
 
-        return consumeChannel(votingId, accountCreationData)
+        return verifySignatureOfRequest(request)
+                .thenCompose(v -> checkIfAlreadyRequestedAccount(request))
+                .thenCompose(v -> consumeChannel(votingId, accountCreationData))
                 .thenCompose(v -> retrieveVoting(votingId, accountCreationData))
                 .thenCompose(v -> selectAnIssuer(votingId, accountCreationData))
-                .thenApply(v -> assemble(accountCreationData))
+                .thenApply(v -> prepareForBlockchainOperation(accountCreationData))
                 .thenCompose(commissionBlockchainOperations::createTransaction)
+                .thenCompose(tx -> storeTransaction(request.getRevealedSignatureBase64(), tx))
                 .thenApply(CommissionCreateAccountSubService::toResponse);
+    }
+
+    private CompletionStage<Void> verifySignatureOfRequest(CommissionAccountCreationRequest request) {
+        return runAsync(() -> {
+            RSAEngine rsaEngine = new RSAEngine();
+            rsaEngine.init(false, envelopeKeyPair.getPublic());
+
+            byte[] revealedSignatureBytes = Base64.decode(request.getRevealedSignatureBase64());
+            byte[] revealedMessageBytes = request.getMessage().getBytes();
+
+            byte[] signatureDecrypted = rsaEngine.processBlock(revealedSignatureBytes, 0, revealedSignatureBytes.length);
+            try {
+                byte[] messageHashed = MessageDigest.getInstance("SHA-256").digest(revealedMessageBytes);
+                if(Arrays.equals(messageHashed, signatureDecrypted)) {
+                    throw new ForbiddenException("Signature for message is not valid!");
+                }
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private CompletionStage<Void> checkIfAlreadyRequestedAccount(CommissionAccountCreationRequest request) {
+        // TODO: Check if transaction exists in DB for signature.
+        return runAsync(() -> {});
     }
 
     private CompletionStage<Void> consumeChannel(Long votingId, AccountCreationCollectedData collectedData) {
@@ -62,7 +103,7 @@ class CommissionCreateAccountSubService {
                 .thenAccept(i -> collectedData.issuer = i);
     }
 
-    private VoterAccount.CreationData assemble(AccountCreationCollectedData accountCreationData) {
+    private VoterAccount.CreationData prepareForBlockchainOperation(AccountCreationCollectedData accountCreationData) {
         VoterAccount.CreationData voterCreationData = new VoterAccount.CreationData();
         voterCreationData.issuerPublicKey = accountCreationData.issuer.getAccountPublic();
         voterCreationData.assetCode = accountCreationData.issuer.getAssetCode();
@@ -74,6 +115,11 @@ class CommissionCreateAccountSubService {
         );
 
         return voterCreationData;
+    }
+
+    private CompletionStage<String> storeTransaction(String signature, String transaction) {
+        // TODO
+        return completedFuture(transaction);
     }
 
     private static CommissionAccountCreationResponse toResponse(String transaction) {

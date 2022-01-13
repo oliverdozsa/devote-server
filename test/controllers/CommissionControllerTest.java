@@ -229,10 +229,15 @@ public class CommissionControllerTest {
         // Then
     }
 
+    @Test
     public void testGetAccountCreationTransaction() {
         // TODO: Present the same account creation request to obtain the stored transaction
     }
 
+    @Test
+    public void testGetAccountCreationTransaction_NotCreatedBefore() {
+        // TODO
+    }
 
     private String createValidVoting() {
         CreateVotingRequest createVotingRequest = createValidVotingRequest();

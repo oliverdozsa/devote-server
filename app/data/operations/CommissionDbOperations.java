@@ -53,13 +53,13 @@ public class CommissionDbOperations {
     }
 
     public CompletionStage<JpaVotingChannelAccount> consumeOneChannel(Long votingId) {
-        // TODO
-        return null;
+        logger.info("consumeOneChannel(): votingId = {}", votingId);
+        return supplyAsync(() -> commissionRepository.consumeOneChannel(votingId), dbExecContext);
     }
 
     public CompletionStage<JpaVotingIssuerAccount> selectAnIssuer(Long votingId) {
-        // TODO: randomly select one
-        return null;
+        logger.info("selectAnIssuer(): votingId = {}", votingId);
+        return supplyAsync(() -> commissionRepository.selectAnIssuer(votingId), dbExecContext);
     }
 }
 

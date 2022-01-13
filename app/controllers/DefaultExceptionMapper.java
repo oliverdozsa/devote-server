@@ -41,7 +41,8 @@ public class DefaultExceptionMapper implements Function<Throwable, Result> {
 
         if (input instanceof ForbiddenException) {
             logger.warn("Forbidden!", input);
-            return forbidden();
+            ValidationError ve = new ValidationError("", input.getMessage());
+            return forbidden(Json.toJson(ve.messages()));
         }
 
         if(input instanceof BlockchainException) {

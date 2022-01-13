@@ -13,4 +13,5 @@ public interface CommissionRepository {
     void storeEnvelopeSignature(String userId, Long votingId, String signature);
     JpaVotingChannelAccount consumeOneChannel(Long votingId);
     JpaVotingIssuerAccount selectAnIssuer(Long votingId);
+    void storeTransactionForRevealedSignature(String signature, String transaction);
 }
