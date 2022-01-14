@@ -1,6 +1,7 @@
 package data.repositories.imp;
 
 import data.entities.JpaCommissionSession;
+import data.entities.JpaStoredTransaction;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
@@ -10,7 +11,7 @@ import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import play.Logger;
 import play.db.ebean.EbeanConfig;
-import scala.util.Random;
+import utils.StringUtils;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -118,7 +119,29 @@ public class EbeanCommissionRepository implements CommissionRepository {
 
     @Override
     public void storeTransactionForRevealedSignature(String signature, String transaction) {
-        // TODO
+        String signatureToLog = StringUtils.redact(signature, 5);
+        String transactionToLog = StringUtils.redact(signature, 5);
+        logger.info("storeTransactionForRevealedSignature(): signatureToLog = {}, transactionToLog = {}",
+                signatureToLog, transactionToLog);
+
+        JpaStoredTransaction storedTransaction = new JpaStoredTransaction();
+        storedTransaction.setSignature(signature);
+        storedTransaction.setTransaction(transaction);
+        ebeanServer.save(storedTransaction);
+    }
+
+    @Override
+    public boolean doesTransactionExistForSignature(String signature) {
+        String signatureToLog = StringUtils.redact(signature, 5);
+        logger.info("doesTransactionExistForSignature(): signature = {}", signatureToLog);
+
+        Optional<JpaStoredTransaction> optionalJpaStoredTransaction =
+                ebeanServer.createQuery(JpaStoredTransaction.class)
+                        .where()
+                        .eq("signature", signature)
+                        .findOneOrEmpty();
+
+        return optionalJpaStoredTransaction.isPresent();
     }
 
     private JpaCommissionSession find(String userId, Long votingId) {

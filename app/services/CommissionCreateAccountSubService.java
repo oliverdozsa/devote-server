@@ -84,8 +84,12 @@ class CommissionCreateAccountSubService {
     }
 
     private CompletionStage<Void> checkIfAlreadyRequestedAccount(CommissionAccountCreationRequest request) {
-        // TODO: Check if transaction exists in DB for signature.
-        return runAsync(() -> {});
+        return commissionDbOperations.doesTransactionExistForSignature(request.getRevealedSignatureBase64())
+                .thenAccept(doesExist -> {
+                    if(doesExist) {
+                        throw new ForbiddenException("Account was requested before!");
+                    }
+                });
     }
 
     private CompletionStage<Void> consumeChannel(Long votingId, AccountCreationCollectedData collectedData) {
@@ -118,8 +122,8 @@ class CommissionCreateAccountSubService {
     }
 
     private CompletionStage<String> storeTransaction(String signature, String transaction) {
-        // TODO
-        return completedFuture(transaction);
+        return commissionDbOperations.storeTransaction(signature, transaction)
+                .thenApply(v -> transaction);
     }
 
     private static CommissionAccountCreationResponse toResponse(String transaction) {

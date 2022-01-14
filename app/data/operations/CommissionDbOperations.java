@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
-import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static java.util.concurrent.CompletableFuture.*;
 
 public class CommissionDbOperations {
     private final CommissionRepository commissionRepository;
@@ -60,6 +60,21 @@ public class CommissionDbOperations {
     public CompletionStage<JpaVotingIssuerAccount> selectAnIssuer(Long votingId) {
         logger.info("selectAnIssuer(): votingId = {}", votingId);
         return supplyAsync(() -> commissionRepository.selectAnIssuer(votingId), dbExecContext);
+    }
+
+    public CompletionStage<Void> storeTransaction(String signature, String transaction) {
+        String signatureToLog = signature.substring(0, 5);
+        String transactionToLog = transaction.substring(0, 5);
+        logger.info("storeTransaction(): signature = {}, transaction = {}", signatureToLog, transactionToLog);
+
+        return runAsync(() -> commissionRepository.storeTransactionForRevealedSignature(signature, transaction),
+                dbExecContext);
+    }
+
+    public CompletionStage<Boolean> doesTransactionExistForSignature(String signature) {
+        String signatureToLog = signature.substring(0, 5);
+        logger.info("doesTransactionExistForSignature(): signature = {}", signatureToLog);
+        return supplyAsync(() -> commissionRepository.doesTransactionExistForSignature(signature), dbExecContext);
     }
 }
 
