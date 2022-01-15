@@ -11,7 +11,6 @@ import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import play.Logger;
 import play.db.ebean.EbeanConfig;
-import utils.StringUtils;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -19,6 +18,7 @@ import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static data.repositories.imp.EbeanRepositoryUtils.assertEntityExists;
+import static utils.StringUtils.redact;
 
 public class EbeanCommissionRepository implements CommissionRepository {
     private final EbeanServer ebeanServer;
@@ -118,26 +118,32 @@ public class EbeanCommissionRepository implements CommissionRepository {
     }
 
     @Override
-    public void storeTransactionForRevealedSignature(String signature, String transaction) {
-        String signatureToLog = StringUtils.redact(signature, 5);
-        String transactionToLog = StringUtils.redact(signature, 5);
-        logger.info("storeTransactionForRevealedSignature(): signatureToLog = {}, transactionToLog = {}",
-                signatureToLog, transactionToLog);
+    public void storeTransactionForRevealedSignature(Long votingId, String signature, String transaction) {
+        String signatureToLog = redact(signature, 5);
+        String transactionToLog = redact(signature, 5);
+        logger.info("storeTransactionForRevealedSignature(): votingId = {}, signatureToLog = {}, transactionToLog = {}",
+                votingId, signatureToLog, transactionToLog);
+
+        JpaVoting voting = ebeanServer.getReference(JpaVoting.class, votingId);
 
         JpaStoredTransaction storedTransaction = new JpaStoredTransaction();
         storedTransaction.setSignature(signature);
+        storedTransaction.setSignatureFootPrint(toSignatureFootPrint(signature));
         storedTransaction.setTransaction(transaction);
+        storedTransaction.setVoting(voting);
         ebeanServer.save(storedTransaction);
     }
 
     @Override
     public boolean doesTransactionExistForSignature(String signature) {
-        String signatureToLog = StringUtils.redact(signature, 5);
+        String signatureToLog = redact(signature, 5);
         logger.info("doesTransactionExistForSignature(): signature = {}", signatureToLog);
 
         Optional<JpaStoredTransaction> optionalJpaStoredTransaction =
                 ebeanServer.createQuery(JpaStoredTransaction.class)
                         .where()
+                        // Index on clob is not supported, so assume this condition helps to shrink the search space
+                        .eq("signatureFootPrint", toSignatureFootPrint(signature))
                         .eq("signature", signature)
                         .findOneOrEmpty();
 
@@ -163,5 +169,9 @@ public class EbeanCommissionRepository implements CommissionRepository {
         }
 
         return true;
+    }
+
+    private static String toSignatureFootPrint(String signature) {
+        return redact(signature, 255);
     }
 }

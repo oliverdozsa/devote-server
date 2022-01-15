@@ -12,6 +12,7 @@ import play.inject.guice.GuiceApplicationBuilder;
 import play.libs.Json;
 import play.mvc.Http;
 import play.mvc.Result;
+import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
@@ -211,13 +212,14 @@ public class CommissionControllerTest {
 
         // When
         String envelopeSignatureBase64 = envelopeSignatureOf(result.http);
-        Result accountCreationRequestResult = testClient.requestAccountCreation(message, envelopeSignatureBase64, result.envelope);
+        CommissionAccountCreationRequest accountCreationRequest = CommissionTestClient.createAccountCreationRequest(message, envelopeSignatureBase64, result.envelope);
+        Result accountCreationRequestResult = testClient.requestAccountCreation(accountCreationRequest);
 
         // Then
         assertThat(statusOf(accountCreationRequestResult), equalTo(OK));
         assertThat(accountCreationPayloadOf(accountCreationRequestResult), notNullValue());
         assertThat(accountCreationPayloadOf(accountCreationRequestResult), not(isEmptyString()));
-        assertThatTransactionIsStoredFor(Base62Conversions.decode(votingInitData.votingId), "someAccountId");
+        assertThatTransactionIsStoredFor(accountCreationRequest.getRevealedSignatureBase64());
     }
 
     @Test

@@ -58,7 +58,7 @@ public class CommissionTestClient extends TestClient {
         return new SignOnEnvelopeResult(httpResult, rsaEnvelope);
     }
 
-    public Result requestAccountCreation(String message, String envelopeSignatureBase64, RsaEnvelope rsaEnvelope) {
+    public static CommissionAccountCreationRequest createAccountCreationRequest(String message, String envelopeSignatureBase64, RsaEnvelope rsaEnvelope) {
         byte[] envelopeSignature = Base64.getDecoder().decode(envelopeSignatureBase64);
 
         byte[] revealedSignature = rsaEnvelope.revealedSignature(envelopeSignature);
@@ -68,9 +68,13 @@ public class CommissionTestClient extends TestClient {
         accountCreationRequest.setMessage(message);
         accountCreationRequest.setRevealedSignatureBase64(revealedSignatureBase64);
 
+        return accountCreationRequest;
+    }
+
+    public Result requestAccountCreation(CommissionAccountCreationRequest request) {
         Http.RequestBuilder httpRequest = new Http.RequestBuilder()
                 .method(POST)
-                .bodyJson(Json.toJson(accountCreationRequest))
+                .bodyJson(Json.toJson(request))
                 .header(CONTENT_TYPE, Http.MimeTypes.JSON)
                 .uri(routes.CommissionController.createAccount().url());
 

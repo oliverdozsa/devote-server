@@ -1,6 +1,6 @@
 package devote.blockchain.api;
 
-public interface VoterAccount {
+public interface VoterAccount extends BlockchainOperation {
     String createTransaction(CreationData creationData);
 
     class CreationData {
@@ -10,5 +10,13 @@ public interface VoterAccount {
         public String issuerPublicKey;
         public String assetCode;
         public Long votesCap;
+
+        @Override
+        public String toString() {
+            return "CreationData{" +
+                    "voterPublicKey='" + voterPublicKey + '\'' +
+                    ", assetCode='" + assetCode + '\'' +
+                    '}';
+        }
     }
 }

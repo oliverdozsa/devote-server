@@ -58,8 +58,8 @@ class CommissionCreateAccountSubService {
                 .thenCompose(v -> retrieveVoting(votingId, accountCreationData))
                 .thenCompose(v -> selectAnIssuer(votingId, accountCreationData))
                 .thenApply(v -> prepareForBlockchainOperation(accountCreationData))
-                .thenCompose(commissionBlockchainOperations::createTransaction)
-                .thenCompose(tx -> storeTransaction(request.getRevealedSignatureBase64(), tx))
+                .thenCompose(c -> commissionBlockchainOperations.createTransaction(accountCreationData.voting.getNetwork(), c))
+                .thenCompose(tx -> storeTransaction(accountCreationData.voting.getId(), request.getRevealedSignatureBase64(), tx))
                 .thenApply(CommissionCreateAccountSubService::toResponse);
     }
 
@@ -121,8 +121,8 @@ class CommissionCreateAccountSubService {
         return voterCreationData;
     }
 
-    private CompletionStage<String> storeTransaction(String signature, String transaction) {
-        return commissionDbOperations.storeTransaction(signature, transaction)
+    private CompletionStage<String> storeTransaction(Long votingId, String signature, String transaction) {
+        return commissionDbOperations.storeTransaction(votingId, signature, transaction)
                 .thenApply(v -> transaction);
     }
 

@@ -6,6 +6,7 @@ import devote.blockchain.api.BlockchainOperation;
 import devote.blockchain.api.ChannelAccount;
 import devote.blockchain.api.DistributionAndBallotAccount;
 import devote.blockchain.api.IssuerAccount;
+import devote.blockchain.api.VoterAccount;
 import org.reflections.Reflections;
 import play.Logger;
 
@@ -34,6 +35,10 @@ public class BlockchainFactory {
 
     public DistributionAndBallotAccount createDistributionAndBallotAccount() {
         return createBlockchainOperation(DistributionAndBallotAccount.class);
+    }
+
+    public VoterAccount createVoterAccount() {
+        return createBlockchainOperation(VoterAccount.class);
     }
 
     private <T extends BlockchainOperation> T createBlockchainOperation(Class<T> blockChainOperationParentClass) {

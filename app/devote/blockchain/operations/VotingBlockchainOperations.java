@@ -18,6 +18,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static utils.StringUtils.createRandomAlphabeticString;
 
 public class VotingBlockchainOperations {
     private final BlockchainExecutionContext blockchainExecContext;
@@ -91,17 +92,5 @@ public class VotingBlockchainOperations {
 
         tokenTitleBase = tokenTitleBase + "-" + createRandomAlphabeticString(3);
         return tokenTitleBase.toUpperCase(Locale.ROOT);
-    }
-
-    private static String createRandomAlphabeticString(int ofLength) {
-        int letterACode = 97;
-        int letterZCode = 122;
-
-        Random random = new Random();
-
-        return random.ints(letterACode, letterZCode + 1)
-                .limit(ofLength)
-                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                .toString();
     }
 }

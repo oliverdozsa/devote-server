@@ -2,6 +2,7 @@ package asserts;
 
 import data.entities.Authorization;
 import data.entities.JpaChannelAccountProgress;
+import data.entities.JpaStoredTransaction;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingAuthorizationEmail;
 import data.entities.JpaVotingChannelAccount;
@@ -14,6 +15,7 @@ import requests.CreatePollRequest;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -28,7 +30,7 @@ public class DbAsserts {
         int totalChannelAccounts = 0;
 
         List<JpaChannelAccountProgress> channelProgresses = channelProgressesOf(votingId);
-        for(JpaChannelAccountProgress p: channelProgresses) {
+        for (JpaChannelAccountProgress p : channelProgresses) {
             assertThat("accounts left to create", p.getNumOfAccountsLeftToCreate(), equalTo(0L));
             totalChannelAccounts += p.getNumOfAccountsToCreate();
         }
@@ -90,9 +92,12 @@ public class DbAsserts {
         });
     }
 
-    public static void assertThatTransactionIsStoredFor(Long votingId, String voterPublic) {
-        // TODO
-        fail("Implement this!");
+    public static void assertThatTransactionIsStoredFor(String signature) {
+        Optional<JpaStoredTransaction> storedTransactionOptional = Ebean.createQuery(JpaStoredTransaction.class)
+                .where()
+                .eq("signature", signature)
+                .findOneOrEmpty();
+        assertTrue("Not found stored transaction for signature: " + signature, storedTransactionOptional.isPresent());
     }
 
     private static List<JpaChannelAccountProgress> channelProgressesOf(Long votingId) {

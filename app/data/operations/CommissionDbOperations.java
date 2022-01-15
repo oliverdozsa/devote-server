@@ -1,6 +1,7 @@
 package data.operations;
 
 import data.entities.JpaCommissionSession;
+import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
 import data.repositories.CommissionRepository;
@@ -62,12 +63,12 @@ public class CommissionDbOperations {
         return supplyAsync(() -> commissionRepository.selectAnIssuer(votingId), dbExecContext);
     }
 
-    public CompletionStage<Void> storeTransaction(String signature, String transaction) {
+    public CompletionStage<Void> storeTransaction(Long votingId, String signature, String transaction) {
         String signatureToLog = signature.substring(0, 5);
         String transactionToLog = transaction.substring(0, 5);
-        logger.info("storeTransaction(): signature = {}, transaction = {}", signatureToLog, transactionToLog);
+        logger.info("storeTransaction(): votingId = {}, signature = {}, transaction = {}", votingId, signatureToLog, transactionToLog);
 
-        return runAsync(() -> commissionRepository.storeTransactionForRevealedSignature(signature, transaction),
+        return runAsync(() -> commissionRepository.storeTransactionForRevealedSignature(votingId, signature, transaction),
                 dbExecContext);
     }
 
