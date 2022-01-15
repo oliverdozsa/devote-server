@@ -16,7 +16,6 @@ import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
-import services.Base62Conversions;
 import utils.JwtTestUtils;
 
 import java.time.Instant;
@@ -200,9 +199,10 @@ public class CommissionControllerTest {
     // TODO: test for retrieving envelope signature for user in voting
 
     @Test
-    public void testAccountCreationRequest() {
+    public void testAccountCreationRequest() throws InterruptedException {
         // Given
         InitData votingInitData = initVotingFor("Bob");
+        Thread.sleep(15 * 1000); // So that some channel accounts are present.
         String message = createMessage(votingInitData.votingId, "someAccountId");
 
         CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
@@ -217,8 +217,8 @@ public class CommissionControllerTest {
 
         // Then
         assertThat(statusOf(accountCreationRequestResult), equalTo(OK));
-        assertThat(accountCreationPayloadOf(accountCreationRequestResult), notNullValue());
-        assertThat(accountCreationPayloadOf(accountCreationRequestResult), not(isEmptyString()));
+        assertThat(accountCreationTransactionOf(accountCreationRequestResult), notNullValue());
+        assertThat(accountCreationTransactionOf(accountCreationRequestResult), not(isEmptyString()));
         assertThatTransactionIsStoredFor(accountCreationRequest.getRevealedSignatureBase64());
     }
 

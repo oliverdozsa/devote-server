@@ -1,5 +1,8 @@
 package requests;
 
+import static utils.StringUtils.redact;
+import static utils.StringUtils.redactWithEllipsis;
+
 public class CommissionAccountCreationRequest {
     // TODO: Validation:
     //         - message: should be non-empty string containing |
@@ -26,8 +29,8 @@ public class CommissionAccountCreationRequest {
     @Override
     public String toString() {
         return "CommissionAccountCreationRequest{" +
-                "message='" + message.substring(0, 10) + "...'" +
-                ", revealedSignatureBase64 length='" + revealedSignatureBase64.substring(0, 10) + "...'" +
+                "message='" + redactWithEllipsis(message, 10) + "...'" +
+                ", revealedSignatureBase64 ='" + redactWithEllipsis(revealedSignatureBase64, 5) + "...'" +
                 '}';
     }
 }

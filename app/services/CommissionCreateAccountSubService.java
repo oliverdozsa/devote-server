@@ -11,7 +11,6 @@ import devote.blockchain.operations.CommissionBlockchainOperations;
 import exceptions.ForbiddenException;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.engines.RSAEngine;
-import org.postgresql.util.Base64;
 import play.Logger;
 import requests.CommissionAccountCreationRequest;
 import responses.CommissionAccountCreationResponse;
@@ -19,10 +18,11 @@ import responses.CommissionAccountCreationResponse;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.concurrent.CompletionStage;
 
-import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.CompletableFuture.runAsync;
+import static utils.StringUtils.redact;
 
 class CommissionCreateAccountSubService {
     private final CommissionDbOperations commissionDbOperations;
@@ -68,13 +68,16 @@ class CommissionCreateAccountSubService {
             RSAEngine rsaEngine = new RSAEngine();
             rsaEngine.init(false, envelopeKeyPair.getPublic());
 
-            byte[] revealedSignatureBytes = Base64.decode(request.getRevealedSignatureBase64());
+            byte[] revealedSignatureBytes = Base64.getDecoder().decode(request.getRevealedSignatureBase64());
             byte[] revealedMessageBytes = request.getMessage().getBytes();
 
             byte[] signatureDecrypted = rsaEngine.processBlock(revealedSignatureBytes, 0, revealedSignatureBytes.length);
             try {
                 byte[] messageHashed = MessageDigest.getInstance("SHA-256").digest(revealedMessageBytes);
                 if(Arrays.equals(messageHashed, signatureDecrypted)) {
+                    logger.info("verifySignatureOfRequest(): signature is valid for request: {}.", request.toString());
+                } else {
+                    logger.warn("verifySignatureOfRequest(): Signature for message is not valid!");
                     throw new ForbiddenException("Signature for message is not valid!");
                 }
             } catch (NoSuchAlgorithmException e) {

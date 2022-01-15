@@ -46,7 +46,7 @@ public class EbeanChannelProgressRepository implements ChannelProgressRepository
 
         return ebeanServer.createQuery(JpaChannelAccountProgress.class)
                 .where()
-                .gt("numOfAccountsToLeftToCreate", 0)
+                .gt("numOfAccountsLeftToCreate", 0)
                 .setMaxRows(sampleSize)
                 .findList();
     }

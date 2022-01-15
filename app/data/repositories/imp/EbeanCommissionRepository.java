@@ -19,6 +19,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static data.repositories.imp.EbeanRepositoryUtils.assertEntityExists;
 import static utils.StringUtils.redact;
+import static utils.StringUtils.redactWithEllipsis;
 
 public class EbeanCommissionRepository implements CommissionRepository {
     private final EbeanServer ebeanServer;
@@ -61,11 +62,18 @@ public class EbeanCommissionRepository implements CommissionRepository {
     @Override
     public Boolean hasAlreadySignedAnEnvelope(String userId, Long votingId) {
         JpaCommissionSession commissionSession = find(userId, votingId);
-        return commissionSession.getEnvelopeSignature() != null;
+        boolean hasAlreadySigned = commissionSession.getEnvelopeSignature() != null;
+
+        logger.info("hasAlreadySignedAnEnvelope(): User {} has {} already signed an envelope in voting {}",
+                userId, hasAlreadySigned ? "" : "not", votingId);
+
+        return hasAlreadySigned;
     }
 
     @Override
     public void storeEnvelopeSignature(String userId, Long votingId, String signature) {
+        logger.info("storeEnvelopeSignature(): userId = {}, votingId = {}, signature = {}",
+                userId, votingId, redactWithEllipsis(signature, 5));
         JpaCommissionSession commissionSession = find(userId, votingId);
 
         commissionSession.setEnvelopeSignature(signature);
@@ -119,8 +127,8 @@ public class EbeanCommissionRepository implements CommissionRepository {
 
     @Override
     public void storeTransactionForRevealedSignature(Long votingId, String signature, String transaction) {
-        String signatureToLog = redact(signature, 5);
-        String transactionToLog = redact(signature, 5);
+        String signatureToLog = redactWithEllipsis(signature, 5);
+        String transactionToLog = redactWithEllipsis(signature, 5);
         logger.info("storeTransactionForRevealedSignature(): votingId = {}, signatureToLog = {}, transactionToLog = {}",
                 votingId, signatureToLog, transactionToLog);
 
@@ -136,7 +144,7 @@ public class EbeanCommissionRepository implements CommissionRepository {
 
     @Override
     public boolean doesTransactionExistForSignature(String signature) {
-        String signatureToLog = redact(signature, 5);
+        String signatureToLog = redactWithEllipsis(signature, 5);
         logger.info("doesTransactionExistForSignature(): signature = {}", signatureToLog);
 
         Optional<JpaStoredTransaction> optionalJpaStoredTransaction =

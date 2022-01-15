@@ -13,6 +13,10 @@ public class StringUtils {
         }
     }
 
+    public static String redactWithEllipsis(String input, int toMaxLength) {
+        return redact(input, toMaxLength) + "...";
+    }
+
     public static String createRandomAlphabeticString(int ofLength) {
         int letterACode = 97;
         int letterZCode = 122;
