@@ -4,9 +4,7 @@ import java.util.Random;
 
 public class StringUtils {
     public static String redact(String input, int toMaxLength) {
-        if (input == null) {
-            return null;
-        } else if (input.length() <= toMaxLength) {
+        if(input == null || input.length() <= toMaxLength){
             return input;
         } else {
             return input.substring(0, toMaxLength);
@@ -14,7 +12,11 @@ public class StringUtils {
     }
 
     public static String redactWithEllipsis(String input, int toMaxLength) {
-        return redact(input, toMaxLength) + "...";
+        if(input == null || input.length() <= toMaxLength) {
+            return input;
+        } else {
+            return redact(input, toMaxLength) + "...";
+        }
     }
 
     public static String createRandomAlphabeticString(int ofLength) {

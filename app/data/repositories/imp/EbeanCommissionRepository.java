@@ -7,6 +7,7 @@ import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
 import data.repositories.CommissionRepository;
 import exceptions.InternalErrorException;
+import exceptions.NotFoundException;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import play.Logger;
@@ -144,18 +145,22 @@ public class EbeanCommissionRepository implements CommissionRepository {
 
     @Override
     public boolean doesTransactionExistForSignature(String signature) {
-        String signatureToLog = redactWithEllipsis(signature, 5);
-        logger.info("doesTransactionExistForSignature(): signature = {}", signatureToLog);
-
-        Optional<JpaStoredTransaction> optionalJpaStoredTransaction =
-                ebeanServer.createQuery(JpaStoredTransaction.class)
-                        .where()
-                        // Index on clob is not supported, so assume this condition helps to shrink the search space
-                        .eq("signatureFootPrint", toSignatureFootPrint(signature))
-                        .eq("signature", signature)
-                        .findOneOrEmpty();
-
+        logger.info("doesTransactionExistForSignature(): signature = {}", redactWithEllipsis(signature, 5));
+        Optional<JpaStoredTransaction> optionalJpaStoredTransaction = findStoredTransaction(signature);
         return optionalJpaStoredTransaction.isPresent();
+    }
+
+    @Override
+    public JpaStoredTransaction getTransaction(String signature) {
+        String redactedSignature = redactWithEllipsis(signature, 5);
+        logger.info("getTransaction(): signature = {}", redactedSignature);
+        Optional<JpaStoredTransaction> optionalJpaStoredTransaction = findStoredTransaction(signature);
+
+        if(!optionalJpaStoredTransaction.isPresent()) {
+            throw new NotFoundException("Not found transaction for signature: " + redactedSignature);
+        }
+
+        return optionalJpaStoredTransaction.get();
     }
 
     private JpaCommissionSession find(String userId, Long votingId) {
@@ -177,6 +182,15 @@ public class EbeanCommissionRepository implements CommissionRepository {
         }
 
         return true;
+    }
+
+    private Optional<JpaStoredTransaction> findStoredTransaction(String signature) {
+        return ebeanServer.createQuery(JpaStoredTransaction.class)
+                        .where()
+                        // Index on clob is not supported, so assume this condition helps to shrink the search space
+                        .eq("signatureFootPrint", toSignatureFootPrint(signature))
+                        .eq("signature", signature)
+                        .findOneOrEmpty();
     }
 
     private static String toSignatureFootPrint(String signature) {

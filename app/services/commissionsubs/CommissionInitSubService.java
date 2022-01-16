@@ -1,4 +1,4 @@
-package services;
+package services.commissionsubs;
 
 import data.entities.JpaCommissionSession;
 import data.operations.CommissionDbOperations;
@@ -8,10 +8,11 @@ import requests.CommissionInitRequest;
 import responses.CommissionInitResponse;
 import security.JwtCenter;
 import security.VerifiedJwt;
+import services.Base62Conversions;
 
 import java.util.concurrent.CompletionStage;
 
-class CommissionInitSubService {
+public class CommissionInitSubService {
     private final String envelopePublicKeyPem;
     private final JwtCenter jwtCenter;
     private final CommissionDbOperations commissionDbOperations;

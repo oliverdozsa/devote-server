@@ -11,9 +11,11 @@ import play.mvc.Result;
 import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
+import requests.CommissionTransactionOfSignatureRequest;
 import responses.CommissionAccountCreationResponse;
 import responses.CommissionInitResponse;
 import responses.CommissionSignEnvelopeResponse;
+import responses.CommissionTransactionOfSignatureResponse;
 import security.SecurityUtils;
 import security.VerifiedJwt;
 import services.CommissionService;
@@ -92,7 +94,26 @@ public class CommissionController extends Controller {
         } else {
             CommissionAccountCreationRequest accountCreationRequest = accountCreationRequestForm.get();
             return commissionService.createAccount(accountCreationRequest)
-                    .thenApply(this::toResult);
+                    .thenApply(this::toResult)
+                    .exceptionally(mapExceptionWithUnpack);
+        }
+    }
+
+    public CompletionStage<Result> transactionOfSignature(Http.Request request) {
+        logger.info("transactionOfSignature()");
+
+        Form<CommissionTransactionOfSignatureRequest> requestForm = formFactory
+                .form(CommissionTransactionOfSignatureRequest.class)
+                .bindFromRequest(request);
+
+        if(requestForm.hasErrors()) {
+            JsonNode errorJson = requestForm.errorsAsJson();
+            logger.warn("transactionOfSignature(): form has errors! error json:\n{}", errorJson.toPrettyString());
+            return completedFuture(badRequest(errorJson));
+        } else {
+            return commissionService.transactionOfSignature(requestForm.get())
+                    .thenApply(this::toResult)
+                    .exceptionally(mapExceptionWithUnpack);
         }
     }
 
@@ -107,5 +128,9 @@ public class CommissionController extends Controller {
 
     private Result toResult(CommissionAccountCreationResponse accountCreationResponse) {
         return ok(Json.toJson(accountCreationResponse));
+    }
+
+    private Result toResult(CommissionTransactionOfSignatureResponse txOfSignatureResponse) {
+        return ok(Json.toJson(txOfSignatureResponse));
     }
 }

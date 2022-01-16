@@ -14,6 +14,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
+import requests.CommissionTransactionOfSignatureRequest;
 import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
 import utils.JwtTestUtils;
@@ -196,8 +197,6 @@ public class CommissionControllerTest {
         assertThat(statusOf(result), equalTo(BAD_REQUEST));
     }
 
-    // TODO: test for retrieving envelope signature for user in voting
-
     @Test
     public void testAccountCreationRequest() throws InterruptedException {
         // Given
@@ -223,23 +222,70 @@ public class CommissionControllerTest {
     }
 
     @Test
-    public void testDoubleAccountCreationRequest() {
-        // TODO: This should be forbidden. There should be a separate API for getting the public account key
-        //       By presenting the original message and revealed signature.
+    public void testDoubleAccountCreationRequest() throws InterruptedException {
         // Given
+        InitData votingInitData = initVotingFor("Bob");
+        Thread.sleep(15 * 1000); // So that some channel accounts are present.
+        String message = createMessage(votingInitData.votingId, "someAccountId");
+
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
+        assertThat(statusOf(result.http), equalTo(OK));
+        assertThat(envelopeSignatureOf(result.http), notNullValue());
+        assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
+
+        String envelopeSignatureBase64 = envelopeSignatureOf(result.http);
+        CommissionAccountCreationRequest accountCreationRequest = CommissionTestClient.createAccountCreationRequest(message, envelopeSignatureBase64, result.envelope);
+        Result accountCreationRequestResult = testClient.requestAccountCreation(accountCreationRequest);
+
+        assertThat(statusOf(accountCreationRequestResult), equalTo(OK));
+        assertThat(accountCreationTransactionOf(accountCreationRequestResult), notNullValue());
+        assertThat(accountCreationTransactionOf(accountCreationRequestResult), not(isEmptyString()));
+        assertThatTransactionIsStoredFor(accountCreationRequest.getRevealedSignatureBase64());
+
         // When
+        Result secondAccountCreationRequestResult = testClient.requestAccountCreation(accountCreationRequest);
+
         // Then
+        assertThat(statusOf(secondAccountCreationRequestResult), equalTo(FORBIDDEN));
     }
 
     @Test
-    public void testGetAccountCreationTransaction() {
-        // TODO: Present the same account creation request to obtain the stored transaction
+    public void testGetAccountCreationTransaction() throws InterruptedException {
+        // Given
+        InitData votingInitData = initVotingFor("Bob");
+        Thread.sleep(15 * 1000); // So that some channel accounts are present.
+        String message = createMessage(votingInitData.votingId, "someAccountId");
+
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
+        assertThat(statusOf(result.http), equalTo(OK));
+        assertThat(envelopeSignatureOf(result.http), notNullValue());
+        assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
+
+        String envelopeSignatureBase64 = envelopeSignatureOf(result.http);
+        CommissionAccountCreationRequest accountCreationRequest = CommissionTestClient.createAccountCreationRequest(message, envelopeSignatureBase64, result.envelope);
+        Result accountCreationRequestResult = testClient.requestAccountCreation(accountCreationRequest);
+
+        assertThat(statusOf(accountCreationRequestResult), equalTo(OK));
+        assertThat(accountCreationTransactionOf(accountCreationRequestResult), notNullValue());
+        assertThat(accountCreationTransactionOf(accountCreationRequestResult), not(isEmptyString()));
+        assertThatTransactionIsStoredFor(accountCreationRequest.getRevealedSignatureBase64());
+
+        // When
+        CommissionTransactionOfSignatureRequest txOfSignatureRequest = new CommissionTransactionOfSignatureRequest();
+        txOfSignatureRequest.setSignature(accountCreationRequest.getRevealedSignatureBase64());
+        Result transactionOfSignatureResult = testClient.transactionOfSignature(txOfSignatureRequest);
+
+        // Then
+        assertThat(statusOf(transactionOfSignatureResult), equalTo(OK));
+        assertThat(transactionOfSignature(transactionOfSignatureResult), notNullValue());
     }
 
     @Test
     public void testGetAccountCreationTransaction_NotCreatedBefore() {
         // TODO
     }
+
+    // TODO: test for retrieving envelope signature for user in voting
 
     private String createValidVoting() {
         CreateVotingRequest createVotingRequest = createValidVotingRequest();

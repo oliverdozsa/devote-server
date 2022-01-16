@@ -1,4 +1,4 @@
-package services;
+package services.commissionsubs;
 
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
@@ -14,6 +14,7 @@ import org.bouncycastle.crypto.engines.RSAEngine;
 import play.Logger;
 import requests.CommissionAccountCreationRequest;
 import responses.CommissionAccountCreationResponse;
+import services.Base62Conversions;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -22,9 +23,8 @@ import java.util.Base64;
 import java.util.concurrent.CompletionStage;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
-import static utils.StringUtils.redact;
 
-class CommissionCreateAccountSubService {
+public class CommissionCreateAccountSubService {
     private final CommissionDbOperations commissionDbOperations;
     private final VotingDbOperations votingDbOperations;
     private final CommissionBlockchainOperations commissionBlockchainOperations;

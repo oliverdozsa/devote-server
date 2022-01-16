@@ -8,3 +8,4 @@ POST    /castvote/init            controllers.CommissionController.init(request:
 + jwtFilter
 POST    /castvote/signEnvelope    controllers.CommissionController.signEnvelope(request: Request)
 POST    /castvote/createAccount   controllers.CommissionController.createAccount(request: Request)
+POST    /castvote/txOfSignature   controllers.CommissionController.transactionOfSignature(request: Request)

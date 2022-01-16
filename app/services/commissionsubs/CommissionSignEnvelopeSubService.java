@@ -1,4 +1,4 @@
-package services;
+package services.commissionsubs;
 
 import data.operations.CommissionDbOperations;
 import exceptions.BusinessLogicViolationException;
@@ -9,11 +9,12 @@ import play.Logger;
 import requests.CommissionSignEnvelopeRequest;
 import responses.CommissionSignEnvelopeResponse;
 import security.VerifiedJwt;
+import services.Base62Conversions;
 
 import java.util.Base64;
 import java.util.concurrent.CompletionStage;
 
-class CommissionSignEnvelopeSubService {
+public class CommissionSignEnvelopeSubService {
     private final AsymmetricCipherKeyPair envelopeKeyPair;
     private final CommissionDbOperations commissionDbOperations;
 

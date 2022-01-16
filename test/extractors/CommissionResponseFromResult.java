@@ -25,4 +25,9 @@ public class CommissionResponseFromResult {
         JsonNode accountCreationResponse = jsonOf(result);
         return accountCreationResponse.get("transaction").asText();
     }
+
+    public static String transactionOfSignature(Result result) {
+        JsonNode accountCreationResponse = jsonOf(result);
+        return accountCreationResponse.get("transaction").asText();
+    }
 }

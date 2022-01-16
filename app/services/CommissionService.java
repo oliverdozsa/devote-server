@@ -8,11 +8,17 @@ import play.Logger;
 import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
+import requests.CommissionTransactionOfSignatureRequest;
 import responses.CommissionAccountCreationResponse;
 import responses.CommissionInitResponse;
 import responses.CommissionSignEnvelopeResponse;
+import responses.CommissionTransactionOfSignatureResponse;
 import security.JwtCenter;
 import security.VerifiedJwt;
+import services.commissionsubs.CommissionCreateAccountSubService;
+import services.commissionsubs.CommissionInitSubService;
+import services.commissionsubs.CommissionSignEnvelopeSubService;
+import services.commissionsubs.CommissionTxOfSignatureSubService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,6 +32,7 @@ public class CommissionService {
     private final CommissionInitSubService initSubService;
     private final CommissionSignEnvelopeSubService signEnvelopeSubService;
     private final CommissionCreateAccountSubService createAccountSubService;
+    private final CommissionTxOfSignatureSubService txOfSignatureSubService;
 
     @Inject
     public CommissionService(
@@ -38,6 +45,7 @@ public class CommissionService {
         initSubService = new CommissionInitSubService(publicKeyToPemString(envelopeKeyPair), jwtCenter, commissionDbOperations);
         signEnvelopeSubService = new CommissionSignEnvelopeSubService(envelopeKeyPair, commissionDbOperations);
         createAccountSubService = new CommissionCreateAccountSubService(commissionDbOperations, votingDbOperations, commissionBlockchainOperations, envelopeKeyPair);
+        txOfSignatureSubService = new CommissionTxOfSignatureSubService(commissionDbOperations);
     }
 
     public CompletionStage<CommissionInitResponse> init(CommissionInitRequest request, VerifiedJwt jwt) {
@@ -52,11 +60,13 @@ public class CommissionService {
 
     public CompletionStage<CommissionAccountCreationResponse> createAccount(CommissionAccountCreationRequest request) {
         logger.info("createAccount(): request = {}", request);
-        // TODO: Store transaction for presented signature in DB.
         return createAccountSubService.createAccount(request);
     }
 
-    // TODO: Request account creation message: votingId|voterPublicAccountId
-    //       Store signature in DB. In case the message is replayed, it can be checked whether the account
-    //       has already been created or not.
+    public CompletionStage<CommissionTransactionOfSignatureResponse> transactionOfSignature(
+            CommissionTransactionOfSignatureRequest request
+    ) {
+        logger.info("transactionOfSignature(): request = {}", request);
+        return txOfSignatureSubService.transactionOfSignature(request);
+    }
 }

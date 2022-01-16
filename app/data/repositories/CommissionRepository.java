@@ -1,6 +1,7 @@
 package data.repositories;
 
 import data.entities.JpaCommissionSession;
+import data.entities.JpaStoredTransaction;
 import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
 
@@ -15,4 +16,5 @@ public interface CommissionRepository {
     JpaVotingIssuerAccount selectAnIssuer(Long votingId);
     void storeTransactionForRevealedSignature(Long votingId, String signature, String transaction);
     boolean doesTransactionExistForSignature(String signature);
+    JpaStoredTransaction getTransaction(String signature);
 }

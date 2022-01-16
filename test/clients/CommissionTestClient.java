@@ -9,6 +9,7 @@ import play.mvc.Result;
 import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
+import requests.CommissionTransactionOfSignatureRequest;
 import utils.JwtTestUtils;
 
 import java.util.Base64;
@@ -77,6 +78,16 @@ public class CommissionTestClient extends TestClient {
                 .bodyJson(Json.toJson(request))
                 .header(CONTENT_TYPE, Http.MimeTypes.JSON)
                 .uri(routes.CommissionController.createAccount().url());
+
+        return route(application, httpRequest);
+    }
+
+    public Result transactionOfSignature(CommissionTransactionOfSignatureRequest request) {
+        Http.RequestBuilder httpRequest = new Http.RequestBuilder()
+                .method(POST)
+                .bodyJson(Json.toJson(request))
+                .header(CONTENT_TYPE, Http.MimeTypes.JSON)
+                .uri(routes.CommissionController.transactionOfSignature().url());
 
         return route(application, httpRequest);
     }

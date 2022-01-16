@@ -1,6 +1,7 @@
 package data.operations;
 
 import data.entities.JpaCommissionSession;
+import data.entities.JpaStoredTransaction;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
 import static java.util.concurrent.CompletableFuture.*;
+import static utils.StringUtils.redactWithEllipsis;
 
 public class CommissionDbOperations {
     private final CommissionRepository commissionRepository;
@@ -73,9 +75,13 @@ public class CommissionDbOperations {
     }
 
     public CompletionStage<Boolean> doesTransactionExistForSignature(String signature) {
-        String signatureToLog = signature.substring(0, 5);
-        logger.info("doesTransactionExistForSignature(): signature = {}", signatureToLog);
+        logger.info("doesTransactionExistForSignature(): signature = {}", redactWithEllipsis(signature, 5));
         return supplyAsync(() -> commissionRepository.doesTransactionExistForSignature(signature), dbExecContext);
+    }
+
+    public CompletionStage<JpaStoredTransaction> getTransaction(String signature) {
+        logger.info("getTransaction(): signature = {}", redactWithEllipsis(signature, 5));
+        return supplyAsync(() -> commissionRepository.getTransaction(signature), dbExecContext);
     }
 }
 
