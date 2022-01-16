@@ -1,11 +1,13 @@
 # Voting administration
-POST    /voting                   controllers.VotingController.create(request: Request)
-GET     /voting/:id               controllers.VotingController.single(id: String)
+POST    /voting                                    controllers.VotingController.create(request: Request)
+GET     /voting/:id                                controllers.VotingController.single(id: String)
 
 # Cast vote
 + jwtFilter
-POST    /castvote/init            controllers.CommissionController.init(request: Request)
+POST    /castvote/init                             controllers.CommissionController.init(request: Request)
 + jwtFilter
-POST    /castvote/signEnvelope    controllers.CommissionController.signEnvelope(request: Request)
-POST    /castvote/createAccount   controllers.CommissionController.createAccount(request: Request)
-POST    /castvote/txOfSignature   controllers.CommissionController.transactionOfSignature(request: Request)
+POST    /castvote/signEnvelope                     controllers.CommissionController.signEnvelope(request: Request)
+POST    /castvote/createAccount                    controllers.CommissionController.createAccount(request: Request)
+GET     /castvote/txOfSignature/:signature         controllers.CommissionController.transactionOfSignature(signature: String)
++ jwtFilter
+GET     /castvote/envlSignature/:votingId/:user    controllers.CommissionController.getEnvelopeSignature(votingId: String, user: String)

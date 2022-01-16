@@ -11,7 +11,6 @@ import play.mvc.Result;
 import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
-import requests.CommissionTransactionOfSignatureRequest;
 import responses.CommissionAccountCreationResponse;
 import responses.CommissionInitResponse;
 import responses.CommissionSignEnvelopeResponse;
@@ -25,6 +24,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
+import static utils.StringUtils.redactWithEllipsis;
 
 public class CommissionController extends Controller {
     private final FormFactory formFactory;
@@ -99,22 +99,18 @@ public class CommissionController extends Controller {
         }
     }
 
-    public CompletionStage<Result> transactionOfSignature(Http.Request request) {
-        logger.info("transactionOfSignature()");
+    public CompletionStage<Result> transactionOfSignature(String signature) {
+        logger.info("transactionOfSignature(): signature = {}", redactWithEllipsis(signature, 5));
 
-        Form<CommissionTransactionOfSignatureRequest> requestForm = formFactory
-                .form(CommissionTransactionOfSignatureRequest.class)
-                .bindFromRequest(request);
+        return commissionService.transactionOfSignature(signature)
+                .thenApply(this::toResult)
+                .exceptionally(mapExceptionWithUnpack);
+    }
 
-        if(requestForm.hasErrors()) {
-            JsonNode errorJson = requestForm.errorsAsJson();
-            logger.warn("transactionOfSignature(): form has errors! error json:\n{}", errorJson.toPrettyString());
-            return completedFuture(badRequest(errorJson));
-        } else {
-            return commissionService.transactionOfSignature(requestForm.get())
-                    .thenApply(this::toResult)
-                    .exceptionally(mapExceptionWithUnpack);
-        }
+    public CompletionStage<Result> getEnvelopeSignature(String votingId, String user) {
+        logger.info("getEnvelopeSignature(): votingId = {}, user = {}", votingId, user);
+        // TODO
+        return completedFuture(notFound());
     }
 
     private Result toResult(CommissionInitResponse initResponse) {

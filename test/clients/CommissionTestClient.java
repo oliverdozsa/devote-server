@@ -9,14 +9,12 @@ import play.mvc.Result;
 import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
-import requests.CommissionTransactionOfSignatureRequest;
 import utils.JwtTestUtils;
 
 import java.util.Base64;
 
 import static play.mvc.Http.HeaderNames.CONTENT_TYPE;
-import static play.test.Helpers.POST;
-import static play.test.Helpers.route;
+import static play.test.Helpers.*;
 import static utils.JwtTestUtils.addJwtTokenTo;
 
 public class CommissionTestClient extends TestClient {
@@ -82,12 +80,22 @@ public class CommissionTestClient extends TestClient {
         return route(application, httpRequest);
     }
 
-    public Result transactionOfSignature(CommissionTransactionOfSignatureRequest request) {
+    public Result transactionOfSignature(String signature) {
         Http.RequestBuilder httpRequest = new Http.RequestBuilder()
-                .method(POST)
-                .bodyJson(Json.toJson(request))
+                .method(GET)
                 .header(CONTENT_TYPE, Http.MimeTypes.JSON)
-                .uri(routes.CommissionController.transactionOfSignature().url());
+                .uri(routes.CommissionController.transactionOfSignature(signature).url());
+
+        return route(application, httpRequest);
+    }
+
+    public Result envelopeSignatureOf(String votingId, String user, String jwt) {
+        Http.RequestBuilder httpRequest = new Http.RequestBuilder()
+                .method(GET)
+                .header(CONTENT_TYPE, Http.MimeTypes.JSON)
+                .uri(routes.CommissionController.getEnvelopeSignature(votingId, user).url());
+
+        addJwtTokenTo(httpRequest, jwt);
 
         return route(application, httpRequest);
     }

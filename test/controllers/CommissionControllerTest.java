@@ -14,7 +14,6 @@ import play.mvc.Http;
 import play.mvc.Result;
 import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
-import requests.CommissionTransactionOfSignatureRequest;
 import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
 import utils.JwtTestUtils;
@@ -271,9 +270,7 @@ public class CommissionControllerTest {
         assertThatTransactionIsStoredFor(accountCreationRequest.getRevealedSignatureBase64());
 
         // When
-        CommissionTransactionOfSignatureRequest txOfSignatureRequest = new CommissionTransactionOfSignatureRequest();
-        txOfSignatureRequest.setSignature(accountCreationRequest.getRevealedSignatureBase64());
-        Result transactionOfSignatureResult = testClient.transactionOfSignature(txOfSignatureRequest);
+        Result transactionOfSignatureResult = testClient.transactionOfSignature(accountCreationRequest.getRevealedSignatureBase64());
 
         // Then
         assertThat(statusOf(transactionOfSignatureResult), equalTo(OK));
@@ -282,10 +279,46 @@ public class CommissionControllerTest {
 
     @Test
     public void testGetAccountCreationTransaction_NotCreatedBefore() {
-        // TODO
+        // Given
+        String someRandomSignature = "844221";
+
+        // When
+        Result transactionOfSignatureResult = testClient.transactionOfSignature(someRandomSignature);
+
+        // Then
+        assertThat(statusOf(transactionOfSignatureResult), equalTo(NOT_FOUND));
     }
 
-    // TODO: test for retrieving envelope signature for user in voting
+    @Test
+    public void testGetEnvelopeSignatureForUserInVoting() {
+        // Given
+        InitData votingInitData = initVotingFor("Bob");
+        String message = createMessage(votingInitData.votingId, "someAccountId");
+
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
+        assertThat(statusOf(result.http), equalTo(OK));
+        assertThat(envelopeSignatureOf(result.http), notNullValue());
+        assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
+
+        // When
+        Result getEnvelopeSignatureResult = testClient.envelopeSignatureOf(votingInitData.votingId, "Bob", votingInitData.sessionJwt);
+
+        // Then
+        assertThat(statusOf(getEnvelopeSignatureResult), equalTo(OK));
+        assertThat(envelopeSignatureOf(getEnvelopeSignatureResult), notNullValue());
+    }
+
+    @Test
+    public void testGetEnvelopeSignatureForUserInVoting_NotSignedEnvelopeBefore() {
+        // Given
+        InitData votingInitData = initVotingFor("Bob");
+
+        // When
+        Result getEnvelopeSignatureResult = testClient.envelopeSignatureOf(votingInitData.votingId, "Bob", votingInitData.sessionJwt);
+
+        // Then
+        assertThat(statusOf(getEnvelopeSignatureResult), equalTo(NOT_FOUND));
+    }
 
     private String createValidVoting() {
         CreateVotingRequest createVotingRequest = createValidVotingRequest();

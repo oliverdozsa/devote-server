@@ -1,13 +1,16 @@
 package requests;
 
+import play.data.validation.Constraints;
+
 import static utils.StringUtils.redact;
 import static utils.StringUtils.redactWithEllipsis;
 
 public class CommissionAccountCreationRequest {
-    // TODO: Validation:
-    //         - message: should be non-empty string containing |
-    //         - revealedSignatureBase64: should be non-empty string
+    @Constraints.Required
+    @Constraints.Pattern(".+|.+")
     private String message;
+
+    @Constraints.Required
     private String revealedSignatureBase64;
 
     public String getMessage() {
@@ -29,8 +32,8 @@ public class CommissionAccountCreationRequest {
     @Override
     public String toString() {
         return "CommissionAccountCreationRequest{" +
-                "message='" + redactWithEllipsis(message, 10) + "...'" +
-                ", revealedSignatureBase64 ='" + redactWithEllipsis(revealedSignatureBase64, 5) + "...'" +
+                "message='" + redactWithEllipsis(message, 10) +
+                ", revealedSignatureBase64 ='" + redactWithEllipsis(revealedSignatureBase64, 5) +
                 '}';
     }
 }

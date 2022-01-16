@@ -8,7 +8,6 @@ import play.Logger;
 import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
-import requests.CommissionTransactionOfSignatureRequest;
 import responses.CommissionAccountCreationResponse;
 import responses.CommissionInitResponse;
 import responses.CommissionSignEnvelopeResponse;
@@ -25,6 +24,7 @@ import javax.inject.Named;
 import java.util.concurrent.CompletionStage;
 
 import static crypto.RsaKeyUtils.publicKeyToPemString;
+import static utils.StringUtils.redactWithEllipsis;
 
 public class CommissionService {
     private static final Logger.ALogger logger = Logger.of(CommissionService.class);
@@ -63,10 +63,8 @@ public class CommissionService {
         return createAccountSubService.createAccount(request);
     }
 
-    public CompletionStage<CommissionTransactionOfSignatureResponse> transactionOfSignature(
-            CommissionTransactionOfSignatureRequest request
-    ) {
-        logger.info("transactionOfSignature(): request = {}", request);
-        return txOfSignatureSubService.transactionOfSignature(request);
+    public CompletionStage<CommissionTransactionOfSignatureResponse> transactionOfSignature(String signature) {
+        logger.info("transactionOfSignature(): signature = {}", redactWithEllipsis(signature, 5));
+        return txOfSignatureSubService.transactionOfSignature(signature);
     }
 }

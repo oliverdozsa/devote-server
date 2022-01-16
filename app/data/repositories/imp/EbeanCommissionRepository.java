@@ -95,12 +95,14 @@ public class EbeanCommissionRepository implements CommissionRepository {
             channelAccount.setConsumed(true);
             ebeanServer.update(channelAccount);
 
-            logger.info("consumeOneChannel(): success consumed a channel! id = {}", channelAccount.getId());
+            logger.info("consumeOneChannel(): successfully consumed a channel! id = {}", channelAccount.getId());
 
             return channelAccount;
         } else if (areAllChannelAccountsCreated(votingId)) {
+            logger.warn("Could not find a free channel account!");
             throw new InternalErrorException("Could not find a free channel account!");
         } else {
+            logger.warn("Could not find a free channel account! Please try again later!");
             throw new InternalErrorException("Could not find a free channel account! Please try again later!");
         }
     }
@@ -145,8 +147,9 @@ public class EbeanCommissionRepository implements CommissionRepository {
 
     @Override
     public boolean doesTransactionExistForSignature(String signature) {
-        logger.info("doesTransactionExistForSignature(): signature = {}", redactWithEllipsis(signature, 5));
         Optional<JpaStoredTransaction> optionalJpaStoredTransaction = findStoredTransaction(signature);
+        logger.info("doesTransactionExistForSignature(): Transaction does {} exist for signature = {}",
+                optionalJpaStoredTransaction.isPresent() ? "" : "not", redactWithEllipsis(signature, 5));
         return optionalJpaStoredTransaction.isPresent();
     }
 

@@ -3,10 +3,11 @@ package services.commissionsubs;
 import data.entities.JpaStoredTransaction;
 import data.operations.CommissionDbOperations;
 import play.Logger;
-import requests.CommissionTransactionOfSignatureRequest;
 import responses.CommissionTransactionOfSignatureResponse;
 
 import java.util.concurrent.CompletionStage;
+
+import static utils.StringUtils.redactWithEllipsis;
 
 public class CommissionTxOfSignatureSubService {
     private final CommissionDbOperations commissionDbOperations;
@@ -17,12 +18,10 @@ public class CommissionTxOfSignatureSubService {
         this.commissionDbOperations = commissionDbOperations;
     }
 
-    public CompletionStage<CommissionTransactionOfSignatureResponse> transactionOfSignature(
-            CommissionTransactionOfSignatureRequest request
-    ) {
-        logger.info("transactionOfSignature(): request = {}", request);
+    public CompletionStage<CommissionTransactionOfSignatureResponse> transactionOfSignature(String signature) {
+        logger.info("transactionOfSignature(): signature = {}", redactWithEllipsis(signature, 5));
 
-        return commissionDbOperations.getTransaction(request.getSignature())
+        return commissionDbOperations.getTransaction(signature)
                 .thenApply(CommissionTxOfSignatureSubService::toResponse);
     }
 
