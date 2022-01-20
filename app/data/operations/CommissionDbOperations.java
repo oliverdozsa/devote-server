@@ -2,7 +2,6 @@ package data.operations;
 
 import data.entities.JpaCommissionSession;
 import data.entities.JpaStoredTransaction;
-import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
 import data.repositories.CommissionRepository;
@@ -13,7 +12,8 @@ import javax.inject.Inject;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
-import static java.util.concurrent.CompletableFuture.*;
+import static java.util.concurrent.CompletableFuture.runAsync;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static utils.StringUtils.redactWithEllipsis;
 
 public class CommissionDbOperations {
@@ -82,6 +82,11 @@ public class CommissionDbOperations {
     public CompletionStage<JpaStoredTransaction> getTransaction(String signature) {
         logger.info("getTransaction(): signature = {}", redactWithEllipsis(signature, 5));
         return supplyAsync(() -> commissionRepository.getTransaction(signature), dbExecContext);
+    }
+
+    public CompletionStage<JpaCommissionSession> getCommissionSession(Long votingId, String user) {
+        logger.info("getCommissionSession(): votingId = {}, user = {}", votingId, user);
+        return supplyAsync(() -> commissionRepository.getCommissionSession(votingId, user), dbExecContext);
     }
 }
 

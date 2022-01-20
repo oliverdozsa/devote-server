@@ -297,7 +297,9 @@ public class CommissionControllerTest {
 
         CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
         assertThat(statusOf(result.http), equalTo(OK));
-        assertThat(envelopeSignatureOf(result.http), notNullValue());
+        String envelopeSignatureOnSign = envelopeSignatureOf(result.http);
+
+        assertThat(envelopeSignatureOnSign, notNullValue());
         assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
 
         // When
@@ -306,6 +308,9 @@ public class CommissionControllerTest {
         // Then
         assertThat(statusOf(getEnvelopeSignatureResult), equalTo(OK));
         assertThat(envelopeSignatureOf(getEnvelopeSignatureResult), notNullValue());
+
+        String getEnvelopeSignature = envelopeSignatureOf(getEnvelopeSignatureResult);
+        assertThat(getEnvelopeSignature, equalTo(envelopeSignatureOnSign));
     }
 
     @Test

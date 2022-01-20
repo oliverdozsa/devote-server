@@ -159,11 +159,26 @@ public class EbeanCommissionRepository implements CommissionRepository {
         logger.info("getTransaction(): signature = {}", redactedSignature);
         Optional<JpaStoredTransaction> optionalJpaStoredTransaction = findStoredTransaction(signature);
 
-        if(!optionalJpaStoredTransaction.isPresent()) {
+        if (!optionalJpaStoredTransaction.isPresent()) {
             throw new NotFoundException("Not found transaction for signature: " + redactedSignature);
         }
 
         return optionalJpaStoredTransaction.get();
+    }
+
+    @Override
+    public JpaCommissionSession getCommissionSession(Long votingId, String userId) {
+        logger.info("getCommissionSession(): votingId = {}, userId = {}", votingId, userId);
+
+        JpaCommissionSession commissionSession = find(userId, votingId);
+
+        if (commissionSession == null) {
+            String errorMessage = String.format("Not found commission session with voting id = %d, user = %s", votingId, userId);
+            logger.warn("getCommissionSession()" + errorMessage);
+            throw new NotFoundException(errorMessage);
+        } else {
+            return commissionSession;
+        }
     }
 
     private JpaCommissionSession find(String userId, Long votingId) {
@@ -189,11 +204,11 @@ public class EbeanCommissionRepository implements CommissionRepository {
 
     private Optional<JpaStoredTransaction> findStoredTransaction(String signature) {
         return ebeanServer.createQuery(JpaStoredTransaction.class)
-                        .where()
-                        // Index on clob is not supported, so assume this condition helps to shrink the search space
-                        .eq("signatureFootPrint", toSignatureFootPrint(signature))
-                        .eq("signature", signature)
-                        .findOneOrEmpty();
+                .where()
+                // Index on clob is not supported, so assume this condition helps to shrink the search space
+                .eq("signatureFootPrint", toSignatureFootPrint(signature))
+                .eq("signature", signature)
+                .findOneOrEmpty();
     }
 
     private static String toSignatureFootPrint(String signature) {

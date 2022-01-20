@@ -2,7 +2,7 @@ package responses;
 
 import static utils.StringUtils.redactWithEllipsis;
 
-public class CommissionSignEnvelopeResponse {
+public class CommissionGetEnvelopeSignatureResponse {
     private String envelopeSignatureBase64;
 
     public String getEnvelopeSignatureBase64() {
@@ -15,7 +15,7 @@ public class CommissionSignEnvelopeResponse {
 
     @Override
     public String toString() {
-        return "CommissionSignEnvelopeResponse{" +
+        return "CommissionGetEnvelopeSignatureResponse{" +
                 "envelopeSignatureBase64='" + redactWithEllipsis(envelopeSignatureBase64, 5) + '\'' +
                 '}';
     }

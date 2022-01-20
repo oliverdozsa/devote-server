@@ -9,6 +9,7 @@ import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
 import responses.CommissionAccountCreationResponse;
+import responses.CommissionGetEnvelopeSignatureResponse;
 import responses.CommissionInitResponse;
 import responses.CommissionSignEnvelopeResponse;
 import responses.CommissionTransactionOfSignatureResponse;
@@ -17,7 +18,7 @@ import security.VerifiedJwt;
 import services.commissionsubs.CommissionCreateAccountSubService;
 import services.commissionsubs.CommissionInitSubService;
 import services.commissionsubs.CommissionSignEnvelopeSubService;
-import services.commissionsubs.CommissionTxOfSignatureSubService;
+import services.commissionsubs.CommissionStoredDataSubService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,7 +33,7 @@ public class CommissionService {
     private final CommissionInitSubService initSubService;
     private final CommissionSignEnvelopeSubService signEnvelopeSubService;
     private final CommissionCreateAccountSubService createAccountSubService;
-    private final CommissionTxOfSignatureSubService txOfSignatureSubService;
+    private final CommissionStoredDataSubService storedDataSubService;
 
     @Inject
     public CommissionService(
@@ -45,7 +46,7 @@ public class CommissionService {
         initSubService = new CommissionInitSubService(publicKeyToPemString(envelopeKeyPair), jwtCenter, commissionDbOperations);
         signEnvelopeSubService = new CommissionSignEnvelopeSubService(envelopeKeyPair, commissionDbOperations);
         createAccountSubService = new CommissionCreateAccountSubService(commissionDbOperations, votingDbOperations, commissionBlockchainOperations, envelopeKeyPair);
-        txOfSignatureSubService = new CommissionTxOfSignatureSubService(commissionDbOperations);
+        storedDataSubService = new CommissionStoredDataSubService(commissionDbOperations);
     }
 
     public CompletionStage<CommissionInitResponse> init(CommissionInitRequest request, VerifiedJwt jwt) {
@@ -65,6 +66,11 @@ public class CommissionService {
 
     public CompletionStage<CommissionTransactionOfSignatureResponse> transactionOfSignature(String signature) {
         logger.info("transactionOfSignature(): signature = {}", redactWithEllipsis(signature, 5));
-        return txOfSignatureSubService.transactionOfSignature(signature);
+        return storedDataSubService.transactionOfSignature(signature);
+    }
+
+    public CompletionStage<CommissionGetEnvelopeSignatureResponse> signatureOfEnvelope(String votingId, String user) {
+        logger.info("signatureOfEnvelope(): votingId = {}, user = {}", votingId, user);
+        return storedDataSubService.signatureOfEnvelope(votingId, user);
     }
 }

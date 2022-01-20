@@ -12,6 +12,7 @@ import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
 import responses.CommissionAccountCreationResponse;
+import responses.CommissionGetEnvelopeSignatureResponse;
 import responses.CommissionInitResponse;
 import responses.CommissionSignEnvelopeResponse;
 import responses.CommissionTransactionOfSignatureResponse;
@@ -109,8 +110,9 @@ public class CommissionController extends Controller {
 
     public CompletionStage<Result> getEnvelopeSignature(String votingId, String user) {
         logger.info("getEnvelopeSignature(): votingId = {}, user = {}", votingId, user);
-        // TODO
-        return completedFuture(notFound());
+        return commissionService.signatureOfEnvelope(votingId, user)
+                .thenApply(this::toResult)
+                .exceptionally(mapExceptionWithUnpack);
     }
 
     private Result toResult(CommissionInitResponse initResponse) {
@@ -128,5 +130,9 @@ public class CommissionController extends Controller {
 
     private Result toResult(CommissionTransactionOfSignatureResponse txOfSignatureResponse) {
         return ok(Json.toJson(txOfSignatureResponse));
+    }
+
+    private Result toResult(CommissionGetEnvelopeSignatureResponse getEnvelopeSignatureResponse) {
+        return ok(Json.toJson(getEnvelopeSignatureResponse));
     }
 }
