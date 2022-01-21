@@ -84,9 +84,9 @@ public class CommissionDbOperations {
         return supplyAsync(() -> commissionRepository.getTransaction(signature), dbExecContext);
     }
 
-    public CompletionStage<JpaCommissionSession> getCommissionSession(Long votingId, String user) {
+    public CompletionStage<JpaCommissionSession> getCommissionSessionWithExistingEnvelopeSignature(Long votingId, String user) {
         logger.info("getCommissionSession(): votingId = {}, user = {}", votingId, user);
-        return supplyAsync(() -> commissionRepository.getCommissionSession(votingId, user), dbExecContext);
+        return supplyAsync(() -> commissionRepository.getCommissionSessionWithExistingEnvelopeSignature(votingId, user), dbExecContext);
     }
 }
 

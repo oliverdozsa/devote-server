@@ -4,10 +4,8 @@ import data.entities.JpaChannelAccountProgress;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingIssuerAccount;
 import data.repositories.ChannelProgressRepository;
-import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import play.Logger;
-import play.db.ebean.EbeanConfig;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -19,8 +17,8 @@ public class EbeanChannelProgressRepository implements ChannelProgressRepository
     private final EbeanServer ebeanServer;
 
     @Inject
-    public EbeanChannelProgressRepository(EbeanConfig ebeanConfig) {
-        ebeanServer = Ebean.getServer(ebeanConfig.defaultServer());
+    public EbeanChannelProgressRepository(EbeanServer ebeanServer) {
+        this.ebeanServer = ebeanServer;
     }
 
     @Override

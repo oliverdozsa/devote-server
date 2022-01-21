@@ -4,6 +4,7 @@ import data.repositories.ChannelProgressRepository;
 import data.repositories.CommissionRepository;
 import data.repositories.imp.EbeanCommissionRepository;
 import data.repositories.imp.EbeanChannelProgressRepository;
+import data.repositories.imp.EbeanServerProvider;
 import devote.blockchain.operations.CommissionBlockchainOperations;
 import devote.blockchain.operations.VotingBlockchainOperations;
 import data.operations.VotingDbOperations;
@@ -12,6 +13,7 @@ import data.repositories.imp.EbeanVotingRepository;
 import devote.blockchain.Blockchains;
 import com.google.inject.AbstractModule;
 import formatters.FormattersProvider;
+import io.ebean.EbeanServer;
 import ipfs.VotingIpfsOperations;
 import ipfs.api.IpfsApi;
 import ipfs.api.imp.IpfsApiImp;
@@ -40,6 +42,7 @@ public class Module extends AbstractModule {
         bind(Blockchains.class).asEagerSingleton();
 
         // Data
+        bind(EbeanServer.class).toProvider(EbeanServerProvider.class);
         bind(VotingRepository.class).to(EbeanVotingRepository.class).asEagerSingleton();
         bind(ChannelProgressRepository.class).to(EbeanChannelProgressRepository.class).asEagerSingleton();
         bind(CommissionRepository.class).to(EbeanCommissionRepository.class).asEagerSingleton();

@@ -8,10 +8,8 @@ import data.entities.JpaVotingIssuerAccount;
 import data.repositories.CommissionRepository;
 import exceptions.InternalErrorException;
 import exceptions.NotFoundException;
-import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import play.Logger;
-import play.db.ebean.EbeanConfig;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -28,8 +26,8 @@ public class EbeanCommissionRepository implements CommissionRepository {
     private static final Logger.ALogger logger = Logger.of(EbeanCommissionRepository.class);
 
     @Inject
-    public EbeanCommissionRepository(EbeanConfig ebeanConfig) {
-        this.ebeanServer = Ebean.getServer(ebeanConfig.defaultServer());
+    public EbeanCommissionRepository(EbeanServer ebeanServer) {
+        this.ebeanServer = ebeanServer;
     }
 
     @Override
@@ -99,11 +97,13 @@ public class EbeanCommissionRepository implements CommissionRepository {
 
             return channelAccount;
         } else if (areAllChannelAccountsCreated(votingId)) {
-            logger.warn("Could not find a free channel account!");
-            throw new InternalErrorException("Could not find a free channel account!");
+            String errorMessage = "Could not find a free channel account!";
+            logger.warn("consumeOneChannel(): {}", errorMessage);
+            throw new InternalErrorException(errorMessage);
         } else {
-            logger.warn("Could not find a free channel account! Please try again later!");
-            throw new InternalErrorException("Could not find a free channel account! Please try again later!");
+            String errorMessage = "Could not find a free channel account! Please try again later!";
+            logger.warn("consumeOneChannel(): {}", errorMessage);
+            throw new InternalErrorException(errorMessage);
         }
     }
 
@@ -167,8 +167,8 @@ public class EbeanCommissionRepository implements CommissionRepository {
     }
 
     @Override
-    public JpaCommissionSession getCommissionSession(Long votingId, String userId) {
-        logger.info("getCommissionSession(): votingId = {}, userId = {}", votingId, userId);
+    public JpaCommissionSession getCommissionSessionWithExistingEnvelopeSignature(Long votingId, String userId) {
+        logger.info("getCommissionSessionWithExistingEnvelopeSignature(): votingId = {}, userId = {}", votingId, userId);
 
         JpaCommissionSession commissionSession = find(userId, votingId);
 
@@ -176,7 +176,13 @@ public class EbeanCommissionRepository implements CommissionRepository {
             String errorMessage = String.format("Not found commission session with voting id = %d, user = %s", votingId, userId);
             logger.warn("getCommissionSession()" + errorMessage);
             throw new NotFoundException(errorMessage);
-        } else {
+        } else if (commissionSession.getEnvelopeSignature() == null || commissionSession.getEnvelopeSignature().length() == 0) {
+            String errorMessage = String.format("Found commission session with voting id = %d, user = %s, but envelope signature is empty.",
+                    votingId, userId);
+            logger.warn("getCommissionSession()" + errorMessage);
+            throw new NotFoundException(errorMessage);
+        }
+        {
             return commissionSession;
         }
     }

@@ -17,5 +17,5 @@ public interface CommissionRepository {
     void storeTransactionForRevealedSignature(Long votingId, String signature, String transaction);
     boolean doesTransactionExistForSignature(String signature);
     JpaStoredTransaction getTransaction(String signature);
-    JpaCommissionSession getCommissionSession(Long votingId, String user);
+    JpaCommissionSession getCommissionSessionWithExistingEnvelopeSignature(Long votingId, String user);
 }

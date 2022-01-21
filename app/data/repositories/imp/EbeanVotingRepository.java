@@ -6,11 +6,9 @@ import data.entities.JpaVotingIssuerAccount;
 import data.repositories.VotingRepository;
 import devote.blockchain.api.DistributionAndBallotAccount;
 import devote.blockchain.api.KeyPair;
-import requests.CreateVotingRequest;
-import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import play.Logger;
-import play.db.ebean.EbeanConfig;
+import requests.CreateVotingRequest;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -27,8 +25,8 @@ public class EbeanVotingRepository implements VotingRepository {
     private final EbeanServer ebeanServer;
 
     @Inject
-    public EbeanVotingRepository(EbeanConfig ebeanConfig) {
-        ebeanServer = Ebean.getServer(ebeanConfig.defaultServer());
+    public EbeanVotingRepository(EbeanServer ebeanServer) {
+        this.ebeanServer = ebeanServer;
     }
 
     @Override

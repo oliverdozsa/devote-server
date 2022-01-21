@@ -32,7 +32,7 @@ public class CommissionStoredDataSubService {
         logger.info("signatureOfEnvelope(): votingId = {}, user = {}", votingId, user);
 
         Long votingIdAsLong = Base62Conversions.decode(votingId);
-        return commissionDbOperations.getCommissionSession(votingIdAsLong, user)
+        return commissionDbOperations.getCommissionSessionWithExistingEnvelopeSignature(votingIdAsLong, user)
                 .thenApply(CommissionStoredDataSubService::toResponse);
     }
 
