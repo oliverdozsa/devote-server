@@ -17,9 +17,8 @@ public class IpfsApiImp implements IpfsApi {
     private final IPFS ipfs;
 
     @Inject
-    public IpfsApiImp(Config config) {
-        String ipfsNodeAddress = config.getString("devote.ipfs.node.address");
-        ipfs = new IPFS(new MultiAddress(ipfsNodeAddress));
+    public IpfsApiImp(IPFS ipfs) {
+        this.ipfs = ipfs;
     }
 
     @Override

@@ -19,12 +19,4 @@ public class VotingIssuerResponse {
     public void setAssetCode(String assetCode) {
         this.assetCode = assetCode;
     }
-
-    @Override
-    public String toString() {
-        return "VotingIssuerResponse{" +
-                "issuerAccountId='" + issuerAccountId + '\'' +
-                ", assetCode='" + assetCode + '\'' +
-                '}';
-    }
 }

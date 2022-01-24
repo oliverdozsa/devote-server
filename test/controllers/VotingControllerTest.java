@@ -2,8 +2,10 @@ package controllers;
 
 import asserts.IpfsAsserts;
 import clients.VotingTestClient;
+import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;
 import ipfs.api.imp.MockIpfsApi;
+import ipfs.api.imp.MockIpfsProvider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,7 +46,8 @@ public class VotingControllerTest {
 
     public VotingControllerTest() {
         GuiceApplicationBuilder applicationBuilder = new GuiceApplicationBuilder()
-                .overrides(bind(IpfsApi.class).to(MockIpfsApi.class));
+                .overrides(bind(IpfsApi.class).to(MockIpfsApi.class))
+                .overrides(bind(IPFS.class).toProvider(MockIpfsProvider.class));;
 
         ruleChainForTests = new RuleChainForTests(applicationBuilder);
         chain = ruleChainForTests.getRuleChain();

@@ -139,25 +139,4 @@ public class VotingResponse {
     public void setVisibility(String visibility) {
         this.visibility = visibility;
     }
-
-    @Override
-    public String toString() {
-        return "VotingResponse{" +
-                "id=" + id +
-                ", network='" + network + '\'' +
-                ", title='" + title + '\'' +
-                ", votesCap=" + votesCap +
-                ", polls=" + polls +
-                ", issuers=" + issuers +
-                ", createdAt=" + createdAt +
-                ", encryptedUntil=" + encryptedUntil +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", distributionAccountId='" + distributionAccountId + '\'' +
-                ", ballotAccountId='" + ballotAccountId + '\'' +
-                ", authorization='" + authorization + '\'' +
-                ", authOptionKeybase='" + authOptionKeybase + '\'' +
-                ", visibility='" + visibility + '\'' +
-                '}';
-    }
 }

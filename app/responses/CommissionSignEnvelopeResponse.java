@@ -12,11 +12,4 @@ public class CommissionSignEnvelopeResponse {
     public void setEnvelopeSignatureBase64(String envelopeSignatureBase64) {
         this.envelopeSignatureBase64 = envelopeSignatureBase64;
     }
-
-    @Override
-    public String toString() {
-        return "CommissionSignEnvelopeResponse{" +
-                "envelopeSignatureBase64='" + redactWithEllipsis(envelopeSignatureBase64, 5) + '\'' +
-                '}';
-    }
 }

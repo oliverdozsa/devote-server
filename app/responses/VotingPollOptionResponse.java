@@ -19,12 +19,4 @@ public class VotingPollOptionResponse {
     public void setCode(Integer code) {
         this.code = code;
     }
-
-    @Override
-    public String toString() {
-        return "VotingPollOptionResponse{" +
-                "name='" + name + '\'' +
-                ", code=" + code +
-                '}';
-    }
 }

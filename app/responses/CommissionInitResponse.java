@@ -20,12 +20,4 @@ public class CommissionInitResponse {
     public void setSessionJwt(String sessionJwt) {
         this.sessionJwt = sessionJwt;
     }
-
-    @Override
-    public String toString() {
-        return "CommissionInitResponse{" +
-                "publicKey='" + publicKey + '\'' +
-                ", sessionJwt='" + sessionJwt + '\'' +
-                '}';
-    }
 }
