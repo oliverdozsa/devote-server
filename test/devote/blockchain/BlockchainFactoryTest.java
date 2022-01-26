@@ -62,7 +62,7 @@ public class BlockchainFactoryTest {
         }
 
         @Override
-        public KeyPair create(long votesCap) {
+        public KeyPair create(long votesCap, int i) {
             return null;
         }
 

@@ -23,6 +23,7 @@ libraryDependencies ++= Seq(javaWs)
 libraryDependencies += "io.seruco.encoding" % "base62" % "0.1.3"
 libraryDependencies += "com.github.stellar" % "java-stellar-sdk" % "0.24.0"
 libraryDependencies += "com.github.ipfs" % "java-ipfs-http-client" % "1.3.3"
+libraryDependencies += "com.github.stellar" % "java-stellar-sdk" % "0.31.0"
 
 libraryDependencies ++= Seq(javaJpa % "test", "org.hibernate" % "hibernate-core" % "5.4.2.Final" % "test")
 libraryDependencies += "com.github.database-rider" % "rider-core" % "1.7.2" % "test"

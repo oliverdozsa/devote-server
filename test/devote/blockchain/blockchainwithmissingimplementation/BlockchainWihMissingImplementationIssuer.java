@@ -11,7 +11,7 @@ public class BlockchainWihMissingImplementationIssuer implements IssuerAccount {
     }
 
     @Override
-    public KeyPair create(long votesCap) {
+    public KeyPair create(long votesCap, int i) {
         return new KeyPair("42", "84");
     }
 

@@ -47,7 +47,7 @@ public class VotingBlockchainOperations {
             List<KeyPair> accountKeyPairs = new ArrayList<>();
 
             for (int i = 0; i < numOfAccountsNeeded; i++) {
-                KeyPair issuerKeyPair = issuerAccount.create(request.getVotesCap());
+                KeyPair issuerKeyPair = issuerAccount.create(request.getVotesCap(), i + 1);
                 accountKeyPairs.add(issuerKeyPair);
             }
 

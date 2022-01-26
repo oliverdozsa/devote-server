@@ -62,7 +62,7 @@ public class VotingBlockhainOperationsTest {
         when(mockBlockchainFactory.createIssuerAccount()).thenReturn(mockIssuerAccount);
         when(mockBlockchainFactory.createDistributionAndBallotAccount()).thenReturn(mockDistributionAndBallotAccount);
         when(mockIssuerAccount.calcNumOfAccountsNeeded(anyLong())).thenReturn(3);
-        when(mockIssuerAccount.create(anyLong())).thenReturn(
+        when(mockIssuerAccount.create(anyLong(), anyInt())).thenReturn(
                 new KeyPair("sA", "pA"),
                 new KeyPair("sB", "pB"),
                 new KeyPair("sC", "pC")
