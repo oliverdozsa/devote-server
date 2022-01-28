@@ -3,9 +3,9 @@ package asserts;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
-import devote.blockchain.mockblockchain.MockBlockchainChannelAccount;
-import devote.blockchain.mockblockchain.MockBlockchainDistributionAndBallotAccount;
-import devote.blockchain.mockblockchain.MockBlockchainIssuerAccount;
+import devote.blockchain.mockblockchain.MockBlockchainChannelAccountFactory;
+import devote.blockchain.mockblockchain.MockBlockchainDistributionAndBallotAccountFactory;
+import devote.blockchain.mockblockchain.MockBlockchainIssuerAccountFactory;
 import io.ebean.Ebean;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class BlockchainAsserts {
     public static void assertIssuerAccountsCreatedOnBlockchain(Long votingId) {
         List<String> accounts = issuerAccountsOf(votingId);
         assertThat(accounts, not(empty()));
-        assertThat(accounts, hasSize(MockBlockchainIssuerAccount.NUM_OF_ISSUER_ACCOUNTS_TO_CREATE));
+        assertThat(accounts, hasSize(MockBlockchainIssuerAccountFactory.NUM_OF_ISSUER_ACCOUNTS_TO_CREATE));
         accounts.forEach(BlockchainAsserts::assertIssuerAccountCreatedOnBlockchain);
     }
 
@@ -41,11 +41,11 @@ public class BlockchainAsserts {
     }
 
     private static void assertChannelAccountCreatedOnBlockchain(String account) {
-        assertTrue("Channel account: " + account + " is not created!", MockBlockchainChannelAccount.isCreated(account));
+        assertTrue("Channel account: " + account + " is not created!", MockBlockchainChannelAccountFactory.isCreated(account));
     }
 
     private static void assertIssuerAccountCreatedOnBlockchain(String account) {
-        assertTrue("Issuer account: " + account + " is not created!", MockBlockchainIssuerAccount.isCreated(account));
+        assertTrue("Issuer account: " + account + " is not created!", MockBlockchainIssuerAccountFactory.isCreated(account));
     }
 
     private static List<String> issuerAccountsOf(Long votingId) {
@@ -79,10 +79,10 @@ public class BlockchainAsserts {
     }
 
     private static void assertDistributionAccountCreated(String account) {
-        assertTrue("Distribution account: " + account + " is not created!", MockBlockchainDistributionAndBallotAccount.isDistributionAccountCreated(account));
+        assertTrue("Distribution account: " + account + " is not created!", MockBlockchainDistributionAndBallotAccountFactory.isDistributionAccountCreated(account));
     }
 
     private static void assertBallotAccountCreated(String account) {
-        assertTrue("Ballot account: " + account + " is not created!", MockBlockchainDistributionAndBallotAccount.isBallotAccountCreated(account));
+        assertTrue("Ballot account: " + account + " is not created!", MockBlockchainDistributionAndBallotAccountFactory.isBallotAccountCreated(account));
     }
 }

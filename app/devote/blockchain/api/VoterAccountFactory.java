@@ -1,7 +1,6 @@
 package devote.blockchain.api;
 
-// TODO: rename to factory
-public interface VoterAccount extends BlockchainOperation {
+public interface VoterAccountFactory extends BlockchainOperation {
     String createTransaction(CreationData creationData);
 
     class CreationData {

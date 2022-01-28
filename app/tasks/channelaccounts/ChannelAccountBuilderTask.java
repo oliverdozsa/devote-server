@@ -3,7 +3,7 @@ package tasks.channelaccounts;
 import data.entities.JpaChannelAccountProgress;
 import data.entities.JpaVotingIssuerAccount;
 import devote.blockchain.BlockchainFactory;
-import devote.blockchain.api.ChannelAccount;
+import devote.blockchain.api.ChannelAccountFactory;
 import devote.blockchain.api.KeyPair;
 import play.Logger;
 
@@ -38,7 +38,7 @@ public class ChannelAccountBuilderTask implements Runnable {
 
     private List<KeyPair> createChannelAccounts(JpaChannelAccountProgress channelProgress) {
         JpaVotingIssuerAccount issuer = channelProgress.getIssuer();
-        ChannelAccount channelAccountFactory = getChannelAccountFactory(issuer);
+        ChannelAccountFactory channelAccountFactory = getChannelAccountFactory(issuer);
 
         long votesCap = issuer.getVoting().getVotesCap();
         int numOfAccountsToCreateInOneBatch =
@@ -67,7 +67,7 @@ public class ChannelAccountBuilderTask implements Runnable {
         context.channelProgressRepository.channelAccountsCreated(channelProgress.getId(), channelKeyPairs.size());
     }
 
-    private ChannelAccount getChannelAccountFactory(JpaVotingIssuerAccount issuer) {
+    private ChannelAccountFactory getChannelAccountFactory(JpaVotingIssuerAccount issuer) {
         String network = issuer.getVoting().getNetwork();
         BlockchainFactory blockchainFactory = context.blockchains.getFactoryByNetwork(network);
         return blockchainFactory.createChannelAccount();
@@ -95,9 +95,9 @@ public class ChannelAccountBuilderTask implements Runnable {
         return null;
     }
 
-    private static int determineNumOfAccountsToCreateInOneBatch(JpaChannelAccountProgress progress, ChannelAccount channelAccount) {
-        if (progress.getNumOfAccountsLeftToCreate() >= channelAccount.maxNumOfAccountsToCreateInOneBatch()) {
-            return channelAccount.maxNumOfAccountsToCreateInOneBatch();
+    private static int determineNumOfAccountsToCreateInOneBatch(JpaChannelAccountProgress progress, ChannelAccountFactory channelAccountFactory) {
+        if (progress.getNumOfAccountsLeftToCreate() >= channelAccountFactory.maxNumOfAccountsToCreateInOneBatch()) {
+            return channelAccountFactory.maxNumOfAccountsToCreateInOneBatch();
         } else {
             return progress.getNumOfAccountsLeftToCreate().intValue();
         }

@@ -4,8 +4,7 @@ package devote.blockchain.api;
 import java.util.List;
 import java.util.Map;
 
-// TODO: rename to factory
-public interface DistributionAndBallotAccount extends BlockchainOperation {
+public interface DistributionAndBallotAccountFactory extends BlockchainOperation {
     TransactionResult create(List<IssuerData> issuerData, Long votesCap);
 
     class IssuerData {

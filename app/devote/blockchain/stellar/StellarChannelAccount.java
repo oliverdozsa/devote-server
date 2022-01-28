@@ -2,7 +2,7 @@ package devote.blockchain.stellar;
 
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.BlockchainException;
-import devote.blockchain.api.ChannelAccount;
+import devote.blockchain.api.ChannelAccountFactory;
 import devote.blockchain.api.KeyPair;
 import org.stellar.sdk.AccountRequiresMemoException;
 import org.stellar.sdk.CreateAccountOperation;
@@ -14,7 +14,7 @@ import utils.StringUtils;
 
 import java.io.IOException;
 
-public class StellarChannelAccount implements ChannelAccount {
+public class StellarChannelAccount implements ChannelAccountFactory {
     private StellarBlockchainConfiguration configuration;
 
     private static final int MAX_NUM_OF_ACCOUNTS_TO_CREATE_IN_ONE_TRANSACTION = 50;

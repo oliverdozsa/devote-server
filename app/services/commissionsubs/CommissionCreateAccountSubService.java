@@ -6,7 +6,7 @@ import data.entities.JpaVotingIssuerAccount;
 import data.operations.CommissionDbOperations;
 import data.operations.VotingDbOperations;
 import devote.blockchain.api.KeyPair;
-import devote.blockchain.api.VoterAccount;
+import devote.blockchain.api.VoterAccountFactory;
 import devote.blockchain.operations.CommissionBlockchainOperations;
 import exceptions.ForbiddenException;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
@@ -110,8 +110,8 @@ public class CommissionCreateAccountSubService {
                 .thenAccept(i -> collectedData.issuer = i);
     }
 
-    private VoterAccount.CreationData prepareForBlockchainOperation(AccountCreationCollectedData accountCreationData) {
-        VoterAccount.CreationData voterCreationData = new VoterAccount.CreationData();
+    private VoterAccountFactory.CreationData prepareForBlockchainOperation(AccountCreationCollectedData accountCreationData) {
+        VoterAccountFactory.CreationData voterCreationData = new VoterAccountFactory.CreationData();
         voterCreationData.issuerPublicKey = accountCreationData.issuer.getAccountPublic();
         voterCreationData.assetCode = accountCreationData.issuer.getAssetCode();
         voterCreationData.votesCap = accountCreationData.voting.getVotesCap();

@@ -1,11 +1,11 @@
 package devote.blockchain.mockblockchain;
 
 import devote.blockchain.api.BlockchainConfiguration;
-import devote.blockchain.api.VoterAccount;
+import devote.blockchain.api.VoterAccountFactory;
 
 import static utils.StringUtils.createRandomAlphabeticString;
 
-public class MockBlockchainVoterAccount implements VoterAccount {
+public class MockBlockchainVoterAccountFactory implements VoterAccountFactory {
     @Override
     public void init(BlockchainConfiguration configuration) {
 

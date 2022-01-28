@@ -1,7 +1,6 @@
 package devote.blockchain.api;
 
-// TODO: rename to factory
-public interface IssuerAccount extends BlockchainOperation {
+public interface IssuerAccountFactory extends BlockchainOperation {
     /**
      *
      * @param votesCap The total number of voters.

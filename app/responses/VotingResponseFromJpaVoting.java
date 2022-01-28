@@ -5,10 +5,6 @@ import data.entities.JpaVoting;
 import data.entities.JpaVotingIssuerAccount;
 import data.entities.JpaVotingPoll;
 import data.entities.JpaVotingPollOption;
-import devote.blockchain.BlockchainFactory;
-import devote.blockchain.Blockchains;
-import devote.blockchain.api.DistributionAndBallotAccount;
-import devote.blockchain.api.IssuerAccount;
 
 import java.util.List;
 import java.util.stream.Collectors;

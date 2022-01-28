@@ -1,14 +1,14 @@
 package devote.blockchain.mockblockchain;
 
 import devote.blockchain.api.BlockchainConfiguration;
-import devote.blockchain.api.DistributionAndBallotAccount;
+import devote.blockchain.api.DistributionAndBallotAccountFactory;
 import devote.blockchain.api.KeyPair;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MockBlockchainDistributionAndBallotAccount implements DistributionAndBallotAccount {
+public class MockBlockchainDistributionAndBallotAccountFactory implements DistributionAndBallotAccountFactory {
     private static int currentDistributionAccountId = 0;
     private static int currentBallotAccountId = 0;
 

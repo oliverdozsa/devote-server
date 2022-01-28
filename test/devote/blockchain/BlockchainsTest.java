@@ -1,8 +1,8 @@
 package devote.blockchain;
 
 import com.typesafe.config.Config;
-import devote.blockchain.api.IssuerAccount;
-import devote.blockchain.mockblockchain.MockBlockchainIssuerAccount;
+import devote.blockchain.api.IssuerAccountFactory;
+import devote.blockchain.mockblockchain.MockBlockchainIssuerAccountFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -33,10 +33,10 @@ public class BlockchainsTest {
         // Then
         assertThat(factoryForMockBlockchain, notNullValue());
 
-        IssuerAccount issuerAccount = factoryForMockBlockchain.createIssuerAccount();
-        assertThat(issuerAccount, instanceOf(MockBlockchainIssuerAccount.class));
+        IssuerAccountFactory issuerAccountFactory = factoryForMockBlockchain.createIssuerAccount();
+        assertThat(issuerAccountFactory, instanceOf(MockBlockchainIssuerAccountFactory.class));
 
-        MockBlockchainIssuerAccount mockIssuerAccount = (MockBlockchainIssuerAccount) factoryForMockBlockchain.createIssuerAccount();
+        MockBlockchainIssuerAccountFactory mockIssuerAccount = (MockBlockchainIssuerAccountFactory) factoryForMockBlockchain.createIssuerAccount();
         assertBlockchainConfigInitCalled(mockIssuerAccount);
         assertTrue(mockIssuerAccount.isInitCalled());
     }
@@ -71,7 +71,7 @@ public class BlockchainsTest {
         assertThat(factory, is(nullValue()));
     }
 
-    private void assertBlockchainConfigInitCalled(MockBlockchainIssuerAccount mockIssuerAccount) {
+    private void assertBlockchainConfigInitCalled(MockBlockchainIssuerAccountFactory mockIssuerAccount) {
         assertTrue(mockIssuerAccount.getConfig().isInitCalled());
     }
 }

@@ -2,8 +2,8 @@ package devote.blockchain.operations;
 
 import devote.blockchain.BlockchainFactory;
 import devote.blockchain.Blockchains;
-import devote.blockchain.api.DistributionAndBallotAccount;
-import devote.blockchain.api.IssuerAccount;
+import devote.blockchain.api.DistributionAndBallotAccountFactory;
+import devote.blockchain.api.IssuerAccountFactory;
 import devote.blockchain.api.KeyPair;
 import requests.CreateVotingRequest;
 import executioncontexts.BlockchainExecutionContext;
@@ -40,13 +40,13 @@ public class VotingBlockhainOperationsTest {
     private BlockchainFactory mockBlockchainFactory;
 
     @Mock
-    private IssuerAccount mockIssuerAccount;
+    private IssuerAccountFactory mockIssuerAccountFactory;
 
     @Mock
-    private DistributionAndBallotAccount mockDistributionAndBallotAccount;
+    private DistributionAndBallotAccountFactory mockDistributionAndBallotAccountFactory;
 
     @Captor
-    private ArgumentCaptor<List<DistributionAndBallotAccount.IssuerData>> issuerDataCaptor;
+    private ArgumentCaptor<List<DistributionAndBallotAccountFactory.IssuerData>> issuerDataCaptor;
 
     private VotingBlockchainOperations operations;
 
@@ -59,16 +59,16 @@ public class VotingBlockhainOperationsTest {
         executeRunnableOnMockExecContext();
 
         when(mockBlockchains.getFactoryByNetwork(anyString())).thenReturn(mockBlockchainFactory);
-        when(mockBlockchainFactory.createIssuerAccount()).thenReturn(mockIssuerAccount);
-        when(mockBlockchainFactory.createDistributionAndBallotAccount()).thenReturn(mockDistributionAndBallotAccount);
-        when(mockIssuerAccount.calcNumOfAccountsNeeded(anyLong())).thenReturn(3);
-        when(mockIssuerAccount.create(anyLong(), anyInt())).thenReturn(
+        when(mockBlockchainFactory.createIssuerAccount()).thenReturn(mockIssuerAccountFactory);
+        when(mockBlockchainFactory.createDistributionAndBallotAccount()).thenReturn(mockDistributionAndBallotAccountFactory);
+        when(mockIssuerAccountFactory.calcNumOfAccountsNeeded(anyLong())).thenReturn(3);
+        when(mockIssuerAccountFactory.create(anyLong(), anyInt())).thenReturn(
                 new KeyPair("sA", "pA"),
                 new KeyPair("sB", "pB"),
                 new KeyPair("sC", "pC")
         );
-        when(mockDistributionAndBallotAccount.create(anyList(), anyLong())).thenReturn(
-                new DistributionAndBallotAccount.TransactionResult(new KeyPair("d", "d"), new KeyPair("b", "b"), new HashMap<>())
+        when(mockDistributionAndBallotAccountFactory.create(anyList(), anyLong())).thenReturn(
+                new DistributionAndBallotAccountFactory.TransactionResult(new KeyPair("d", "d"), new KeyPair("b", "b"), new HashMap<>())
         );
     }
 
@@ -101,13 +101,13 @@ public class VotingBlockhainOperationsTest {
                 new KeyPair("issuerSecret2", "issuerPublic2")
         );
 
-        CompletionStage<DistributionAndBallotAccount.TransactionResult> resultCompletionStage =
+        CompletionStage<DistributionAndBallotAccountFactory.TransactionResult> resultCompletionStage =
                 operations.createDistributionAndBallotAccounts(request, issuerKeyPairs);
         resultCompletionStage.toCompletableFuture().get();
 
-        Mockito.verify(mockDistributionAndBallotAccount).create(issuerDataCaptor.capture(), anyLong());
+        Mockito.verify(mockDistributionAndBallotAccountFactory).create(issuerDataCaptor.capture(), anyLong());
 
-        List<DistributionAndBallotAccount.IssuerData> capturedIssuerData = issuerDataCaptor.getValue();
+        List<DistributionAndBallotAccountFactory.IssuerData> capturedIssuerData = issuerDataCaptor.getValue();
         capturedIssuerData.forEach(i -> assertThat(i.voteTokenTitle, Matchers.startsWith("SOMEVOTI")));
     }
 
@@ -124,13 +124,13 @@ public class VotingBlockhainOperationsTest {
                 new KeyPair("issuerSecret2", "issuerPublic2")
         );
 
-        CompletionStage<DistributionAndBallotAccount.TransactionResult> resultCompletionStage =
+        CompletionStage<DistributionAndBallotAccountFactory.TransactionResult> resultCompletionStage =
                 operations.createDistributionAndBallotAccounts(request, issuerKeyPairs);
         resultCompletionStage.toCompletableFuture().get();
 
-        Mockito.verify(mockDistributionAndBallotAccount).create(issuerDataCaptor.capture(), anyLong());
+        Mockito.verify(mockDistributionAndBallotAccountFactory).create(issuerDataCaptor.capture(), anyLong());
 
-        List<DistributionAndBallotAccount.IssuerData> capturedIssuerData = issuerDataCaptor.getValue();
+        List<DistributionAndBallotAccountFactory.IssuerData> capturedIssuerData = issuerDataCaptor.getValue();
         capturedIssuerData.forEach(i -> assertThat(i.voteTokenTitle, Matchers.startsWith("SOMEID")));
     }
 

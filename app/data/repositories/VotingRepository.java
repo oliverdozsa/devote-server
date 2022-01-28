@@ -1,7 +1,7 @@
 package data.repositories;
 
 import data.entities.JpaVoting;
-import devote.blockchain.api.DistributionAndBallotAccount;
+import devote.blockchain.api.DistributionAndBallotAccountFactory;
 import devote.blockchain.api.KeyPair;
 import requests.CreateVotingRequest;
 
@@ -12,6 +12,6 @@ public interface VotingRepository {
     JpaVoting single(Long id);
     void issuerAccountsCreated(Long id, List<KeyPair> keyPairs);
     void channelAccountCreated(Long id, List<KeyPair> keyPairs);
-    void distributionAndBallotAccountsCreated(Long id, DistributionAndBallotAccount.TransactionResult transactionResult);
+    void distributionAndBallotAccountsCreated(Long id, DistributionAndBallotAccountFactory.TransactionResult transactionResult);
     void votingSavedToIpfs(Long id, String ipfsCid);
 }

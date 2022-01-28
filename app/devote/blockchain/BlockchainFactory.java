@@ -3,10 +3,10 @@ package devote.blockchain;
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.BlockchainException;
 import devote.blockchain.api.BlockchainOperation;
-import devote.blockchain.api.ChannelAccount;
-import devote.blockchain.api.DistributionAndBallotAccount;
-import devote.blockchain.api.IssuerAccount;
-import devote.blockchain.api.VoterAccount;
+import devote.blockchain.api.ChannelAccountFactory;
+import devote.blockchain.api.DistributionAndBallotAccountFactory;
+import devote.blockchain.api.IssuerAccountFactory;
+import devote.blockchain.api.VoterAccountFactory;
 import org.reflections.Reflections;
 import play.Logger;
 
@@ -25,20 +25,20 @@ public class BlockchainFactory {
         this.networkName = configuration.getNetworkName();
     }
 
-    public IssuerAccount createIssuerAccount() {
-        return createBlockchainOperation(IssuerAccount.class);
+    public IssuerAccountFactory createIssuerAccount() {
+        return createBlockchainOperation(IssuerAccountFactory.class);
     }
 
-    public ChannelAccount createChannelAccount() {
-        return createBlockchainOperation(ChannelAccount.class);
+    public ChannelAccountFactory createChannelAccount() {
+        return createBlockchainOperation(ChannelAccountFactory.class);
     }
 
-    public DistributionAndBallotAccount createDistributionAndBallotAccount() {
-        return createBlockchainOperation(DistributionAndBallotAccount.class);
+    public DistributionAndBallotAccountFactory createDistributionAndBallotAccount() {
+        return createBlockchainOperation(DistributionAndBallotAccountFactory.class);
     }
 
-    public VoterAccount createVoterAccount() {
-        return createBlockchainOperation(VoterAccount.class);
+    public VoterAccountFactory createVoterAccount() {
+        return createBlockchainOperation(VoterAccountFactory.class);
     }
 
     private <T extends BlockchainOperation> T createBlockchainOperation(Class<T> blockChainOperationParentClass) {
