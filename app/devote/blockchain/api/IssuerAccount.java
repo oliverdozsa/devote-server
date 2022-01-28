@@ -1,5 +1,6 @@
 package devote.blockchain.api;
 
+// TODO: rename to factory
 public interface IssuerAccount extends BlockchainOperation {
     /**
      *

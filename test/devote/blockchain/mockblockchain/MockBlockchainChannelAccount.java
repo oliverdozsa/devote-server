@@ -19,7 +19,7 @@ public class MockBlockchainChannelAccount implements ChannelAccount {
     }
 
     @Override
-    public KeyPair create(long votesCap, String issuerSecret) {
+    public KeyPair create(long votesCap, KeyPair issuerKeyPair) {
         currentChannelAccountId++;
         String currentChannelAccountIdAsString = Integer.toString(currentChannelAccountId);
         return new KeyPair(currentChannelAccountIdAsString, currentChannelAccountIdAsString);

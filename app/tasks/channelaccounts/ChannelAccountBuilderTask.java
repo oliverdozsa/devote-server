@@ -38,23 +38,24 @@ public class ChannelAccountBuilderTask implements Runnable {
 
     private List<KeyPair> createChannelAccounts(JpaChannelAccountProgress channelProgress) {
         JpaVotingIssuerAccount issuer = channelProgress.getIssuer();
-        ChannelAccount channelAccount = getChannelAccount(issuer);
+        ChannelAccount channelAccountFactory = getChannelAccountFactory(issuer);
 
         long votesCap = issuer.getVoting().getVotesCap();
         int numOfAccountsToCreateInOneBatch =
-                determineNumOfAccountsToCreateInOneBatch(channelProgress, channelAccount);
+                determineNumOfAccountsToCreateInOneBatch(channelProgress, channelAccountFactory);
 
-        logger.info("[CHANNEL-TASK-{}]: createChannelAccounts(): about to create {} channel accounts on blockchain for progress {}",
-                taskId, numOfAccountsToCreateInOneBatch, channelProgress.getId());
+        logger.info("[CHANNEL-TASK-{}]: createChannelAccounts(): about to create {} channel accounts on blockchain {} for progress {}",
+                taskId, numOfAccountsToCreateInOneBatch, issuer.getVoting().getNetwork(), channelProgress.getId());
 
         List<KeyPair> channelAccountKeyPairs = new ArrayList<>();
         for (int i = 0; i < numOfAccountsToCreateInOneBatch; i++) {
-            KeyPair accountKeyPair = channelAccount.create(votesCap, issuer.getAccountSecret());
+            KeyPair issuerKeyPair = new KeyPair(issuer.getAccountSecret(), issuer.getAccountPublic());
+            KeyPair accountKeyPair = channelAccountFactory.create(votesCap, issuerKeyPair);
             channelAccountKeyPairs.add(accountKeyPair);
         }
 
-        logger.info("[CHANNEL-TASK-{}]: createChannelAccounts(): successfully created {} channel accounts on blockchain",
-                taskId, channelAccountKeyPairs.size());
+        logger.info("[CHANNEL-TASK-{}]: createChannelAccounts(): successfully created {} channel accounts on blockchain {}",
+                taskId, channelAccountKeyPairs.size(), issuer.getVoting().getNetwork());
 
         return channelAccountKeyPairs;
     }
@@ -66,7 +67,7 @@ public class ChannelAccountBuilderTask implements Runnable {
         context.channelProgressRepository.channelAccountsCreated(channelProgress.getId(), channelKeyPairs.size());
     }
 
-    private ChannelAccount getChannelAccount(JpaVotingIssuerAccount issuer) {
+    private ChannelAccount getChannelAccountFactory(JpaVotingIssuerAccount issuer) {
         String network = issuer.getVoting().getNetwork();
         BlockchainFactory blockchainFactory = context.blockchains.getFactoryByNetwork(network);
         return blockchainFactory.createChannelAccount();
