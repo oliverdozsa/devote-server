@@ -14,13 +14,13 @@ import utils.StringUtils;
 
 import java.io.IOException;
 
-public class StellarChannelAccount implements ChannelAccountOperation {
+public class StellarChannelAccountOperation implements ChannelAccountOperation {
     private StellarBlockchainConfiguration configuration;
 
     private static final int MAX_NUM_OF_ACCOUNTS_TO_CREATE_IN_ONE_TRANSACTION = 50;
     private static final String STARTING_BALANCE_STR = "2";
 
-    private static final Logger.ALogger logger = Logger.of(StellarChannelAccount.class);
+    private static final Logger.ALogger logger = Logger.of(StellarChannelAccountOperation.class);
 
     @Override
     public void init(BlockchainConfiguration configuration) {
@@ -35,7 +35,7 @@ public class StellarChannelAccount implements ChannelAccountOperation {
     @Override
     public KeyPair create(long votesCap, KeyPair issuerKeyPair) {
         try {
-            org.stellar.sdk.KeyPair stellarIssuerKeyPair = org.stellar.sdk.KeyPair.fromSecretSeed(issuerKeyPair.secretKey);
+            org.stellar.sdk.KeyPair stellarIssuerKeyPair = StellarUtils.fromDevoteKeyPair(issuerKeyPair);
 
             Transaction.Builder txBuilder = prepareTransaction(stellarIssuerKeyPair.getAccountId());
             org.stellar.sdk.KeyPair stellarChannelKeyPair = prepareChannelCreationOn(txBuilder);

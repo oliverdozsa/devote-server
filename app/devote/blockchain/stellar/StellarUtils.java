@@ -1,5 +1,6 @@
 package devote.blockchain.stellar;
 
+import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Network;
 import org.stellar.sdk.Server;
 import org.stellar.sdk.Transaction;
@@ -32,5 +33,9 @@ public class StellarUtils {
         return new Transaction.Builder(accountResponse, network)
                 .setBaseFee(STELLAR_MIN_BASE_FEE)
                 .setTimeout(STELLAR_TIMEOUT_SECONDS);
+    }
+
+    public static KeyPair fromDevoteKeyPair(devote.blockchain.api.KeyPair devoteKeyPair) {
+        return KeyPair.fromSecretSeed(devoteKeyPair.secretKey);
     }
 }
