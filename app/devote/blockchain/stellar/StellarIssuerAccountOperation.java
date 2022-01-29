@@ -2,7 +2,7 @@ package devote.blockchain.stellar;
 
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.BlockchainException;
-import devote.blockchain.api.IssuerAccountFactory;
+import devote.blockchain.api.IssuerAccountOperation;
 import devote.blockchain.api.KeyPair;
 import org.stellar.sdk.AccountRequiresMemoException;
 import org.stellar.sdk.CreateAccountOperation;
@@ -14,10 +14,10 @@ import utils.StringUtils;
 
 import java.io.IOException;
 
-public class StellarIssuerAccountFactory implements IssuerAccountFactory {
+public class StellarIssuerAccountOperation implements IssuerAccountOperation {
     private StellarBlockchainConfiguration configuration;
 
-    private static final Logger.ALogger logger = Logger.of(StellarIssuerAccountFactory.class);
+    private static final Logger.ALogger logger = Logger.of(StellarIssuerAccountOperation.class);
 
 
     @Override

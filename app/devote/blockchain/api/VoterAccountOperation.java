@@ -1,6 +1,6 @@
 package devote.blockchain.api;
 
-public interface VoterAccountFactory extends BlockchainOperation {
+public interface VoterAccountOperation extends BlockchainOperation {
     String createTransaction(CreationData creationData);
 
     class CreationData {

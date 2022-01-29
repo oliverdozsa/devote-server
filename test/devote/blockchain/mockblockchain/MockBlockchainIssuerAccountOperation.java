@@ -1,10 +1,10 @@
 package devote.blockchain.mockblockchain;
 
 import devote.blockchain.api.BlockchainConfiguration;
-import devote.blockchain.api.IssuerAccountFactory;
+import devote.blockchain.api.IssuerAccountOperation;
 import devote.blockchain.api.KeyPair;
 
-public class MockBlockchainIssuerAccountFactory implements IssuerAccountFactory {
+public class MockBlockchainIssuerAccountOperation implements IssuerAccountOperation {
     public static final int NUM_OF_ISSUER_ACCOUNTS_TO_CREATE = 4;
 
     private MockBlockchainConfiguration config;

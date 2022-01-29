@@ -3,7 +3,7 @@ package data.operations;
 import data.entities.JpaVoting;
 import data.repositories.ChannelProgressRepository;
 import data.repositories.VotingRepository;
-import devote.blockchain.api.DistributionAndBallotAccountFactory;
+import devote.blockchain.api.DistributionAndBallotAccountOperation;
 import devote.blockchain.api.KeyPair;
 import requests.CreateVotingRequest;
 import executioncontexts.DatabaseExecutionContext;
@@ -55,7 +55,7 @@ public class VotingDbOperations {
         }, dbExecContext);
     }
 
-    public CompletionStage<Void> distributionAndBallotAccountsCreated(Long votingId, DistributionAndBallotAccountFactory.TransactionResult transactionResult) {
+    public CompletionStage<Void> distributionAndBallotAccountsCreated(Long votingId, DistributionAndBallotAccountOperation.TransactionResult transactionResult) {
         return runAsync(() -> {
             logger.info("distributionAndBallotAccountsCreated(): votingId = {}", votingId);
             votingRepository.distributionAndBallotAccountsCreated(votingId, transactionResult);

@@ -4,7 +4,7 @@ package devote.blockchain.api;
 import java.util.List;
 import java.util.Map;
 
-public interface DistributionAndBallotAccountFactory extends BlockchainOperation {
+public interface DistributionAndBallotAccountOperation extends BlockchainOperation {
     TransactionResult create(List<IssuerData> issuerData, Long votesCap);
 
     class IssuerData {

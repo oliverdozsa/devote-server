@@ -4,7 +4,7 @@ import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
 import data.repositories.VotingRepository;
-import devote.blockchain.api.DistributionAndBallotAccountFactory;
+import devote.blockchain.api.DistributionAndBallotAccountOperation;
 import devote.blockchain.api.KeyPair;
 import io.ebean.EbeanServer;
 import play.Logger;
@@ -75,7 +75,7 @@ public class EbeanVotingRepository implements VotingRepository {
     }
 
     @Override
-    public void distributionAndBallotAccountsCreated(Long id, DistributionAndBallotAccountFactory.TransactionResult transactionResult) {
+    public void distributionAndBallotAccountsCreated(Long id, DistributionAndBallotAccountOperation.TransactionResult transactionResult) {
         logger.info("distributionAndBallotAccountsCreated(): id = {}", id);
 
         JpaVoting voting = ebeanServer.find(JpaVoting.class, id);

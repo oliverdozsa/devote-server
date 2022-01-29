@@ -2,8 +2,8 @@ package devote.blockchain.operations;
 
 import devote.blockchain.BlockchainFactory;
 import devote.blockchain.Blockchains;
-import devote.blockchain.api.DistributionAndBallotAccountFactory;
-import devote.blockchain.api.IssuerAccountFactory;
+import devote.blockchain.api.DistributionAndBallotAccountOperation;
+import devote.blockchain.api.IssuerAccountOperation;
 import devote.blockchain.api.KeyPair;
 import executioncontexts.BlockchainExecutionContext;
 import play.Logger;
@@ -40,13 +40,13 @@ public class VotingBlockchainOperations {
         return supplyAsync(() -> {
             logger.info("createIssuerAccounts(): request = {}", request);
             BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(request.getNetwork());
-            IssuerAccountFactory issuerAccountFactory = blockchainFactory.createIssuerAccount();
+            IssuerAccountOperation issuerAccountOperation = blockchainFactory.createIssuerAccountOperation();
 
-            int numOfAccountsNeeded = issuerAccountFactory.calcNumOfAccountsNeeded(request.getVotesCap());
+            int numOfAccountsNeeded = issuerAccountOperation.calcNumOfAccountsNeeded(request.getVotesCap());
             List<KeyPair> accountKeyPairs = new ArrayList<>();
 
             for (int i = 0; i < numOfAccountsNeeded; i++) {
-                KeyPair issuerKeyPair = issuerAccountFactory.create(request.getVotesCap(), i + 1);
+                KeyPair issuerKeyPair = issuerAccountOperation.create(request.getVotesCap(), i + 1);
                 accountKeyPairs.add(issuerKeyPair);
             }
 
@@ -54,17 +54,17 @@ public class VotingBlockchainOperations {
         }, blockchainExecContext);
     }
 
-    public CompletionStage<DistributionAndBallotAccountFactory.TransactionResult> createDistributionAndBallotAccounts(
+    public CompletionStage<DistributionAndBallotAccountOperation.TransactionResult> createDistributionAndBallotAccounts(
             CreateVotingRequest request,
             List<KeyPair> issuerKeyPairs) {
         return supplyAsync(() -> {
             logger.info("createDistributionAndBallotAccounts(): request = {}, issuers.size = {}", request, issuerKeyPairs.size());
 
             BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(request.getNetwork());
-            DistributionAndBallotAccountFactory distributionAndBallotAccountFactory = blockchainFactory.createDistributionAndBallotAccount();
+            DistributionAndBallotAccountOperation distributionAndBallotAccountOperation = blockchainFactory.createDistributionAndBallotAccountOperation();
 
-            List<DistributionAndBallotAccountFactory.IssuerData> issuerData = issuerKeyPairs.stream()
-                    .map(kp -> new DistributionAndBallotAccountFactory.IssuerData(generateTokenTitle(request), kp))
+            List<DistributionAndBallotAccountOperation.IssuerData> issuerData = issuerKeyPairs.stream()
+                    .map(kp -> new DistributionAndBallotAccountOperation.IssuerData(generateTokenTitle(request), kp))
                     .collect(Collectors.toList());
 
             List<String> tokenTitles = issuerData.stream()
@@ -72,7 +72,7 @@ public class VotingBlockchainOperations {
                     .collect(Collectors.toList());
             logger.info("createDistributionAndBallotAccounts(): About to create distribution and ballot accounts with tokens: {}", tokenTitles);
 
-            return distributionAndBallotAccountFactory.create(issuerData, request.getVotesCap());
+            return distributionAndBallotAccountOperation.create(issuerData, request.getVotesCap());
         }, blockchainExecContext);
     }
 

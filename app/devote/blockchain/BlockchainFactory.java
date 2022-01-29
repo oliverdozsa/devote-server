@@ -3,10 +3,10 @@ package devote.blockchain;
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.BlockchainException;
 import devote.blockchain.api.BlockchainOperation;
-import devote.blockchain.api.ChannelAccountFactory;
-import devote.blockchain.api.DistributionAndBallotAccountFactory;
-import devote.blockchain.api.IssuerAccountFactory;
-import devote.blockchain.api.VoterAccountFactory;
+import devote.blockchain.api.ChannelAccountOperation;
+import devote.blockchain.api.DistributionAndBallotAccountOperation;
+import devote.blockchain.api.IssuerAccountOperation;
+import devote.blockchain.api.VoterAccountOperation;
 import org.reflections.Reflections;
 import play.Logger;
 
@@ -25,20 +25,20 @@ public class BlockchainFactory {
         this.networkName = configuration.getNetworkName();
     }
 
-    public IssuerAccountFactory createIssuerAccount() {
-        return createBlockchainOperation(IssuerAccountFactory.class);
+    public IssuerAccountOperation createIssuerAccountOperation() {
+        return createBlockchainOperation(IssuerAccountOperation.class);
     }
 
-    public ChannelAccountFactory createChannelAccount() {
-        return createBlockchainOperation(ChannelAccountFactory.class);
+    public ChannelAccountOperation createChannelAccountOperation() {
+        return createBlockchainOperation(ChannelAccountOperation.class);
     }
 
-    public DistributionAndBallotAccountFactory createDistributionAndBallotAccount() {
-        return createBlockchainOperation(DistributionAndBallotAccountFactory.class);
+    public DistributionAndBallotAccountOperation createDistributionAndBallotAccountOperation() {
+        return createBlockchainOperation(DistributionAndBallotAccountOperation.class);
     }
 
-    public VoterAccountFactory createVoterAccount() {
-        return createBlockchainOperation(VoterAccountFactory.class);
+    public VoterAccountOperation createVoterAccountOperation() {
+        return createBlockchainOperation(VoterAccountOperation.class);
     }
 
     private <T extends BlockchainOperation> T createBlockchainOperation(Class<T> blockChainOperationParentClass) {

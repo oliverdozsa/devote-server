@@ -2,7 +2,7 @@ package devote.blockchain;
 
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.BlockchainException;
-import devote.blockchain.api.IssuerAccountFactory;
+import devote.blockchain.api.IssuerAccountOperation;
 import devote.blockchain.api.KeyPair;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,21 +39,21 @@ public class BlockchainFactoryTest {
     public void testCreateIssuerAccountFails() {
         // Given
         Set<Class<?>> mockIssuerClassSet = new HashSet<>();
-        mockIssuerClassSet.add(SomeMockIssuerClassWithNoDefaultCtorFactory.class);
+        mockIssuerClassSet.add(SomeMockIssuerClassWithNoDefaultCtorOperation.class);
 
         when(mockReflections.getSubTypesOf(any())).thenReturn(mockIssuerClassSet);
 
         // When
         // Then
         BlockchainException exception = assertThrows(BlockchainException.class, () -> {
-            blockchainFactory.createIssuerAccount();
+            blockchainFactory.createIssuerAccountOperation();
         });
 
         assertThat(exception.getMessage(), containsString("Failed to create instance of"));
     }
 
-    private static class SomeMockIssuerClassWithNoDefaultCtorFactory implements IssuerAccountFactory {
-        public SomeMockIssuerClassWithNoDefaultCtorFactory(int someArg) {
+    private static class SomeMockIssuerClassWithNoDefaultCtorOperation implements IssuerAccountOperation {
+        public SomeMockIssuerClassWithNoDefaultCtorOperation(int someArg) {
         }
 
         @Override

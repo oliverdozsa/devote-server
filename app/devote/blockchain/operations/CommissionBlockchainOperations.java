@@ -2,7 +2,7 @@ package devote.blockchain.operations;
 
 import devote.blockchain.BlockchainFactory;
 import devote.blockchain.Blockchains;
-import devote.blockchain.api.VoterAccountFactory;
+import devote.blockchain.api.VoterAccountOperation;
 import executioncontexts.BlockchainExecutionContext;
 import play.Logger;
 
@@ -26,12 +26,12 @@ public class CommissionBlockchainOperations {
         this.blockchains = blockchains;
     }
 
-    public CompletionStage<String> createTransaction(String network, VoterAccountFactory.CreationData data) {
+    public CompletionStage<String> createTransaction(String network, VoterAccountOperation.CreationData data) {
         logger.info("createTransaction(): network = {}, data = {}", network, data);
 
         BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(network);
-        VoterAccountFactory voterAccountFactory = blockchainFactory.createVoterAccount();
+        VoterAccountOperation voterAccountOperation = blockchainFactory.createVoterAccountOperation();
 
-        return supplyAsync(() -> voterAccountFactory.createTransaction(data), blockchainExecContext);
+        return supplyAsync(() -> voterAccountOperation.createTransaction(data), blockchainExecContext);
     }
 }

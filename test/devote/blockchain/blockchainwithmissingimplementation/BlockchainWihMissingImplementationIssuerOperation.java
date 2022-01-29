@@ -1,10 +1,10 @@
 package devote.blockchain.blockchainwithmissingimplementation;
 
 import devote.blockchain.api.BlockchainConfiguration;
-import devote.blockchain.api.IssuerAccountFactory;
+import devote.blockchain.api.IssuerAccountOperation;
 import devote.blockchain.api.KeyPair;
 
-public class BlockchainWihMissingImplementationIssuerFactory implements IssuerAccountFactory {
+public class BlockchainWihMissingImplementationIssuerOperation implements IssuerAccountOperation {
     @Override
     public void init(BlockchainConfiguration configuration) {
 

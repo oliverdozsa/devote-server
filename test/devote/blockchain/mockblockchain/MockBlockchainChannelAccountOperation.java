@@ -1,10 +1,10 @@
 package devote.blockchain.mockblockchain;
 
 import devote.blockchain.api.BlockchainConfiguration;
-import devote.blockchain.api.ChannelAccountFactory;
+import devote.blockchain.api.ChannelAccountOperation;
 import devote.blockchain.api.KeyPair;
 
-public class MockBlockchainChannelAccountFactory implements ChannelAccountFactory {
+public class MockBlockchainChannelAccountOperation implements ChannelAccountOperation {
     public static final int NUM_OF_CHANNEL_ACCOUNTS_TO_CREATE_IN_ON_BATCH = 11;
 
     private static int currentChannelAccountId = 0;
