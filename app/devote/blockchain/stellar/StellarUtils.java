@@ -38,4 +38,8 @@ public class StellarUtils {
     public static KeyPair fromDevoteKeyPair(devote.blockchain.api.KeyPair devoteKeyPair) {
         return KeyPair.fromSecretSeed(devoteKeyPair.secretKey);
     }
+
+    public static devote.blockchain.api.KeyPair toDevoteKeyPair(KeyPair keyPair) {
+        return new devote.blockchain.api.KeyPair(new String(keyPair.getSecretSeed()), keyPair.getAccountId());
+    }
 }

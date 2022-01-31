@@ -23,7 +23,7 @@ public class MockBlockchainDistributionAndBallotAccountOperation implements Dist
 
         Map<String, String> issuerTokens = new HashMap<>();
         for (IssuerData issuerD : issuerData) {
-            issuerTokens.put(issuerD.issuerKeyPair.secretKey, issuerD.voteTokenTitle);
+            issuerTokens.put(issuerD.keyPair.secretKey, issuerD.voteTokenTitle);
         }
 
         String currentDistributionAccountIdAsString = Integer.toString(currentDistributionAccountId);

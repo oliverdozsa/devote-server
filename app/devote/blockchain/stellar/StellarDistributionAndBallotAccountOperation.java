@@ -18,7 +18,9 @@ import play.Logger;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class StellarDistributionAndBallotAccountOperation implements DistributionAndBallotAccountOperation {
@@ -33,13 +35,18 @@ public class StellarDistributionAndBallotAccountOperation implements Distributio
     }
 
     @Override
-    public TransactionResult create(List<IssuerData> issuerData) {
+    public TransactionResult create(List<IssuerData> issuers) {
         try {
-            Transaction.Builder txBuilder = prepareTransaction(issuerData.get(0));
-            TransactionResult transactionResult = prepareDistributionAndBallotCreationOn(txBuilder, issuerData);
-            submitTransaction(txBuilder, issuerData, transactionResult);
+            List<String> tokens = issuers.stream()
+                    .map(issuer -> issuer.voteTokenTitle)
+                    .collect(Collectors.toList());
+            logger.info("[STELLAR]: About to create ballot and distribution account for vote tokens: {}", tokens);
 
-            return null;
+            Transaction.Builder txBuilder = prepareTransaction(issuers.get(0));
+            TransactionResult transactionResult = prepareDistributionAndBallotCreationOn(txBuilder, issuers);
+            submitTransaction(txBuilder, issuers, transactionResult);
+
+            return transactionResult;
         } catch (IOException | AccountRequiresMemoException e) {
             logger.warn("[STELLAR]: Failed to create distribution and ballot accounts!", e);
             throw new BlockchainException("[STELLAR]: Failed to create distribution and ballot accounts!", e);
@@ -49,23 +56,32 @@ public class StellarDistributionAndBallotAccountOperation implements Distributio
     private Transaction.Builder prepareTransaction(IssuerData anIssuerData) throws IOException {
         Server server = configuration.getServer();
         Network network = configuration.getNetwork();
-        KeyPair stellarIssuerKeyPair = StellarUtils.fromDevoteKeyPair(anIssuerData.issuerKeyPair);
+        KeyPair stellarIssuerKeyPair = StellarUtils.fromDevoteKeyPair(anIssuerData.keyPair);
 
         return StellarUtils.createTransactionBuilder(server, network, stellarIssuerKeyPair.getAccountId());
     }
 
-    private TransactionResult prepareDistributionAndBallotCreationOn(Transaction.Builder txBuilder, List<IssuerData> issuerData) {
-        long totalVotesCap = issuerData.stream()
+    private TransactionResult prepareDistributionAndBallotCreationOn(Transaction.Builder txBuilder, List<IssuerData> issuers) {
+        long totalVotesCap = issuers.stream()
                 .map(i -> i.votesCap)
                 .reduce(0L, Long::sum);
 
         KeyPair distributionKeyPair = prepareDistributionCreationOn(txBuilder, totalVotesCap);
         KeyPair ballotKeyPair = prepareBallotCreationOn(txBuilder);
-        sendAllVoteTokensToDistributionAccount(distributionKeyPair, issuerData);
-        allowBallotToHaveVoteTokens(ballotKeyPair, issuerData);
 
-        // TODO
-        return null;
+        allowDistributionToHaveVoteTokensOfIssuers(txBuilder, distributionKeyPair, issuers);
+        sendAllVoteTokensOfIssuersToDistribution(txBuilder, distributionKeyPair, issuers);
+        lockOutIssuers(txBuilder, issuers);
+        allowBallotToHaveVoteTokensOfIssuers(txBuilder, ballotKeyPair, issuers);
+
+        Map<String, String> issuersAndTheirTokens = new HashMap<>();
+        issuers.forEach(i -> issuersAndTheirTokens.put(i.keyPair.secretKey, i.voteTokenTitle));
+
+        return new TransactionResult(
+                StellarUtils.toDevoteKeyPair(distributionKeyPair),
+                StellarUtils.toDevoteKeyPair(ballotKeyPair),
+                issuersAndTheirTokens
+        );
     }
 
     private KeyPair prepareDistributionCreationOn(Transaction.Builder txBuilder, long votesCap) {
@@ -93,63 +109,94 @@ public class StellarDistributionAndBallotAccountOperation implements Distributio
         return ballotKeyPair;
     }
 
-    private void sendAllVoteTokensToDistributionAccount(Transaction.Builder txBuilder, KeyPair distribution, List<IssuerData> issuers) {
-        // TODO
-        issuers.forEach(i -> {
-            KeyPair stellarIssuerKeyPair = StellarUtils.fromDevoteKeyPair(i.issuerKeyPair);
-            Asset asset = Asset.create(null, i.voteTokenTitle, stellarIssuerKeyPair.getAccountId());
-            ChangeTrustAsset chgTrustAsset = ChangeTrustAsset.create(asset);
+    private void allowDistributionToHaveVoteTokensOfIssuers(Transaction.Builder txBuilder, KeyPair distribution, List<IssuerData> issuers) {
+        issuers.forEach(issuer -> allowDistributionToHaveVoteTokensOfIssuer(txBuilder, distribution, issuer));
+    }
 
-            // TODO: To new method: allow distribution to have vote tokens
-            BigDecimal votesCap = new BigDecimal(i.votesCap);
-            BigDecimal divisor = new BigDecimal(10).pow(7);
-            String allVoteTokensOfIssuer = votesCap.divide(divisor).toString();
+    private void allowDistributionToHaveVoteTokensOfIssuer(Transaction.Builder txBuilder, KeyPair distribution, IssuerData issuerData) {
+        ChangeTrustAsset chgTrustAsset = toChangeTrustAsset(issuerData);
+        String allVoteTokensOfIssuer = calcNumOfAllVoteTokensOfIssuer(issuerData);
 
-            ChangeTrustOperation changeTrustOperation = new ChangeTrustOperation.Builder(chgTrustAsset, allVoteTokensOfIssuer)
-                    .setSourceAccount(distribution.getAccountId())
-                    .build();
-            txBuilder.addOperation(changeTrustOperation);
+        ChangeTrustOperation changeTrustOperation = new ChangeTrustOperation.Builder(chgTrustAsset, allVoteTokensOfIssuer)
+                .setSourceAccount(distribution.getAccountId())
+                .build();
+        txBuilder.addOperation(changeTrustOperation);
+    }
 
-            // TODO: To new method: doSendVoteToken to distro
-            PaymentOperation paymentOperation = new PaymentOperation.Builder(distribution.getAccountId(), asset, allVoteTokensOfIssuer)
-                    .setSourceAccount(stellarIssuerKeyPair.getAccountId())
-                    .build();
-            txBuilder.addOperation(paymentOperation);
+    private void sendAllVoteTokensOfIssuersToDistribution(Transaction.Builder txBuilder, KeyPair distribution, List<IssuerData> issuers) {
+        issuers.forEach(issuer -> sendAllVoteTokensOfIssuerToDistribution(txBuilder, distribution, issuer));
+    }
 
-            // TODO: To new method: lock out issuer
-            SetOptionsOperation setOptionsOperation = new SetOptionsOperation.Builder()
-                    .setSourceAccount(stellarIssuerKeyPair.getAccountId())
-                    .setMasterKeyWeight(0)
-                    .setLowThreshold(1)
-                    .setMediumThreshold(1)
-                    .setHighThreshold(1)
-                    .build();
-            txBuilder.addOperation(setOptionsOperation);
-        });
+    private void sendAllVoteTokensOfIssuerToDistribution(Transaction.Builder txBuilder, KeyPair distribution, IssuerData issuerData) {
+        KeyPair stellarIssuerKeyPair = StellarUtils.fromDevoteKeyPair(issuerData.keyPair);
+        String allVoteTokensOfIssuer = calcNumOfAllVoteTokensOfIssuer(issuerData);
+        Asset asset = toAsset(issuerData);
 
+        PaymentOperation paymentOperation = new PaymentOperation.Builder(distribution.getAccountId(), asset, allVoteTokensOfIssuer)
+                .setSourceAccount(stellarIssuerKeyPair.getAccountId())
+                .build();
+        txBuilder.addOperation(paymentOperation);
+    }
+
+    private void lockOutIssuers(Transaction.Builder txBuilder, List<IssuerData> issuers) {
+        issuers.forEach(issuer -> lockOutIssuer(txBuilder, issuer));
+    }
+
+    private void lockOutIssuer(Transaction.Builder txBuilder, IssuerData issuer) {
+        KeyPair stellarIssuerKeyPair = StellarUtils.fromDevoteKeyPair(issuer.keyPair);
+        SetOptionsOperation setOptionsOperation = new SetOptionsOperation.Builder()
+                .setSourceAccount(stellarIssuerKeyPair.getAccountId())
+                .setMasterKeyWeight(0)
+                .setLowThreshold(1)
+                .setMediumThreshold(1)
+                .setHighThreshold(1)
+                .build();
+        txBuilder.addOperation(setOptionsOperation);
+    }
+
+    private void allowBallotToHaveVoteTokensOfIssuers(Transaction.Builder txBuilder, KeyPair ballot, List<IssuerData> issuers) {
+        issuers.forEach(issuer -> allowBallotToHaveVoteTokenOfIssuer(txBuilder, ballot, issuer));
+    }
+
+    private void allowBallotToHaveVoteTokenOfIssuer(Transaction.Builder txBuilder, KeyPair ballot, IssuerData issuer) {
+        ChangeTrustAsset chgTrustAsset = toChangeTrustAsset(issuer);
+        String allVoteTokensOfIssuer = calcNumOfAllVoteTokensOfIssuer(issuer);
+
+        ChangeTrustOperation changeTrustOperation = new ChangeTrustOperation.Builder(chgTrustAsset, allVoteTokensOfIssuer)
+                .setSourceAccount(ballot.getAccountId())
+                .build();
+
+        txBuilder.addOperation(changeTrustOperation);
+    }
+
+    private Asset toAsset(IssuerData issuerData) {
+        KeyPair stellarIssuerKeyPair = StellarUtils.fromDevoteKeyPair(issuerData.keyPair);
+        return Asset.create(null, issuerData.voteTokenTitle, stellarIssuerKeyPair.getAccountId());
 
     }
 
-    private void allowBallotToHaveVoteTokens(KeyPair ballot, List<IssuerData> issuers) {
-        // TODO
+    private ChangeTrustAsset toChangeTrustAsset(IssuerData issuerData) {
+        return ChangeTrustAsset.create(toAsset(issuerData));
     }
 
-    private void submitTransaction(
-            Transaction.Builder txBuilder,
-            List<IssuerData> issuerData,
-            TransactionResult transactionResult
-    ) throws AccountRequiresMemoException, IOException {
+    private String calcNumOfAllVoteTokensOfIssuer(IssuerData issuer) {
+        BigDecimal votesCap = new BigDecimal(issuer.votesCap);
+        BigDecimal divisor = new BigDecimal(10).pow(7);
+        return votesCap.divide(divisor).toString();
+    }
+
+    private void submitTransaction(Transaction.Builder txBuilder, List<IssuerData> issuers, TransactionResult result)
+            throws AccountRequiresMemoException, IOException {
         Transaction transaction = txBuilder.build();
 
-        List<KeyPair> stellarIssuerKeyPairs = issuerData.stream()
-                .map(i -> StellarUtils.fromDevoteKeyPair(i.issuerKeyPair))
-                .collect(Collectors.toList());
+        issuers.stream()
+                .map(issuer -> StellarUtils.fromDevoteKeyPair(issuer.keyPair))
+                .forEach(transaction::sign);
 
-        KeyPair stellarBallot = StellarUtils.fromDevoteKeyPair(transactionResult.ballot);
-        KeyPair stellarDistribution = StellarUtils.fromDevoteKeyPair(transactionResult.distribution);
-
-        stellarIssuerKeyPairs.forEach(transaction::sign);
+        KeyPair stellarBallot = StellarUtils.fromDevoteKeyPair(result.ballot);
         transaction.sign(stellarBallot);
+
+        KeyPair stellarDistribution = StellarUtils.fromDevoteKeyPair(result.distribution);
         transaction.sign(stellarDistribution);
 
         Server server = configuration.getServer();

@@ -9,12 +9,12 @@ public interface DistributionAndBallotAccountOperation extends BlockchainOperati
 
     class IssuerData {
         public final String voteTokenTitle;
-        public final KeyPair issuerKeyPair;
+        public final KeyPair keyPair;
         public final long votesCap;
 
-        public IssuerData(String voteTokenTitle, KeyPair issuerKeyPair, long votesCap) {
+        public IssuerData(String voteTokenTitle, KeyPair keyPair, long votesCap) {
             this.voteTokenTitle = voteTokenTitle;
-            this.issuerKeyPair = issuerKeyPair;
+            this.keyPair = keyPair;
             this.votesCap = votesCap;
         }
     }
