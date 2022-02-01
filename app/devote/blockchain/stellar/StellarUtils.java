@@ -1,5 +1,8 @@
 package devote.blockchain.stellar;
 
+import devote.blockchain.api.DistributionAndBallotAccountOperation;
+import org.stellar.sdk.Asset;
+import org.stellar.sdk.ChangeTrustAsset;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Network;
 import org.stellar.sdk.Server;
@@ -8,12 +11,13 @@ import org.stellar.sdk.responses.AccountResponse;
 import org.stellar.sdk.responses.SubmitTransactionResponse;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
 import static org.stellar.sdk.AbstractTransaction.MIN_BASE_FEE;
 
-public class StellarUtils {
+class StellarUtils {
     public static final int STELLAR_MIN_BASE_FEE = MIN_BASE_FEE * 3;
     public static final int STELLAR_TIMEOUT_SECONDS = 30;
 
