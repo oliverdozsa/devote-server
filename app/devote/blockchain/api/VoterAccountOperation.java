@@ -4,19 +4,9 @@ public interface VoterAccountOperation extends BlockchainOperation {
     String createTransaction(CreationData creationData);
 
     class CreationData {
-        public String channelSecret;
+        public KeyPair channelKeyPair;
         public KeyPair distributionKeyPair;
+        public Issuer issuer;
         public String voterPublicKey;
-        public String issuerPublicKey;
-        public String assetCode;
-        public Long votesCap;
-
-        @Override
-        public String toString() {
-            return "CreationData{" +
-                    "voterPublicKey='" + voterPublicKey + '\'' +
-                    ", assetCode='" + assetCode + '\'' +
-                    '}';
-        }
     }
 }

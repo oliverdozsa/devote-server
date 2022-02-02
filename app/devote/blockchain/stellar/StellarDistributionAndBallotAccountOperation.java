@@ -3,6 +3,7 @@ package devote.blockchain.stellar;
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.BlockchainException;
 import devote.blockchain.api.DistributionAndBallotAccountOperation;
+import devote.blockchain.api.Issuer;
 import org.stellar.sdk.AccountRequiresMemoException;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Network;
@@ -20,7 +21,6 @@ public class StellarDistributionAndBallotAccountOperation implements Distributio
     private StellarBlockchainConfiguration configuration;
 
     private static final Logger.ALogger logger = Logger.of(StellarDistributionAndBallotAccountOperation.class);
-    private static final String BALLOT_STARTING_BALANCE = "2";
 
     @Override
     public void init(BlockchainConfiguration configuration) {
@@ -28,32 +28,26 @@ public class StellarDistributionAndBallotAccountOperation implements Distributio
     }
 
     @Override
-    public TransactionResult create(List<IssuerData> issuers) {
+    public TransactionResult create(List<Issuer> issuers) {
         try {
             List<String> tokens = issuers.stream()
-                    .map(issuer -> issuer.voteTokenTitle)
+                    .map(issuer -> issuer.assetCode)
                     .collect(Collectors.toList());
             logger.info("[STELLAR]: About to create ballot and distribution account for vote tokens: {}", tokens);
 
             Transaction.Builder txBuilder = prepareTransaction(issuers.get(0));
-            StellarDistributionAccountOperation distributionAccountOperation =
-                    new StellarDistributionAccountOperation(txBuilder, issuers);
-            StellarBallotAccountOperation ballotAccountOperation =
-                    new StellarBallotAccountOperation(txBuilder, issuers);
+            KeyPair stellarDistribution = prepareDistributionAccount(txBuilder, issuers);
+            KeyPair stellarBallot = prepareBallotAccount(txBuilder, issuers);
+            submitTransaction(txBuilder, issuers, stellarDistribution, stellarBallot);
 
-            KeyPair stellarDistribution = distributionAccountOperation.prepare();
-            KeyPair stellarBallot = ballotAccountOperation.prepare();
-            TransactionResult transactionResult = createTransactionResult(stellarDistribution, stellarBallot, issuers);
-            submitTransaction(txBuilder, issuers, transactionResult);
-
-            return transactionResult;
+            return createTransactionResult(stellarDistribution, stellarBallot, issuers);
         } catch (IOException | AccountRequiresMemoException e) {
             logger.warn("[STELLAR]: Failed to create distribution and ballot accounts!", e);
             throw new BlockchainException("[STELLAR]: Failed to create distribution and ballot accounts!", e);
         }
     }
 
-    private Transaction.Builder prepareTransaction(IssuerData anIssuerData) throws IOException {
+    private Transaction.Builder prepareTransaction(Issuer anIssuerData) throws IOException {
         Server server = configuration.getServer();
         Network network = configuration.getNetwork();
         KeyPair stellarIssuerKeyPair = StellarUtils.fromDevoteKeyPair(anIssuerData.keyPair);
@@ -61,9 +55,22 @@ public class StellarDistributionAndBallotAccountOperation implements Distributio
         return StellarUtils.createTransactionBuilder(server, network, stellarIssuerKeyPair.getAccountId());
     }
 
-    private TransactionResult createTransactionResult(KeyPair distribution, KeyPair ballot, List<IssuerData> issuers) {
+    private KeyPair prepareDistributionAccount(Transaction.Builder txBuilder, List<Issuer> issuers) {
+        StellarDistributionAccountOperation distributionAccountOperation =
+                new StellarDistributionAccountOperation(txBuilder, issuers);
+        return distributionAccountOperation.prepare();
+    }
+
+    private KeyPair prepareBallotAccount(Transaction.Builder txBuilder, List<Issuer> issuers) {
+        StellarBallotAccountOperation ballotAccountOperation =
+                new StellarBallotAccountOperation(txBuilder, issuers);
+
+        return ballotAccountOperation.prepare();
+    }
+
+    private TransactionResult createTransactionResult(KeyPair distribution, KeyPair ballot, List<Issuer> issuers) {
         Map<String, String> issuersAndTheirTokens = new HashMap<>();
-        issuers.forEach(i -> issuersAndTheirTokens.put(i.keyPair.secretKey, i.voteTokenTitle));
+        issuers.forEach(issuer -> issuersAndTheirTokens.put(issuer.keyPair.secretKey, issuer.assetCode));
 
         return new TransactionResult(
                 StellarUtils.toDevoteKeyPair(distribution),
@@ -72,19 +79,19 @@ public class StellarDistributionAndBallotAccountOperation implements Distributio
         );
     }
 
-    private void submitTransaction(Transaction.Builder txBuilder, List<IssuerData> issuers, TransactionResult result)
-            throws AccountRequiresMemoException, IOException {
+    private void submitTransaction(
+            Transaction.Builder txBuilder,
+            List<Issuer> issuers,
+            KeyPair distribution,
+            KeyPair ballot) throws AccountRequiresMemoException, IOException {
         Transaction transaction = txBuilder.build();
 
         issuers.stream()
                 .map(issuer -> StellarUtils.fromDevoteKeyPair(issuer.keyPair))
                 .forEach(transaction::sign);
 
-        KeyPair stellarBallot = StellarUtils.fromDevoteKeyPair(result.ballot);
-        transaction.sign(stellarBallot);
-
-        KeyPair stellarDistribution = StellarUtils.fromDevoteKeyPair(result.distribution);
-        transaction.sign(stellarDistribution);
+        transaction.sign(ballot);
+        transaction.sign(distribution);
 
         Server server = configuration.getServer();
         server.submitTransaction(transaction);

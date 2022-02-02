@@ -4,7 +4,7 @@ import data.entities.JpaVoting;
 import data.repositories.ChannelProgressRepository;
 import data.repositories.VotingRepository;
 import devote.blockchain.api.DistributionAndBallotAccountOperation;
-import devote.blockchain.api.KeyPair;
+import devote.blockchain.api.Issuer;
 import requests.CreateVotingRequest;
 import executioncontexts.DatabaseExecutionContext;
 import play.Logger;
@@ -47,10 +47,10 @@ public class VotingDbOperations {
         }, dbExecContext);
     }
 
-    public CompletionStage<Void> issuerAccountsCreated(Long votingId, List<KeyPair> keyPairs) {
+    public CompletionStage<Void> issuerAccountsCreated(Long votingId, List<Issuer> issuers) {
         return runAsync(() -> {
-            logger.info("issuerAccountsCreated(): votingId = {}, accounts size = {}", votingId, keyPairs.size());
-            votingRepository.issuerAccountsCreated(votingId, keyPairs);
+            logger.info("issuerAccountsCreated(): votingId = {}, accounts size = {}", votingId, issuers.size());
+            votingRepository.issuerAccountsCreated(votingId, issuers);
             channelProgressRepository.issuersCreated(votingId);
         }, dbExecContext);
     }

@@ -1,6 +1,6 @@
 package devote.blockchain.stellar;
 
-import devote.blockchain.api.DistributionAndBallotAccountOperation.IssuerData;
+import devote.blockchain.api.Issuer;
 import org.stellar.sdk.ChangeTrustAsset;
 import org.stellar.sdk.ChangeTrustOperation;
 import org.stellar.sdk.CreateAccountOperation;
@@ -9,17 +9,17 @@ import org.stellar.sdk.Transaction;
 
 import java.util.List;
 
-import static devote.blockchain.stellar.StellarIssuerDataUtils.calcNumOfAllVoteTokensOf;
-import static devote.blockchain.stellar.StellarIssuerDataUtils.obtainsChangeTrustAssetFrom;
+import static devote.blockchain.stellar.StellarIssuerUtils.calcNumOfAllVoteTokensOf;
+import static devote.blockchain.stellar.StellarIssuerUtils.obtainsChangeTrustAssetFrom;
 
 class StellarBallotAccountOperation {
     private final Transaction.Builder txBuilder;
-    private final List<IssuerData> issuers;
+    private final List<Issuer> issuers;
 
 
     private static final String BALLOT_STARTING_BALANCE = "2";
 
-    public StellarBallotAccountOperation(Transaction.Builder txBuilder, List<IssuerData> issuers) {
+    public StellarBallotAccountOperation(Transaction.Builder txBuilder, List<Issuer> issuers) {
         this.txBuilder = txBuilder;
         this.issuers = issuers;
     }
@@ -47,7 +47,7 @@ class StellarBallotAccountOperation {
         issuers.forEach(issuer -> allowBallotToHaveVoteTokenOfIssuer(ballot, issuer));
     }
 
-    private void allowBallotToHaveVoteTokenOfIssuer(KeyPair ballot, IssuerData issuer) {
+    private void allowBallotToHaveVoteTokenOfIssuer(KeyPair ballot, Issuer issuer) {
         ChangeTrustAsset chgTrustAsset = obtainsChangeTrustAssetFrom(issuer);
         String allVoteTokensOfIssuer = calcNumOfAllVoteTokensOf(issuer);
 

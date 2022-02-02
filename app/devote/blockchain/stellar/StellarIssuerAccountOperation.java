@@ -26,10 +26,10 @@ public class StellarIssuerAccountOperation implements IssuerAccountOperation {
     }
 
     @Override
-    public KeyPair create(long votesCap, int i) {
+    public KeyPair create(long votesCapForIssuer) {
         try {
             Transaction.Builder txBuilder = prepareTransaction();
-            org.stellar.sdk.KeyPair issuerKeyPair = prepareIssuerCreationOn(txBuilder, i, votesCap);
+            org.stellar.sdk.KeyPair issuerKeyPair = prepareIssuerCreationOn(txBuilder, votesCapForIssuer);
             submitTransaction(txBuilder);
 
             return toDevoteKeyPair(issuerKeyPair);
@@ -52,9 +52,9 @@ public class StellarIssuerAccountOperation implements IssuerAccountOperation {
         return StellarUtils.createTransactionBuilder(server, network, masterKeyPair.getAccountId());
     }
 
-    private org.stellar.sdk.KeyPair prepareIssuerCreationOn(Transaction.Builder txBuilder, int i, long votesCap) {
+    private org.stellar.sdk.KeyPair prepareIssuerCreationOn(Transaction.Builder txBuilder, long votesCapForIssuer) {
         org.stellar.sdk.KeyPair issuerKeyPair = org.stellar.sdk.KeyPair.random();
-        String startingBalance = calcStartingBalanceFor(i, votesCap);
+        String startingBalance = calcStartingBalanceFor(votesCapForIssuer);
         CreateAccountOperation createAccountOperation =
                 new CreateAccountOperation.Builder(issuerKeyPair.getAccountId(), startingBalance)
                         .build();
@@ -67,19 +67,8 @@ public class StellarIssuerAccountOperation implements IssuerAccountOperation {
         return issuerKeyPair;
     }
 
-    private String calcStartingBalanceFor(int i, long votesCap) {
-        int n = calcNumOfAccountsNeeded(votesCap);
-
-        long votesCapPerIssuer = votesCap / n;
-        long votesCapForLastIssuer = votesCapPerIssuer + votesCap % n;
-
-        long votesCapToUse = votesCapPerIssuer;
-        if (i == n) {
-            votesCapToUse = votesCapForLastIssuer;
-        }
-
-        long startingBalance = 4 * votesCapToUse + 10;
-        return Long.toBinaryString(startingBalance);
+    private String calcStartingBalanceFor(long votesCapPerIssuer) {
+        return Long.toString((4 * votesCapPerIssuer) + 10);
     }
 
     private void submitTransaction(Transaction.Builder txBuilder) throws AccountRequiresMemoException, IOException {

@@ -5,19 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface DistributionAndBallotAccountOperation extends BlockchainOperation {
-    TransactionResult create(List<IssuerData> issuerData);
+    TransactionResult create(List<Issuer> issuers);
 
-    class IssuerData {
-        public final String voteTokenTitle;
-        public final KeyPair keyPair;
-        public final long votesCap;
-
-        public IssuerData(String voteTokenTitle, KeyPair keyPair, long votesCap) {
-            this.voteTokenTitle = voteTokenTitle;
-            this.keyPair = keyPair;
-            this.votesCap = votesCap;
-        }
-    }
 
     class TransactionResult {
         public final KeyPair distribution;

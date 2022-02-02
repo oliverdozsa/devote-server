@@ -3,6 +3,7 @@ package devote.blockchain.operations;
 import devote.blockchain.BlockchainFactory;
 import devote.blockchain.Blockchains;
 import devote.blockchain.api.DistributionAndBallotAccountOperation;
+import devote.blockchain.api.Issuer;
 import devote.blockchain.api.IssuerAccountOperation;
 import devote.blockchain.api.KeyPair;
 import requests.CreateVotingRequest;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -46,7 +48,7 @@ public class VotingBlockhainOperationsTest {
     private DistributionAndBallotAccountOperation mockDistributionAndBallotAccountOperation;
 
     @Captor
-    private ArgumentCaptor<List<DistributionAndBallotAccountOperation.IssuerData>> issuerDataCaptor;
+    private ArgumentCaptor<List<Issuer>> issuersCaptor;
 
     private VotingBlockchainOperations operations;
 
@@ -62,12 +64,12 @@ public class VotingBlockhainOperationsTest {
         when(mockBlockchainFactory.createIssuerAccountOperation()).thenReturn(mockIssuerAccountOperation);
         when(mockBlockchainFactory.createDistributionAndBallotAccountOperation()).thenReturn(mockDistributionAndBallotAccountOperation);
         when(mockIssuerAccountOperation.calcNumOfAccountsNeeded(anyLong())).thenReturn(3);
-        when(mockIssuerAccountOperation.create(anyLong(), anyInt())).thenReturn(
+        when(mockIssuerAccountOperation.create(anyLong())).thenReturn(
                 new KeyPair("sA", "pA"),
                 new KeyPair("sB", "pB"),
                 new KeyPair("sC", "pC")
         );
-        when(mockDistributionAndBallotAccountOperation.create(anyList(), anyLong())).thenReturn(
+        when(mockDistributionAndBallotAccountOperation.create(anyList())).thenReturn(
                 new DistributionAndBallotAccountOperation.TransactionResult(new KeyPair("d", "d"), new KeyPair("b", "b"), new HashMap<>())
         );
     }
@@ -78,10 +80,12 @@ public class VotingBlockhainOperationsTest {
         request.setNetwork("mocknetwork");
         request.setVotesCap(42L);
 
-        CompletionStage<List<KeyPair>> createIssuerAccountsStage = operations.createIssuerAccounts(request);
-        CompletableFuture<List<KeyPair>> createIssuerAccountsFuture = createIssuerAccountsStage.toCompletableFuture();
+        CompletionStage<List<Issuer>> createIssuerAccountsStage = operations.createIssuerAccounts(request);
+        CompletableFuture<List<Issuer>> createIssuerAccountsFuture = createIssuerAccountsStage.toCompletableFuture();
 
-        List<KeyPair> createdAccounts = createIssuerAccountsFuture.get();
+        List<KeyPair> createdAccounts = createIssuerAccountsFuture.get().stream()
+                .map(issuer -> issuer.keyPair)
+                .collect(Collectors.toList());
         assertThat(createdAccounts, containsInAnyOrder(
                 new KeyPair("sA", "pA"),
                 new KeyPair("sB", "pB"),
@@ -96,19 +100,27 @@ public class VotingBlockhainOperationsTest {
         request.setVotesCap(42L);
         request.setTitle("S#ome!Vo@tingWithALongTitle");
 
-        List<KeyPair> issuerKeyPairs = Arrays.asList(
-                new KeyPair("issuerSecret1", "issuerPublic1"),
-                new KeyPair("issuerSecret2", "issuerPublic2")
+        List<Issuer> issuers = Arrays.asList(
+                new Issuer(
+                        new KeyPair("issuerSecret1", "issuerPublic1"),
+                        42,
+                        "A1"
+                ),
+                new Issuer(
+                        new KeyPair("issuerSecret2", "issuerPublic2"),
+                        21,
+                        "A2"
+                )
         );
 
         CompletionStage<DistributionAndBallotAccountOperation.TransactionResult> resultCompletionStage =
-                operations.createDistributionAndBallotAccounts(request, issuerKeyPairs);
+                operations.createDistributionAndBallotAccounts(request, issuers);
         resultCompletionStage.toCompletableFuture().get();
 
-        Mockito.verify(mockDistributionAndBallotAccountOperation).create(issuerDataCaptor.capture(), anyLong());
+        Mockito.verify(mockDistributionAndBallotAccountOperation).create(issuersCaptor.capture());
 
-        List<DistributionAndBallotAccountOperation.IssuerData> capturedIssuerData = issuerDataCaptor.getValue();
-        capturedIssuerData.forEach(i -> assertThat(i.voteTokenTitle, Matchers.startsWith("SOMEVOTI")));
+        List<Issuer> capturedIssuers = issuersCaptor.getValue();
+        capturedIssuers.forEach(issuer -> assertThat(issuer.assetCode, Matchers.startsWith("SOMEVOTI")));
     }
 
     @Test
@@ -119,19 +131,27 @@ public class VotingBlockhainOperationsTest {
         request.setTitle("S#ome!Vo@tingWithALongTitle");
         request.setTokenIdentifier("SomeID");
 
-        List<KeyPair> issuerKeyPairs = Arrays.asList(
-                new KeyPair("issuerSecret1", "issuerPublic1"),
-                new KeyPair("issuerSecret2", "issuerPublic2")
+        List<Issuer> issuers = Arrays.asList(
+                new Issuer(
+                        new KeyPair("issuerSecret1", "issuerPublic1"),
+                        42,
+                        "A1"
+                ),
+                new Issuer(
+                        new KeyPair("issuerSecret2", "issuerPublic2"),
+                        21,
+                        "A2"
+                )
         );
 
         CompletionStage<DistributionAndBallotAccountOperation.TransactionResult> resultCompletionStage =
-                operations.createDistributionAndBallotAccounts(request, issuerKeyPairs);
+                operations.createDistributionAndBallotAccounts(request, issuers);
         resultCompletionStage.toCompletableFuture().get();
 
-        Mockito.verify(mockDistributionAndBallotAccountOperation).create(issuerDataCaptor.capture(), anyLong());
+        Mockito.verify(mockDistributionAndBallotAccountOperation).create(issuersCaptor.capture());
 
-        List<DistributionAndBallotAccountOperation.IssuerData> capturedIssuerData = issuerDataCaptor.getValue();
-        capturedIssuerData.forEach(i -> assertThat(i.voteTokenTitle, Matchers.startsWith("SOMEID")));
+        List<Issuer> capturedIssuers = issuersCaptor.getValue();
+        capturedIssuers.forEach(i -> assertThat(i.assetCode, Matchers.startsWith("SOMEID")));
     }
 
     public void executeRunnableOnMockExecContext() {

@@ -5,6 +5,7 @@ import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
 import data.operations.CommissionDbOperations;
 import data.operations.VotingDbOperations;
+import devote.blockchain.api.Issuer;
 import devote.blockchain.api.KeyPair;
 import devote.blockchain.api.VoterAccountOperation;
 import devote.blockchain.operations.CommissionBlockchainOperations;
@@ -112,10 +113,10 @@ public class CommissionCreateAccountSubService {
 
     private VoterAccountOperation.CreationData prepareForBlockchainOperation(AccountCreationCollectedData accountCreationData) {
         VoterAccountOperation.CreationData voterCreationData = new VoterAccountOperation.CreationData();
-        voterCreationData.issuerPublicKey = accountCreationData.issuer.getAccountPublic();
-        voterCreationData.assetCode = accountCreationData.issuer.getAssetCode();
-        voterCreationData.votesCap = accountCreationData.voting.getVotesCap();
-        voterCreationData.channelSecret = accountCreationData.channelAccount.getAccountSecret();
+        voterCreationData.issuer = toIssuer(accountCreationData.issuer);
+        voterCreationData.channelKeyPair = new KeyPair(
+                accountCreationData.channelAccount.getAccountSecret(), accountCreationData.channelAccount.getAccountPublic()
+        );
         voterCreationData.voterPublicKey = accountCreationData.voterPublic;
         voterCreationData.distributionKeyPair = new KeyPair(
                 accountCreationData.voting.getDistributionAccountSecret(), accountCreationData.voting.getDistributionAccountPublic()
@@ -134,6 +135,11 @@ public class CommissionCreateAccountSubService {
         response.setTransaction(transaction);
 
         return response;
+    }
+
+    private static Issuer toIssuer(JpaVotingIssuerAccount jpaVotingIssuer) {
+        KeyPair keyPair = new KeyPair(jpaVotingIssuer.getAccountSecret(), jpaVotingIssuer.getAccountPublic());
+        return new Issuer(keyPair, jpaVotingIssuer.getVotesCap(), jpaVotingIssuer.getAssetCode());
     }
 
     private static class ParsedMessage {

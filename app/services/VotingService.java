@@ -1,7 +1,7 @@
 package services;
 
 import data.operations.VotingDbOperations;
-import devote.blockchain.api.KeyPair;
+import devote.blockchain.api.Issuer;
 import devote.blockchain.operations.VotingBlockchainOperations;
 import ipfs.VotingIpfsOperations;
 import play.Logger;
@@ -42,9 +42,9 @@ public class VotingService {
                 .initialize(request)
                 .thenAccept(createdVotingData::setId)
                 .thenCompose(v -> votingBlockchainOperations.createIssuerAccounts(request))
-                .thenAccept(issuerKeyPairs -> createdVotingData.issuerKeyPairs = issuerKeyPairs)
-                .thenCompose(v -> votingDbOperations.issuerAccountsCreated(createdVotingData.id, createdVotingData.issuerKeyPairs))
-                .thenCompose(v -> votingBlockchainOperations.createDistributionAndBallotAccounts(request, createdVotingData.issuerKeyPairs))
+                .thenAccept(issuers -> createdVotingData.issuers = issuers)
+                .thenCompose(v -> votingDbOperations.issuerAccountsCreated(createdVotingData.id, createdVotingData.issuers))
+                .thenCompose(v -> votingBlockchainOperations.createDistributionAndBallotAccounts(request, createdVotingData.issuers))
                 .thenCompose(tr -> votingDbOperations.distributionAndBallotAccountsCreated(createdVotingData.id, tr))
                 .thenCompose(v -> votingIpfsOperations.saveVotingToIpfs(createdVotingData.id))
                 .thenCompose(cid -> votingDbOperations.votingSavedToIpfs(createdVotingData.id, cid))
@@ -61,7 +61,7 @@ public class VotingService {
 
     private static class CreatedVotingData {
         public Long id;
-        public List<KeyPair> issuerKeyPairs;
+        public List<Issuer> issuers;
         public String encodedId;
 
         public void setId(Long id) {

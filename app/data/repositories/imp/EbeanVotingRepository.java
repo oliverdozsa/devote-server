@@ -5,6 +5,7 @@ import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingIssuerAccount;
 import data.repositories.VotingRepository;
 import devote.blockchain.api.DistributionAndBallotAccountOperation;
+import devote.blockchain.api.Issuer;
 import devote.blockchain.api.KeyPair;
 import io.ebean.EbeanServer;
 import play.Logger;
@@ -47,13 +48,13 @@ public class EbeanVotingRepository implements VotingRepository {
     }
 
     @Override
-    public void issuerAccountsCreated(Long id, List<KeyPair> keyPairs) {
-        logger.info("issuerAccountsCreated(): id = {}, accounts size = {}", id, keyPairs.size());
+    public void issuerAccountsCreated(Long id, List<Issuer> issuers) {
+        logger.info("issuerAccountsCreated(): id = {}, accounts size = {}", id, issuers.size());
 
         JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
 
-        List<JpaVotingIssuerAccount> votingIssuers = keyPairs.stream()
-                .map(this::fromIssuerKeyPair)
+        List<JpaVotingIssuerAccount> votingIssuers = issuers.stream()
+                .map(this::fromIssuer)
                 .collect(Collectors.toList());
 
         voting.setIssuerAccounts(votingIssuers);
@@ -105,10 +106,12 @@ public class EbeanVotingRepository implements VotingRepository {
         ebeanServer.update(voting);
     }
 
-    private JpaVotingIssuerAccount fromIssuerKeyPair(KeyPair keyPair) {
+    private JpaVotingIssuerAccount fromIssuer(Issuer issuer) {
         JpaVotingIssuerAccount votingIssuer = new JpaVotingIssuerAccount();
-        votingIssuer.setAccountSecret(keyPair.secretKey);
-        votingIssuer.setAccountPublic(keyPair.publicKey);
+        votingIssuer.setAccountSecret(issuer.keyPair.secretKey);
+        votingIssuer.setAccountPublic(issuer.keyPair.publicKey);
+        votingIssuer.setAssetCode(issuer.assetCode);
+        votingIssuer.setVotesCap(issuer.votesCap);
         return votingIssuer;
     }
 

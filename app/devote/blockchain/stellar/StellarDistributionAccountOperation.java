@@ -1,5 +1,6 @@
 package devote.blockchain.stellar;
 
+import devote.blockchain.api.Issuer;
 import org.stellar.sdk.Asset;
 import org.stellar.sdk.ChangeTrustAsset;
 import org.stellar.sdk.ChangeTrustOperation;
@@ -8,17 +9,16 @@ import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.PaymentOperation;
 import org.stellar.sdk.SetOptionsOperation;
 import org.stellar.sdk.Transaction;
-import devote.blockchain.api.DistributionAndBallotAccountOperation.IssuerData;
 
 import java.util.List;
 
-import static devote.blockchain.stellar.StellarIssuerDataUtils.*;
+import static devote.blockchain.stellar.StellarIssuerUtils.*;
 
 class StellarDistributionAccountOperation {
     private final Transaction.Builder txBuilder;
-    private final List<IssuerData> issuers;
+    private final List<Issuer> issuers;
 
-    public StellarDistributionAccountOperation(Transaction.Builder txBuilder, List<IssuerData> issuers) {
+    public StellarDistributionAccountOperation(Transaction.Builder txBuilder, List<Issuer> issuers) {
         this.txBuilder = txBuilder;
         this.issuers = issuers;
     }
@@ -50,7 +50,7 @@ class StellarDistributionAccountOperation {
         issuers.forEach(issuer -> allowDistributionToHaveVoteTokensOfIssuer(distribution, issuer));
     }
 
-    private void allowDistributionToHaveVoteTokensOfIssuer(KeyPair distribution, IssuerData issuer) {
+    private void allowDistributionToHaveVoteTokensOfIssuer(KeyPair distribution, Issuer issuer) {
         ChangeTrustAsset chgTrustAsset = obtainsChangeTrustAssetFrom(issuer);
         String allVoteTokensOfIssuer = calcNumOfAllVoteTokensOf(issuer);
 
@@ -64,7 +64,7 @@ class StellarDistributionAccountOperation {
         issuers.forEach(issuer -> sendAllVoteTokensOfIssuerToDistribution(distribution, issuer));
     }
 
-    private void sendAllVoteTokensOfIssuerToDistribution(KeyPair distribution, IssuerData issuer) {
+    private void sendAllVoteTokensOfIssuerToDistribution(KeyPair distribution, Issuer issuer) {
         KeyPair stellarIssuerKeyPair = StellarUtils.fromDevoteKeyPair(issuer.keyPair);
         String allVoteTokensOfIssuer = calcNumOfAllVoteTokensOf(issuer);
         Asset asset = obtainAssetFrom(issuer);
@@ -79,7 +79,7 @@ class StellarDistributionAccountOperation {
         issuers.forEach(this::lockOutIssuer);
     }
 
-    private void lockOutIssuer(IssuerData issuer) {
+    private void lockOutIssuer(Issuer issuer) {
         KeyPair stellarIssuerKeyPair = StellarUtils.fromDevoteKeyPair(issuer.keyPair);
         SetOptionsOperation setOptionsOperation = new SetOptionsOperation.Builder()
                 .setSourceAccount(stellarIssuerKeyPair.getAccountId())

@@ -54,31 +54,26 @@ public class EbeanChannelProgressRepository implements ChannelProgressRepository
         JpaVoting voting = ebeanServer.find(JpaVoting.class, votingId);
         List<JpaVotingIssuerAccount> issuers = voting.getIssuerAccounts();
 
-        long numOfChannelAccountsToCreateForOneIssuer = voting.getVotesCap() / issuers.size();
-        long remainderChannelAccountsToCreate = voting.getVotesCap() % issuers.size();
-
         logger.info("issuersCreated(): Total channel accounts to create: {}", voting.getVotesCap());
         logger.info("issuersCreated(): Creating {} channel progresses for voting with id = {}.",
                 issuers.size(), votingId);
-        logger.info("issuersCreated(): Number of channel accounts to create per issuer: {}. Remainder channel accounts to create: {}",
-                numOfChannelAccountsToCreateForOneIssuer, remainderChannelAccountsToCreate);
+        List<Long> votesCapOfIssuers = issuers.stream()
+                .map(JpaVotingIssuerAccount::getVotesCap)
+                .collect(Collectors.toList());
+        logger.info("issuersCreated(): Number of channel accounts to create for issuers: {}", votesCapOfIssuers);
 
         List<JpaChannelAccountProgress> progresses = issuers.stream()
-                .map(i -> fromIssuer(i, numOfChannelAccountsToCreateForOneIssuer))
+                .map(this::fromIssuer)
                 .collect(Collectors.toList());
-
-        JpaChannelAccountProgress last = progresses.get(progresses.size() - 1);
-        last.setNumOfAccountsLeftToCreate(numOfChannelAccountsToCreateForOneIssuer + remainderChannelAccountsToCreate);
-        last.setNumOfAccountsToCreate(numOfChannelAccountsToCreateForOneIssuer + remainderChannelAccountsToCreate);
 
         progresses.forEach(ebeanServer::save);
     }
 
-    private JpaChannelAccountProgress fromIssuer(JpaVotingIssuerAccount issuer, long numOfAccountsToCreate) {
+    private JpaChannelAccountProgress fromIssuer(JpaVotingIssuerAccount issuer) {
         JpaChannelAccountProgress progress = new JpaChannelAccountProgress();
         progress.setIssuer(issuer);
-        progress.setNumOfAccountsToCreate(numOfAccountsToCreate);
-        progress.setNumOfAccountsLeftToCreate(numOfAccountsToCreate);
+        progress.setNumOfAccountsToCreate(issuer.getVotesCap());
+        progress.setNumOfAccountsLeftToCreate(issuer.getVotesCap());
         return progress;
     }
 }

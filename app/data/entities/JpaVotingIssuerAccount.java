@@ -34,6 +34,9 @@ public class JpaVotingIssuerAccount {
     @Column(name = "asset_code", length = 20)
     private String assetCode;
 
+    @Column(name = "votes_cap")
+    private Long votesCap;
+
     @OneToOne(mappedBy = "issuer")
     private JpaChannelAccountProgress channelAccountProgress;
 
@@ -83,5 +86,13 @@ public class JpaVotingIssuerAccount {
 
     public void setAccountPublic(String accountPublic) {
         this.accountPublic = accountPublic;
+    }
+
+    public Long getVotesCap() {
+        return votesCap;
+    }
+
+    public void setVotesCap(Long votesCap) {
+        this.votesCap = votesCap;
     }
 }
