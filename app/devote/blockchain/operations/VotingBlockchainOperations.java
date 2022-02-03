@@ -71,12 +71,12 @@ public class VotingBlockchainOperations {
     }
 
     public CompletionStage<DistributionAndBallotAccountOperation.TransactionResult> createDistributionAndBallotAccounts(
-            CreateVotingRequest request,
+            String network,
             List<Issuer> issuers) {
         return supplyAsync(() -> {
-            logger.info("createDistributionAndBallotAccounts(): request = {}, issuers.size = {}", request, issuers.size());
+            logger.info("createDistributionAndBallotAccounts(): network = {}, issuers.size = {}", network, issuers.size());
 
-            BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(request.getNetwork());
+            BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(network);
             DistributionAndBallotAccountOperation distributionAndBallotAccountOperation = blockchainFactory.createDistributionAndBallotAccountOperation();
 
             List<String> tokenTitles = issuers.stream()

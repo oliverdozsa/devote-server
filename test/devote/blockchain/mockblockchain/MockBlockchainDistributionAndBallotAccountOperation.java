@@ -2,6 +2,7 @@ package devote.blockchain.mockblockchain;
 
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.DistributionAndBallotAccountOperation;
+import devote.blockchain.api.Issuer;
 import devote.blockchain.api.KeyPair;
 
 import java.util.HashMap;
@@ -17,13 +18,13 @@ public class MockBlockchainDistributionAndBallotAccountOperation implements Dist
     }
 
     @Override
-    public TransactionResult create(List<IssuerData> issuerData, Long votesCap) {
+    public TransactionResult create(List<Issuer> issuers) {
         currentDistributionAccountId++;
         currentBallotAccountId++;
 
         Map<String, String> issuerTokens = new HashMap<>();
-        for (IssuerData issuerD : issuerData) {
-            issuerTokens.put(issuerD.keyPair.secretKey, issuerD.voteTokenTitle);
+        for (Issuer issuer : issuers) {
+            issuerTokens.put(issuer.keyPair.secretKey, issuer.assetCode);
         }
 
         String currentDistributionAccountIdAsString = Integer.toString(currentDistributionAccountId);

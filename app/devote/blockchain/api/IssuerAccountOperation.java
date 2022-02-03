@@ -4,16 +4,16 @@ public interface IssuerAccountOperation extends BlockchainOperation {
     /**
      * Creates the issuer account.
      *
-     * @param votesCapForIssuer The votes cap for the issuer.
+     * @param votesCap The votes cap for the issuer.
      * @return Keypair of the created account
      */
-    KeyPair create(long votesCapForIssuer);
+    KeyPair create(long votesCap);
 
     /**
      * Should calc the number of issuer accounts to create optionally based on votes cap.
      *
-     * @param votesCap Number of voters allowed.
+     * @param totalVotesCap Number of voters allowed.
      * @return See above
      */
-    int calcNumOfAccountsNeeded(long votesCap);
+    int calcNumOfAccountsNeeded(long totalVotesCap);
 }

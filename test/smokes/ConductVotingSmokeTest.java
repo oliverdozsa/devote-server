@@ -1,8 +1,7 @@
 package smokes;
 
-import clients.CommissionTestClient;
-import clients.VotingTestClient;
-import controllers.CommissionControllerTest;
+import components.clients.CommissionTestClient;
+import components.clients.VotingTestClient;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,9 +16,9 @@ import rules.RuleChainForTests;
 import java.util.Arrays;
 
 import static asserts.DbAsserts.assertThatTransactionIsStoredFor;
-import static controllers.VotingRequestMaker.createValidVotingRequest;
-import static extractors.CommissionResponseFromResult.*;
-import static extractors.GenericDataFromResult.statusOf;
+import static components.controllers.VotingRequestMaker.createValidVotingRequest;
+import static components.extractors.CommissionResponseFromResult.*;
+import static components.extractors.GenericDataFromResult.statusOf;
 import static matchers.ResultHasHeader.hasLocationHeader;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.CoreMatchers.notNullValue;

@@ -44,7 +44,7 @@ public class VotingService {
                 .thenCompose(v -> votingBlockchainOperations.createIssuerAccounts(request))
                 .thenAccept(issuers -> createdVotingData.issuers = issuers)
                 .thenCompose(v -> votingDbOperations.issuerAccountsCreated(createdVotingData.id, createdVotingData.issuers))
-                .thenCompose(v -> votingBlockchainOperations.createDistributionAndBallotAccounts(request, createdVotingData.issuers))
+                .thenCompose(v -> votingBlockchainOperations.createDistributionAndBallotAccounts(request.getNetwork(), createdVotingData.issuers))
                 .thenCompose(tr -> votingDbOperations.distributionAndBallotAccountsCreated(createdVotingData.id, tr))
                 .thenCompose(v -> votingIpfsOperations.saveVotingToIpfs(createdVotingData.id))
                 .thenCompose(cid -> votingDbOperations.votingSavedToIpfs(createdVotingData.id, cid))

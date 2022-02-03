@@ -19,14 +19,14 @@ public class MockBlockchainIssuerAccountOperation implements IssuerAccountOperat
     }
 
     @Override
-    public KeyPair create(long votesCap, int i) {
+    public KeyPair create(long votesCap) {
         currentIssuerAccountId++;
         String currentIssuerAccountIdAsString = Integer.toString(currentIssuerAccountId);
         return new KeyPair(currentIssuerAccountIdAsString, currentIssuerAccountIdAsString);
     }
 
     @Override
-    public int calcNumOfAccountsNeeded(long votesCap) {
+    public int calcNumOfAccountsNeeded(long totalVotesCap) {
         return NUM_OF_ISSUER_ACCOUNTS_TO_CREATE;
     }
 

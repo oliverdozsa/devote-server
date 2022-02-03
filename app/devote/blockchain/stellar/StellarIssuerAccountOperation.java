@@ -26,10 +26,10 @@ public class StellarIssuerAccountOperation implements IssuerAccountOperation {
     }
 
     @Override
-    public KeyPair create(long votesCapForIssuer) {
+    public KeyPair create(long votesCap) {
         try {
             Transaction.Builder txBuilder = prepareTransaction();
-            org.stellar.sdk.KeyPair issuerKeyPair = prepareIssuerCreationOn(txBuilder, votesCapForIssuer);
+            org.stellar.sdk.KeyPair issuerKeyPair = prepareIssuerCreationOn(txBuilder, votesCap);
             submitTransaction(txBuilder);
 
             return toDevoteKeyPair(issuerKeyPair);
@@ -40,7 +40,7 @@ public class StellarIssuerAccountOperation implements IssuerAccountOperation {
     }
 
     @Override
-    public int calcNumOfAccountsNeeded(long votesCap) {
+    public int calcNumOfAccountsNeeded(long totalVotesCap) {
         return configuration.getNumOfVoteBuckets();
     }
 

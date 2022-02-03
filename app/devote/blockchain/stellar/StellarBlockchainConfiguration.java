@@ -10,8 +10,8 @@ import play.Logger;
 public class StellarBlockchainConfiguration implements BlockchainConfiguration {
     private Server server;
     private Network network;
-    private int numOfVoteBuckets;
     private KeyPair masterKeyPair;
+    private Config config;
 
     private static final Logger.ALogger logger = Logger.of(StellarBlockchainConfiguration.class);
 
@@ -24,38 +24,42 @@ public class StellarBlockchainConfiguration implements BlockchainConfiguration {
     @Override
     public void init(Config config) {
         logger.info("[STELLAR]: initializing");
-
-        initServerAndNetwork(config);
-        numOfVoteBuckets = config.getInt("devote.vote.buckets");
-        masterKeyPair = KeyPair.fromSecretSeed(config.getString("devote.stellar.secret"));
+        this.config = config;
     }
 
     public Server getServer() {
+        initServerAndNetworkIfNeeded();
         return server;
     }
 
     public Network getNetwork() {
+        initServerAndNetworkIfNeeded();
         return network;
     }
 
     public int getNumOfVoteBuckets() {
-        return numOfVoteBuckets;
+        return config.getInt("devote.blockchain.stellar.votebuckets");
     }
 
     public KeyPair getMasterKeyPair() {
+        if (masterKeyPair == null) {
+            masterKeyPair = KeyPair.fromSecretSeed(config.getString("devote.blockchain.stellar.secret"));
+        }
+
         return masterKeyPair;
     }
 
-    private void initServerAndNetwork(Config config) {
-        String horizonUrl = config.getString("devote.stellar.url");
+    private void initServerAndNetworkIfNeeded() {
+        if (server == null) {
+            String horizonUrl = config.getString("devote.blockchain.stellar.url");
+            logger.info("[STELLAR]: horizon url = {}", horizonUrl);
+            server = new Server(horizonUrl);
 
-        logger.info("[STELLAR]: horizon url = {}", horizonUrl);
-        server = new Server(horizonUrl);
-
-        if (horizonUrl.contains("testnet")) {
-            network = Network.TESTNET;
-        } else {
-            network = Network.PUBLIC;
+            if (horizonUrl.contains("testnet")) {
+                network = Network.TESTNET;
+            } else {
+                network = Network.PUBLIC;
+            }
         }
     }
 }

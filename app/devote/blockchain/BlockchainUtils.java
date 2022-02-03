@@ -5,7 +5,7 @@ import play.Logger;
 
 import java.util.Set;
 
-class BlockchainUtils {
+public class BlockchainUtils {
     private static final Logger.ALogger logger = Logger.of(BlockchainUtils.class);
 
     public static <T> Class<? extends T> findUniqueSubtypeOfOrNull(Class<T> classToFind, Reflections reflections) {
