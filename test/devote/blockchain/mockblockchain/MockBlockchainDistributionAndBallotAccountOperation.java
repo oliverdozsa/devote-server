@@ -22,18 +22,13 @@ public class MockBlockchainDistributionAndBallotAccountOperation implements Dist
         currentDistributionAccountId++;
         currentBallotAccountId++;
 
-        Map<String, String> issuerTokens = new HashMap<>();
-        for (Issuer issuer : issuers) {
-            issuerTokens.put(issuer.keyPair.secretKey, issuer.assetCode);
-        }
-
         String currentDistributionAccountIdAsString = Integer.toString(currentDistributionAccountId);
         String currentBallotAccountIdAsString = Integer.toString(currentBallotAccountId);
 
         KeyPair distributionKeyPair = new KeyPair(currentDistributionAccountIdAsString, currentDistributionAccountIdAsString);
         KeyPair ballotKeyPair = new KeyPair(currentBallotAccountIdAsString, currentBallotAccountIdAsString);
 
-        return new TransactionResult(distributionKeyPair, ballotKeyPair, issuerTokens);
+        return new TransactionResult(distributionKeyPair, ballotKeyPair);
     }
 
     public static boolean isDistributionAccountCreated(String account) {

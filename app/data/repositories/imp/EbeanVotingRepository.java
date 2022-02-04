@@ -86,15 +86,6 @@ public class EbeanVotingRepository implements VotingRepository {
         voting.setBallotAccountPublic(transactionResult.ballot.publicKey);
 
         ebeanServer.update(voting);
-
-        Map<String, JpaVotingIssuerAccount> votingIssuersBySecret = new HashMap<>();
-        voting.getIssuerAccounts().forEach(i -> votingIssuersBySecret.put(i.getAccountSecret(), i));
-
-        transactionResult.issuerTokens.forEach((s, t) -> {
-            JpaVotingIssuerAccount votingIssuer = votingIssuersBySecret.get(s);
-            votingIssuer.setAssetCode(t);
-            ebeanServer.update(votingIssuer);
-        });
     }
 
     @Override

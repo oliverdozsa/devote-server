@@ -40,7 +40,7 @@ public class StellarDistributionAndBallotAccountOperation implements Distributio
             KeyPair stellarBallot = prepareBallotAccount(txBuilder, issuers);
             submitTransaction(txBuilder, issuers, stellarDistribution, stellarBallot);
 
-            return createTransactionResult(stellarDistribution, stellarBallot, issuers);
+            return createTransactionResult(stellarDistribution, stellarBallot);
         } catch (IOException | AccountRequiresMemoException e) {
             logger.warn("[STELLAR]: Failed to create distribution and ballot accounts!", e);
             throw new BlockchainException("[STELLAR]: Failed to create distribution and ballot accounts!", e);
@@ -68,14 +68,10 @@ public class StellarDistributionAndBallotAccountOperation implements Distributio
         return ballotAccountOperation.prepare();
     }
 
-    private TransactionResult createTransactionResult(KeyPair distribution, KeyPair ballot, List<Issuer> issuers) {
-        Map<String, String> issuersAndTheirTokens = new HashMap<>();
-        issuers.forEach(issuer -> issuersAndTheirTokens.put(issuer.keyPair.secretKey, issuer.assetCode));
-
+    private TransactionResult createTransactionResult(KeyPair distribution, KeyPair ballot) {
         return new TransactionResult(
                 StellarUtils.toDevoteKeyPair(distribution),
-                StellarUtils.toDevoteKeyPair(ballot),
-                issuersAndTheirTokens
+                StellarUtils.toDevoteKeyPair(ballot)
         );
     }
 

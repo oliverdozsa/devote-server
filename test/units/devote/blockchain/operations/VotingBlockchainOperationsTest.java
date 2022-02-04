@@ -71,7 +71,7 @@ public class VotingBlockchainOperationsTest {
                 new KeyPair("sC", "pC")
         );
         when(mockDistributionAndBallotAccountOperation.create(anyList())).thenReturn(
-                new DistributionAndBallotAccountOperation.TransactionResult(new KeyPair("d", "d"), new KeyPair("b", "b"), new HashMap<>())
+                new DistributionAndBallotAccountOperation.TransactionResult(new KeyPair("d", "d"), new KeyPair("b", "b"))
         );
     }
 
