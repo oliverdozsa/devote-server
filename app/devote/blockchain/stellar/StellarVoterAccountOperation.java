@@ -41,7 +41,7 @@ public class StellarVoterAccountOperation implements VoterAccountOperation {
             return transaction.toEnvelopeXdrBase64();
         } catch (IOException e) {
             logger.warn("[STELLAR]: Failed to create voter account transaction!", e);
-            throw new BlockchainException("[STELLAR]: Failed to create issuer account!", e);
+            throw new BlockchainException("[STELLAR]: Failed to create voter account transaction!", e);
         }
     }
 

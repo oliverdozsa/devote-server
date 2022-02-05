@@ -3,7 +3,7 @@ package devote.blockchain.api;
 import com.typesafe.config.Config;
 
 /**
- * Will be instantiated once per network. This is a place where you can place any globals if necessary.
+ * Will be instantiated once per network. This is where you can place any globals if necessary.
  *
  * Blockchain implementations should be placed under devote.blockchain.[blockchain-package].
  * More precisely, the BlockchainConfiguration class should be placed under devote.blockchain.[blockchain-package]

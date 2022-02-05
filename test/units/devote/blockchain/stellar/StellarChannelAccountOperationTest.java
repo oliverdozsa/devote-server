@@ -1,7 +1,9 @@
 package units.devote.blockchain.stellar;
 
 import devote.blockchain.api.BlockchainException;
-import devote.blockchain.stellar.StellarIssuerAccountOperation;
+import devote.blockchain.api.KeyPair;
+import devote.blockchain.stellar.StellarChannelAccountOperation;
+import devote.blockchain.stellar.StellarUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.stellar.sdk.AccountRequiresMemoException;
@@ -16,51 +18,54 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class StellarIssuerAccountOperationTest {
+public class StellarChannelAccountOperationTest {
     private StellarMock stellarMock;
 
-    private StellarIssuerAccountOperation operation;
+    private StellarChannelAccountOperation operation;
 
     @Before
     public void setup() throws IOException {
         stellarMock = new StellarMock();
 
-        operation = new StellarIssuerAccountOperation();
+        operation = new StellarChannelAccountOperation();
         operation.init(stellarMock.configuration);
     }
 
     @Test
     public void testCreate() throws AccountRequiresMemoException, IOException {
         // Given
+        KeyPair someIssuerKeyPair = StellarUtils.toDevoteKeyPair(org.stellar.sdk.KeyPair.random());
+
         // When
-        devote.blockchain.api.KeyPair keyPair = operation.create(42L);
+        KeyPair channelKeyPair = operation.create(42, someIssuerKeyPair);
 
         // Then
-        assertThat(keyPair, notNullValue());
+        assertThat(channelKeyPair, notNullValue());
         verify(stellarMock.server).submitTransaction(any(Transaction.class));
     }
 
     @Test
-    public void testCreateFailsWithIOException() throws AccountRequiresMemoException, IOException {
+    public void testCreateWithFailure() throws AccountRequiresMemoException, IOException {
         // Given
+        KeyPair someIssuerKeyPair = StellarUtils.toDevoteKeyPair(org.stellar.sdk.KeyPair.random());
         when(stellarMock.server.submitTransaction(any(Transaction.class))).thenThrow(new IOException("Some IO error!"));
 
         // When
+        BlockchainException exception =
+                assertThrows(BlockchainException.class, () -> operation.create(42, someIssuerKeyPair));
+
         // Then
-        BlockchainException exception = assertThrows(BlockchainException.class, () -> operation.create(42L));
-        assertThat(exception.getMessage(), equalTo("[STELLAR]: Failed to create issuer account!"));
+        assertThat(exception.getMessage(), equalTo("[STELLAR]: Failed to create channel account!"));
         assertThat(exception.getCause(), instanceOf(IOException.class));
     }
 
     @Test
-    public void testCalcNumOfAccountsNeeded() {
+    public void testMaxNumOfAccountsToCreateInOneBatch() {
         // Given
-        when(stellarMock.configuration.getNumOfVoteBuckets()).thenReturn(42);
-
         // When
-        int numOfAccountsNeeded = operation.calcNumOfAccountsNeeded(8484);
+        int maxNumOfOperationsInOneBranch = operation.maxNumOfAccountsToCreateInOneBatch();
 
         // Then
-        assertThat(numOfAccountsNeeded, equalTo(42));
+        assertThat(maxNumOfOperationsInOneBranch, equalTo(50));
     }
 }

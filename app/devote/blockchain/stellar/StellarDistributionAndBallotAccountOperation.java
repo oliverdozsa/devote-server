@@ -12,9 +12,7 @@ import org.stellar.sdk.Transaction;
 import play.Logger;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class StellarDistributionAndBallotAccountOperation implements DistributionAndBallotAccountOperation {
