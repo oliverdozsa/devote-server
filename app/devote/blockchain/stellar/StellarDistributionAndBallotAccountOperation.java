@@ -9,6 +9,7 @@ import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Network;
 import org.stellar.sdk.Server;
 import org.stellar.sdk.Transaction;
+import org.stellar.sdk.responses.SubmitTransactionResponse;
 import play.Logger;
 
 import java.io.IOException;
@@ -88,6 +89,6 @@ public class StellarDistributionAndBallotAccountOperation implements Distributio
         transaction.sign(distribution);
 
         Server server = configuration.getServer();
-        server.submitTransaction(transaction);
+        StellarSubmitTransaction.submit(transaction, server);
     }
 }

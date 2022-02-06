@@ -24,7 +24,7 @@ public class StellarChannelAccountOperationTest {
     private StellarChannelAccountOperation operation;
 
     @Before
-    public void setup() throws IOException {
+    public void setup() throws IOException, AccountRequiresMemoException {
         stellarMock = new StellarMock();
 
         operation = new StellarChannelAccountOperation();

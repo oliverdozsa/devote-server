@@ -28,7 +28,7 @@ public class StellarDistributionAndBallotAccountOperationTest {
     private StellarDistributionAndBallotAccountOperation operation;
 
     @Before
-    public void setup() throws IOException {
+    public void setup() throws IOException, AccountRequiresMemoException {
         stellarMock = new StellarMock();
 
         operation = new StellarDistributionAndBallotAccountOperation();

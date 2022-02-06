@@ -3,14 +3,18 @@ package units.devote.blockchain.stellar;
 import devote.blockchain.stellar.StellarBlockchainConfiguration;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.stellar.sdk.AccountRequiresMemoException;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Network;
 import org.stellar.sdk.Server;
+import org.stellar.sdk.Transaction;
 import org.stellar.sdk.requests.AccountsRequestBuilder;
 import org.stellar.sdk.responses.AccountResponse;
+import org.stellar.sdk.responses.SubmitTransactionResponse;
 
 import java.io.IOException;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -27,7 +31,10 @@ class StellarMock {
     @Mock
     AccountResponse accountResponse;
 
-    public StellarMock() throws IOException {
+    @Mock
+    SubmitTransactionResponse mockSubmitTxResponse;
+
+    public StellarMock() throws IOException, AccountRequiresMemoException {
         MockitoAnnotations.initMocks(this);
 
         KeyPair randomMasterKeyPair = KeyPair.random();
@@ -38,5 +45,7 @@ class StellarMock {
         when(server.accounts()).thenReturn(accountsRequestBuilder);
         when(accountsRequestBuilder.account(anyString())).thenReturn(accountResponse);
         when(accountResponse.getAccountId()).thenReturn(randomMasterKeyPair.getAccountId());
+        when(server.submitTransaction(any(Transaction.class))).thenReturn(mockSubmitTxResponse);
+        when(mockSubmitTxResponse.isSuccess()).thenReturn(true);
     }
 }

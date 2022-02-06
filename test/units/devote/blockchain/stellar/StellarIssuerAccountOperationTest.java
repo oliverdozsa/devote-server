@@ -22,7 +22,7 @@ public class StellarIssuerAccountOperationTest {
     private StellarIssuerAccountOperation operation;
 
     @Before
-    public void setup() throws IOException {
+    public void setup() throws IOException, AccountRequiresMemoException {
         stellarMock = new StellarMock();
 
         operation = new StellarIssuerAccountOperation();

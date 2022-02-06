@@ -78,7 +78,7 @@ public class StellarIssuerAccountOperation implements IssuerAccountOperation {
         Transaction transaction = txBuilder.build();
         transaction.sign(masterKeyPair);
 
-        server.submitTransaction(transaction);
+        StellarSubmitTransaction.submit(transaction, server);
     }
 
     private static KeyPair toDevoteKeyPair(org.stellar.sdk.KeyPair stellarKeyPair) {
