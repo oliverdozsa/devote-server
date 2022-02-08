@@ -68,8 +68,8 @@ public class BlockchainFactoryTest {
         }
 
         @Override
-        public int calcNumOfAccountsNeeded(long totalVotesCap) {
-            return 0;
+        public long calcNumOfAccountsNeeded(long totalVotesCap) {
+            return 0L;
         }
     }
 }

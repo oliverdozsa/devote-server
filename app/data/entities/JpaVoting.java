@@ -72,6 +72,14 @@ public class JpaVoting {
     @Lob
     private String ballotAccountPublic;
 
+    @Column(name = "funding_account_public")
+    @Lob
+    private String fundingAccountPublic;
+
+    @Column(name = "funding_account_secret")
+    @Lob
+    private String fundingAccountSecret;
+
     @Column(name = "authorization", nullable = false)
     @Enumerated(EnumType.STRING)
     private Authorization authorization;
@@ -269,5 +277,21 @@ public class JpaVoting {
 
     public void setBallotAccountPublic(String ballotAccountPublic) {
         this.ballotAccountPublic = ballotAccountPublic;
+    }
+
+    public String getFundingAccountPublic() {
+        return fundingAccountPublic;
+    }
+
+    public void setFundingAccountPublic(String fundingAccountPublic) {
+        this.fundingAccountPublic = fundingAccountPublic;
+    }
+
+    public String getFundingAccountSecret() {
+        return fundingAccountSecret;
+    }
+
+    public void setFundingAccountSecret(String fundingAccountSecret) {
+        this.fundingAccountSecret = fundingAccountSecret;
     }
 }

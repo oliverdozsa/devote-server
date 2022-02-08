@@ -40,7 +40,7 @@ public class StellarIssuerAccountOperation implements IssuerAccountOperation {
     }
 
     @Override
-    public int calcNumOfAccountsNeeded(long totalVotesCap) {
+    public long calcNumOfAccountsNeeded(long totalVotesCap) {
         return configuration.getNumOfVoteBuckets();
     }
 

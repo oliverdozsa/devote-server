@@ -37,8 +37,8 @@ public class StellarBlockchainConfiguration implements BlockchainConfiguration {
         return network;
     }
 
-    public int getNumOfVoteBuckets() {
-        return config.getInt("devote.blockchain.stellar.votebuckets");
+    public long getNumOfVoteBuckets() {
+        return config.getLong("devote.blockchain.stellar.votebuckets");
     }
 
     public KeyPair getMasterKeyPair() {

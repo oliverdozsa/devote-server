@@ -70,13 +70,13 @@ public class StellarBlockchainConfigurationTest {
     @Test
     public void testGetNumOfVoteBuckets() {
         // Given
-        when(mockConfig.getInt("devote.blockchain.stellar.votebuckets")).thenReturn(42);
+        when(mockConfig.getLong("devote.blockchain.stellar.votebuckets")).thenReturn(42L);
 
         // When
         StellarBlockchainConfiguration configuration = new StellarBlockchainConfiguration();
         configuration.init(mockConfig);
 
         // Then
-        assertThat(configuration.getNumOfVoteBuckets(), equalTo(42));
+        assertThat(configuration.getNumOfVoteBuckets(), equalTo(42L));
     }
 }

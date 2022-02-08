@@ -43,5 +43,7 @@
   "authorization": "KEYBASE",
   "authorizationKeybaseOptions": "a team",
   "visibility": "PUBLIC",
-  "votesCap": 126
+  "votesCap": 126,
+  "fundingAccountPublic": "some-public-key",
+  "fundingAccountSecret": "some-secret-key"
 }

@@ -19,8 +19,10 @@ import java.util.Set;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 
+import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static utils.StringUtils.createRandomAlphabeticString;
+import static utils.StringUtils.redactWithEllipsis;
 
 public class VotingBlockchainOperations {
     private final BlockchainExecutionContext blockchainExecContext;
@@ -45,7 +47,7 @@ public class VotingBlockchainOperations {
             BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(request.getNetwork());
             IssuerAccountOperation issuerAccountOperation = blockchainFactory.createIssuerAccountOperation();
 
-            int numOfAccountsNeeded = issuerAccountOperation.calcNumOfAccountsNeeded(request.getVotesCap());
+            long numOfAccountsNeeded = issuerAccountOperation.calcNumOfAccountsNeeded(request.getVotesCap());
 
             long votesCapPerIssuer = request.getVotesCap() / numOfAccountsNeeded;
             long votesCapRemainder = request.getVotesCap() % numOfAccountsNeeded;
@@ -88,7 +90,14 @@ public class VotingBlockchainOperations {
         }, blockchainExecContext);
     }
 
-    private static List<String> generateUniqueAssetCodes(CreateVotingRequest request, int numsToCreate) {
+    public CompletionStage<Void> checkFundingAccountOf(CreateVotingRequest createVotingRequest) {
+        String accountLogMessage = redactWithEllipsis(createVotingRequest.getFundingAccountPublic(), 5);
+        logger.info("checkFundingAccountOf(): checking {}", accountLogMessage);
+        // TODO: Check that account exists and has sufficient balance.
+        return runAsync(() -> {}, blockchainExecContext);
+    }
+
+    private static List<String> generateUniqueAssetCodes(CreateVotingRequest request, long numsToCreate) {
         Set<String> uniqueAssetCodes = new HashSet<>();
 
         while(uniqueAssetCodes.size() != numsToCreate) {

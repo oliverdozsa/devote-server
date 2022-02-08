@@ -26,7 +26,7 @@ public class MockBlockchainIssuerAccountOperation implements IssuerAccountOperat
     }
 
     @Override
-    public int calcNumOfAccountsNeeded(long totalVotesCap) {
+    public long calcNumOfAccountsNeeded(long totalVotesCap) {
         return NUM_OF_ISSUER_ACCOUNTS_TO_CREATE;
     }
 

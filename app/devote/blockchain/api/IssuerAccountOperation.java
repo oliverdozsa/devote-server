@@ -15,5 +15,5 @@ public interface IssuerAccountOperation extends BlockchainOperation {
      * @param totalVotesCap Number of voters allowed.
      * @return See above
      */
-    int calcNumOfAccountsNeeded(long totalVotesCap);
+    long calcNumOfAccountsNeeded(long totalVotesCap);
 }

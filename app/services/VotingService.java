@@ -38,8 +38,9 @@ public class VotingService {
         logger.info("create(): request = {}", request);
         CreatedVotingData createdVotingData = new CreatedVotingData();
 
-        return votingDbOperations
-                .initialize(request)
+        return votingBlockchainOperations
+                .checkFundingAccountOf(request)
+                .thenCompose(v -> votingDbOperations.initialize(request))
                 .thenAccept(createdVotingData::setId)
                 .thenCompose(v -> votingBlockchainOperations.createIssuerAccounts(request))
                 .thenAccept(issuers -> createdVotingData.issuers = issuers)

@@ -24,6 +24,8 @@ class EbeanVotingInit {
         voting.setTitle(request.getTitle());
         voting.setVotesCap(request.getVotesCap());
         voting.setCreatedAt(Instant.now());
+        voting.setFundingAccountPublic(request.getFundingAccountPublic());
+        voting.setFundingAccountSecret(request.getFundingAccountSecret());
 
         setEncryption(request, voting);
         setAuthorization(request, voting);

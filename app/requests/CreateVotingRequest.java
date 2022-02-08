@@ -2,6 +2,7 @@ package requests;
 
 import com.typesafe.config.Config;
 import play.data.validation.Constraints;
+import utils.StringUtils;
 import validation.ValidatableWithConfig;
 import validation.ValidateWithConfig;
 
@@ -49,6 +50,12 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
 
     @Constraints.Required
     private Visibility visibility;
+
+    @Constraints.Required
+    private String fundingAccountPublic;
+
+    @Constraints.Required
+    private String fundingAccountSecret;
 
     public String getNetwork() {
         return network;
@@ -198,6 +205,22 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
         this.visibility = visibility;
     }
 
+    public String getFundingAccountPublic() {
+        return fundingAccountPublic;
+    }
+
+    public void setFundingAccountPublic(String fundingAccountPublic) {
+        this.fundingAccountPublic = fundingAccountPublic;
+    }
+
+    public String getFundingAccountSecret() {
+        return fundingAccountSecret;
+    }
+
+    public void setFundingAccountSecret(String fundingAccountSecret) {
+        this.fundingAccountSecret = fundingAccountSecret;
+    }
+
     @Override
     public String toString() {
         return "CreateVotingRequest{" +
@@ -213,6 +236,8 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
                 ", authorizationKeybaseOptions='" + authorizationKeybaseOptions + '\'' +
                 ", polls=" + polls +
                 ", visibility=" + visibility +
+                ", fundingAccountPublic='" + StringUtils.redactWithEllipsis(fundingAccountPublic, 5) + '\'' +
+                ", fundingAccountSecret='***'" +
                 '}';
     }
 

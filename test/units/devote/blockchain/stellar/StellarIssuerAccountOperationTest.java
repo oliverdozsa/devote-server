@@ -55,12 +55,12 @@ public class StellarIssuerAccountOperationTest {
     @Test
     public void testCalcNumOfAccountsNeeded() {
         // Given
-        when(stellarMock.configuration.getNumOfVoteBuckets()).thenReturn(42);
+        when(stellarMock.configuration.getNumOfVoteBuckets()).thenReturn(42L);
 
         // When
-        int numOfAccountsNeeded = operation.calcNumOfAccountsNeeded(8484);
+        long numOfAccountsNeeded = operation.calcNumOfAccountsNeeded(8484);
 
         // Then
-        assertThat(numOfAccountsNeeded, equalTo(42));
+        assertThat(numOfAccountsNeeded, equalTo(42L));
     }
 }
