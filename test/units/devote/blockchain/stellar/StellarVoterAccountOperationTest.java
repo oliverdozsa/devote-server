@@ -2,14 +2,13 @@ package units.devote.blockchain.stellar;
 
 import devote.blockchain.api.BlockchainException;
 import devote.blockchain.api.Issuer;
-import devote.blockchain.api.KeyPair;
+import devote.blockchain.api.Account;
 import devote.blockchain.api.VoterAccountOperation;
 import devote.blockchain.stellar.StellarUtils;
 import devote.blockchain.stellar.StellarVoterAccountOperation;
 import org.junit.Before;
 import org.junit.Test;
 import org.stellar.sdk.AccountRequiresMemoException;
-import org.stellar.sdk.Transaction;
 
 import java.io.IOException;
 
@@ -36,10 +35,10 @@ public class StellarVoterAccountOperationTest {
     @Test
     public void testCreateTransaction() {
         // Given
-        VoterAccountOperation.CreationData creationData = generateCreationData();
+        VoterAccountOperation.CreateTransactionParams params = generateCreationData();
 
         // When
-        String transactionString = operation.createTransaction(creationData);
+        String transactionString = operation.createTransaction(params);
 
         // Then
         assertThat(transactionString, notNullValue());
@@ -49,33 +48,33 @@ public class StellarVoterAccountOperationTest {
     @Test
     public void testCreateTransactionWithFailure() throws IOException {
         // Given
-        VoterAccountOperation.CreationData creationData = generateCreationData();
+        VoterAccountOperation.CreateTransactionParams params = generateCreationData();
         when(stellarMock.server.accounts().account(anyString())).thenThrow(new IOException("Some IO error"));
 
         // When
         // Then
-        BlockchainException exception = assertThrows(BlockchainException.class, () -> operation.createTransaction(creationData));
+        BlockchainException exception = assertThrows(BlockchainException.class, () -> operation.createTransaction(params));
 
         assertThat(exception.getMessage(), equalTo("[STELLAR]: Failed to create voter account transaction!"));
         assertThat(exception.getCause(), instanceOf(IOException.class));
     }
 
-    private static VoterAccountOperation.CreationData generateCreationData() {
-        VoterAccountOperation.CreationData creationData =
-                new VoterAccountOperation.CreationData();
+    private static VoterAccountOperation.CreateTransactionParams generateCreationData() {
+        VoterAccountOperation.CreateTransactionParams params =
+                new VoterAccountOperation.CreateTransactionParams();
 
-        KeyPair anIssuerKeyPair = StellarUtils.toDevoteKeyPair(org.stellar.sdk.KeyPair.random());
-        Issuer anIssuer = new Issuer(anIssuerKeyPair, 42, "ISSUER-1");
-        creationData.issuer = anIssuer;
+        Account anIssuerAccount = StellarUtils.toAccount(org.stellar.sdk.KeyPair.random());
+        Issuer anIssuer = new Issuer(anIssuerAccount, 42, "ISSUER-1");
+        params.issuer = anIssuer;
 
-        KeyPair aChannelKeyPair = StellarUtils.toDevoteKeyPair(org.stellar.sdk.KeyPair.random());
-        creationData.channelKeyPair = aChannelKeyPair;
+        Account aChannelAccount = StellarUtils.toAccount(org.stellar.sdk.KeyPair.random());
+        params.channel = aChannelAccount;
 
-        creationData.voterPublicKey = org.stellar.sdk.KeyPair.random().getAccountId();
+        params.voterAccountPublic = org.stellar.sdk.KeyPair.random().getAccountId();
 
-        KeyPair aDistributionKeyPair = StellarUtils.toDevoteKeyPair(org.stellar.sdk.KeyPair.random());
-        creationData.distributionKeyPair = aDistributionKeyPair;
+        Account aDistributionAccount = StellarUtils.toAccount(org.stellar.sdk.KeyPair.random());
+        params.distribution = aDistributionAccount;
 
-        return creationData;
+        return params;
     }
 }

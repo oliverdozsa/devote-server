@@ -1,7 +1,7 @@
 package units.devote.blockchain.stellar;
 
 import devote.blockchain.api.BlockchainException;
-import devote.blockchain.api.KeyPair;
+import devote.blockchain.api.Account;
 import devote.blockchain.stellar.StellarChannelAccountOperation;
 import devote.blockchain.stellar.StellarUtils;
 import org.junit.Before;
@@ -34,25 +34,25 @@ public class StellarChannelAccountOperationTest {
     @Test
     public void testCreate() throws AccountRequiresMemoException, IOException {
         // Given
-        KeyPair someIssuerKeyPair = StellarUtils.toDevoteKeyPair(org.stellar.sdk.KeyPair.random());
+        Account someIssuerAccount = StellarUtils.toAccount(org.stellar.sdk.KeyPair.random());
 
         // When
-        KeyPair channelKeyPair = operation.create(42, someIssuerKeyPair);
+        Account channelAccount = operation.create(42, someIssuerAccount);
 
         // Then
-        assertThat(channelKeyPair, notNullValue());
+        assertThat(channelAccount, notNullValue());
         verify(stellarMock.server).submitTransaction(any(Transaction.class));
     }
 
     @Test
     public void testCreateWithFailure() throws AccountRequiresMemoException, IOException {
         // Given
-        KeyPair someIssuerKeyPair = StellarUtils.toDevoteKeyPair(org.stellar.sdk.KeyPair.random());
+        Account someIssuerAccount = StellarUtils.toAccount(org.stellar.sdk.KeyPair.random());
         when(stellarMock.server.submitTransaction(any(Transaction.class))).thenThrow(new IOException("Some IO error!"));
 
         // When
         BlockchainException exception =
-                assertThrows(BlockchainException.class, () -> operation.create(42, someIssuerKeyPair));
+                assertThrows(BlockchainException.class, () -> operation.create(42, someIssuerAccount));
 
         // Then
         assertThat(exception.getMessage(), equalTo("[STELLAR]: Failed to create channel account!"));

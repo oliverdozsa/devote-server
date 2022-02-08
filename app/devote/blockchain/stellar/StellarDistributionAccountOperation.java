@@ -24,26 +24,24 @@ class StellarDistributionAccountOperation {
     }
 
     public KeyPair prepare() {
-        KeyPair distributionKeyPair = prepareAccountCreation();
-        allowToHaveVoteTokenOfIssuers(distributionKeyPair);
-        sendAllVoteTokensOfIssuersTo(distributionKeyPair);
+        KeyPair distribution = prepareAccountCreation();
+        allowToHaveVoteTokenOfIssuers(distribution);
+        sendAllVoteTokensOfIssuersTo(distribution);
         lockOutIssuers();
 
-        return distributionKeyPair;
+        return distribution;
     }
 
     private KeyPair prepareAccountCreation() {
         long totalVotesCap = totalVotesCapOf(issuers);
-        KeyPair distributionKeyPair = KeyPair.random();
-        String distributionStartingBalance = Long.toString(totalVotesCap * 2);
+        KeyPair distribution = KeyPair.random();
+        String startingBalance = Long.toString(totalVotesCap * 2);
 
-        CreateAccountOperation distributionAccountCreateOp = new CreateAccountOperation.Builder(
-                distributionKeyPair.getAccountId(),
-                distributionStartingBalance
-        ).build();
-        txBuilder.addOperation(distributionAccountCreateOp);
+        CreateAccountOperation createAccount = new CreateAccountOperation.Builder(distribution.getAccountId(), startingBalance)
+                .build();
+        txBuilder.addOperation(createAccount);
 
-        return distributionKeyPair;
+        return distribution;
     }
 
     private void allowToHaveVoteTokenOfIssuers(KeyPair distribution) {
@@ -51,43 +49,43 @@ class StellarDistributionAccountOperation {
     }
 
     private void allowDistributionToHaveVoteTokensOfIssuer(KeyPair distribution, Issuer issuer) {
-        ChangeTrustAsset chgTrustAsset = obtainsChangeTrustAssetFrom(issuer);
+        ChangeTrustAsset asset = obtainsChangeTrustAssetFrom(issuer);
         String allVoteTokensOfIssuer = calcNumOfAllVoteTokensOf(issuer);
 
-        ChangeTrustOperation changeTrustOperation = new ChangeTrustOperation.Builder(chgTrustAsset, allVoteTokensOfIssuer)
+        ChangeTrustOperation changeTrust = new ChangeTrustOperation.Builder(asset, allVoteTokensOfIssuer)
                 .setSourceAccount(distribution.getAccountId())
                 .build();
-        txBuilder.addOperation(changeTrustOperation);
+        txBuilder.addOperation(changeTrust);
     }
 
     private void sendAllVoteTokensOfIssuersTo(KeyPair distribution) {
         issuers.forEach(issuer -> sendAllVoteTokensOfIssuerToDistribution(distribution, issuer));
     }
 
-    private void sendAllVoteTokensOfIssuerToDistribution(KeyPair distribution, Issuer issuer) {
-        KeyPair stellarIssuerKeyPair = StellarUtils.fromDevoteKeyPair(issuer.keyPair);
-        String allVoteTokensOfIssuer = calcNumOfAllVoteTokensOf(issuer);
-        Asset asset = obtainAssetFrom(issuer);
+    private void sendAllVoteTokensOfIssuerToDistribution(KeyPair distribution, Issuer issuerAccount) {
+        KeyPair issuer = StellarUtils.fromAccount(issuerAccount.account);
+        String allVoteTokensOfIssuer = calcNumOfAllVoteTokensOf(issuerAccount);
+        Asset asset = obtainAssetFrom(issuerAccount);
 
-        PaymentOperation paymentOperation = new PaymentOperation.Builder(distribution.getAccountId(), asset, allVoteTokensOfIssuer)
-                .setSourceAccount(stellarIssuerKeyPair.getAccountId())
+        PaymentOperation payment = new PaymentOperation.Builder(distribution.getAccountId(), asset, allVoteTokensOfIssuer)
+                .setSourceAccount(issuer.getAccountId())
                 .build();
-        txBuilder.addOperation(paymentOperation);
+        txBuilder.addOperation(payment);
     }
 
     private void lockOutIssuers() {
         issuers.forEach(this::lockOutIssuer);
     }
 
-    private void lockOutIssuer(Issuer issuer) {
-        KeyPair stellarIssuerKeyPair = StellarUtils.fromDevoteKeyPair(issuer.keyPair);
-        SetOptionsOperation setOptionsOperation = new SetOptionsOperation.Builder()
-                .setSourceAccount(stellarIssuerKeyPair.getAccountId())
+    private void lockOutIssuer(Issuer issuerAccount) {
+        KeyPair issuer = StellarUtils.fromAccount(issuerAccount.account);
+        SetOptionsOperation setOptions = new SetOptionsOperation.Builder()
+                .setSourceAccount(issuer.getAccountId())
                 .setMasterKeyWeight(0)
                 .setLowThreshold(1)
                 .setMediumThreshold(1)
                 .setHighThreshold(1)
                 .build();
-        txBuilder.addOperation(setOptionsOperation);
+        txBuilder.addOperation(setOptions);
     }
 }

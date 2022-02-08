@@ -4,7 +4,7 @@ import data.entities.JpaChannelAccountProgress;
 import data.entities.JpaVotingIssuerAccount;
 import devote.blockchain.BlockchainFactory;
 import devote.blockchain.api.ChannelAccountOperation;
-import devote.blockchain.api.KeyPair;
+import devote.blockchain.api.Account;
 import play.Logger;
 
 import java.util.ArrayList;
@@ -32,11 +32,11 @@ public class ChannelAccountBuilderTask implements Runnable {
             return;
         }
 
-        List<KeyPair> channelAccountKeyPairs = createChannelAccounts(channelProgress);
-        channelAccountsCreated(channelProgress, channelAccountKeyPairs);
+        List<Account> channelAccountAccounts = createChannelAccounts(channelProgress);
+        channelAccountsCreated(channelProgress, channelAccountAccounts);
     }
 
-    private List<KeyPair> createChannelAccounts(JpaChannelAccountProgress channelProgress) {
+    private List<Account> createChannelAccounts(JpaChannelAccountProgress channelProgress) {
         JpaVotingIssuerAccount issuer = channelProgress.getIssuer();
         ChannelAccountOperation channelAccountOperation = getChannelAccountFactory(issuer);
 
@@ -47,24 +47,24 @@ public class ChannelAccountBuilderTask implements Runnable {
         logger.info("[CHANNEL-TASK-{}]: createChannelAccounts(): about to create {} channel accounts on blockchain {} for progress {}",
                 taskId, numOfAccountsToCreateInOneBatch, issuer.getVoting().getNetwork(), channelProgress.getId());
 
-        List<KeyPair> channelAccountKeyPairs = new ArrayList<>();
+        List<Account> channelAccountAccounts = new ArrayList<>();
         for (int i = 0; i < numOfAccountsToCreateInOneBatch; i++) {
-            KeyPair issuerKeyPair = new KeyPair(issuer.getAccountSecret(), issuer.getAccountPublic());
-            KeyPair accountKeyPair = channelAccountOperation.create(votesCap, issuerKeyPair);
-            channelAccountKeyPairs.add(accountKeyPair);
+            Account issuerAccount = new Account(issuer.getAccountSecret(), issuer.getAccountPublic());
+            Account accountAccount = channelAccountOperation.create(votesCap, issuerAccount);
+            channelAccountAccounts.add(accountAccount);
         }
 
         logger.info("[CHANNEL-TASK-{}]: createChannelAccounts(): successfully created {} channel accounts on blockchain {}",
-                taskId, channelAccountKeyPairs.size(), issuer.getVoting().getNetwork());
+                taskId, channelAccountAccounts.size(), issuer.getVoting().getNetwork());
 
-        return channelAccountKeyPairs;
+        return channelAccountAccounts;
     }
 
-    private void channelAccountsCreated(JpaChannelAccountProgress channelProgress, List<KeyPair> channelKeyPairs) {
+    private void channelAccountsCreated(JpaChannelAccountProgress channelProgress, List<Account> channelAccounts) {
         Long votingId = channelProgress.getIssuer().getVoting().getId();
 
-        context.votingRepository.channelAccountCreated(votingId, channelKeyPairs);
-        context.channelProgressRepository.channelAccountsCreated(channelProgress.getId(), channelKeyPairs.size());
+        context.votingRepository.channelAccountCreated(votingId, channelAccounts);
+        context.channelProgressRepository.channelAccountsCreated(channelProgress.getId(), channelAccounts.size());
     }
 
     private ChannelAccountOperation getChannelAccountFactory(JpaVotingIssuerAccount issuer) {

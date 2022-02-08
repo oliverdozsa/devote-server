@@ -16,7 +16,6 @@ class StellarBallotAccountOperation {
     private final Transaction.Builder txBuilder;
     private final List<Issuer> issuers;
 
-
     private static final String BALLOT_STARTING_BALANCE = "2";
 
     public StellarBallotAccountOperation(Transaction.Builder txBuilder, List<Issuer> issuers) {
@@ -32,15 +31,15 @@ class StellarBallotAccountOperation {
     }
 
     private KeyPair prepareAccountCreation() {
-        KeyPair ballotKeyPair = KeyPair.random();
+        KeyPair ballot = KeyPair.random();
 
-        CreateAccountOperation ballotAccountCreateOp = new CreateAccountOperation.Builder(
-                ballotKeyPair.getAccountId(),
+        CreateAccountOperation createAccount = new CreateAccountOperation.Builder(
+                ballot.getAccountId(),
                 BALLOT_STARTING_BALANCE
         ).build();
-        txBuilder.addOperation(ballotAccountCreateOp);
+        txBuilder.addOperation(createAccount);
 
-        return ballotKeyPair;
+        return ballot;
     }
 
     private void allowBallotToHaveVoteTokensOfIssuers(KeyPair ballot) {
@@ -48,13 +47,13 @@ class StellarBallotAccountOperation {
     }
 
     private void allowBallotToHaveVoteTokenOfIssuer(KeyPair ballot, Issuer issuer) {
-        ChangeTrustAsset chgTrustAsset = obtainsChangeTrustAssetFrom(issuer);
+        ChangeTrustAsset asset = obtainsChangeTrustAssetFrom(issuer);
         String allVoteTokensOfIssuer = calcNumOfAllVoteTokensOf(issuer);
 
-        ChangeTrustOperation changeTrustOperation = new ChangeTrustOperation.Builder(chgTrustAsset, allVoteTokensOfIssuer)
+        ChangeTrustOperation changeTrust = new ChangeTrustOperation.Builder(asset, allVoteTokensOfIssuer)
                 .setSourceAccount(ballot.getAccountId())
                 .build();
 
-        txBuilder.addOperation(changeTrustOperation);
+        txBuilder.addOperation(changeTrust);
     }
 }

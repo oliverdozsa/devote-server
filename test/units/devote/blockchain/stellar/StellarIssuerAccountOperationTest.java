@@ -1,5 +1,6 @@
 package units.devote.blockchain.stellar;
 
+import devote.blockchain.api.Account;
 import devote.blockchain.api.BlockchainException;
 import devote.blockchain.stellar.StellarIssuerAccountOperation;
 import org.junit.Before;
@@ -33,10 +34,10 @@ public class StellarIssuerAccountOperationTest {
     public void testCreate() throws AccountRequiresMemoException, IOException {
         // Given
         // When
-        devote.blockchain.api.KeyPair keyPair = operation.create(42L);
+        Account account = operation.create(42L);
 
         // Then
-        assertThat(keyPair, notNullValue());
+        assertThat(account, notNullValue());
         verify(stellarMock.server).submitTransaction(any(Transaction.class));
     }
 

@@ -12,8 +12,8 @@ public class MockBlockchainVoterAccountFactory implements VoterAccountOperation 
     }
 
     @Override
-    public String createTransaction(CreationData creationData) {
+    public String createTransaction(CreateTransactionParams params) {
         String randomTransactionString = createRandomAlphabeticString(16);
-        return randomTransactionString + creationData.voterPublicKey.substring(0, 5);
+        return randomTransactionString + params.voterAccountPublic.substring(0, 5);
     }
 }

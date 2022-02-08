@@ -1,12 +1,12 @@
 package devote.blockchain.api;
 
 public interface VoterAccountOperation extends BlockchainOperation {
-    String createTransaction(CreationData creationData);
+    String createTransaction(CreateTransactionParams params);
 
-    class CreationData {
-        public KeyPair channelKeyPair;
-        public KeyPair distributionKeyPair;
+    class CreateTransactionParams {
+        public Account channel;
+        public Account distribution;
         public Issuer issuer;
-        public String voterPublicKey;
+        public String voterAccountPublic;
     }
 }

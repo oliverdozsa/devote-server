@@ -19,7 +19,7 @@ public class StellarIssuerUtils {
     }
 
     public static Asset obtainAssetFrom(Issuer issuer) {
-        return Asset.create(null, issuer.assetCode, issuer.keyPair.publicKey);
+        return Asset.create(null, issuer.assetCode, issuer.account.publik);
 
     }
 

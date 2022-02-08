@@ -5,7 +5,7 @@ import devote.blockchain.Blockchains;
 import devote.blockchain.api.DistributionAndBallotAccountOperation;
 import devote.blockchain.api.Issuer;
 import devote.blockchain.api.IssuerAccountOperation;
-import devote.blockchain.api.KeyPair;
+import devote.blockchain.api.Account;
 import devote.blockchain.operations.VotingBlockchainOperations;
 import requests.CreateVotingRequest;
 import executioncontexts.BlockchainExecutionContext;
@@ -19,7 +19,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -66,12 +65,12 @@ public class VotingBlockchainOperationsTest {
         when(mockBlockchainFactory.createDistributionAndBallotAccountOperation()).thenReturn(mockDistributionAndBallotAccountOperation);
         when(mockIssuerAccountOperation.calcNumOfAccountsNeeded(anyLong())).thenReturn(3L);
         when(mockIssuerAccountOperation.create(anyLong())).thenReturn(
-                new KeyPair("sA", "pA"),
-                new KeyPair("sB", "pB"),
-                new KeyPair("sC", "pC")
+                new Account("sA", "pA"),
+                new Account("sB", "pB"),
+                new Account("sC", "pC")
         );
         when(mockDistributionAndBallotAccountOperation.create(anyList())).thenReturn(
-                new DistributionAndBallotAccountOperation.TransactionResult(new KeyPair("d", "d"), new KeyPair("b", "b"))
+                new DistributionAndBallotAccountOperation.TransactionResult(new Account("d", "d"), new Account("b", "b"))
         );
     }
 
@@ -85,13 +84,13 @@ public class VotingBlockchainOperationsTest {
         CompletionStage<List<Issuer>> createIssuerAccountsStage = operations.createIssuerAccounts(request);
         CompletableFuture<List<Issuer>> createIssuerAccountsFuture = createIssuerAccountsStage.toCompletableFuture();
 
-        List<KeyPair> createdAccounts = createIssuerAccountsFuture.get().stream()
-                .map(issuer -> issuer.keyPair)
+        List<Account> createdAccounts = createIssuerAccountsFuture.get().stream()
+                .map(issuer -> issuer.account)
                 .collect(Collectors.toList());
         assertThat(createdAccounts, containsInAnyOrder(
-                new KeyPair("sA", "pA"),
-                new KeyPair("sB", "pB"),
-                new KeyPair("sC", "pC")
+                new Account("sA", "pA"),
+                new Account("sB", "pB"),
+                new Account("sC", "pC")
         ));
     }
 
@@ -104,12 +103,12 @@ public class VotingBlockchainOperationsTest {
 
         List<Issuer> issuers = Arrays.asList(
                 new Issuer(
-                        new KeyPair("issuerSecret1", "issuerPublic1"),
+                        new Account("issuerSecret1", "issuerPublic1"),
                         42,
                         "SOMEID-1"
                 ),
                 new Issuer(
-                        new KeyPair("issuerSecret2", "issuerPublic2"),
+                        new Account("issuerSecret2", "issuerPublic2"),
                         21,
                         "SOMEID-2"
                 )
@@ -135,12 +134,12 @@ public class VotingBlockchainOperationsTest {
 
         List<Issuer> issuers = Arrays.asList(
                 new Issuer(
-                        new KeyPair("issuerSecret1", "issuerPublic1"),
+                        new Account("issuerSecret1", "issuerPublic1"),
                         42,
                         "SOMEID-1"
                 ),
                 new Issuer(
-                        new KeyPair("issuerSecret2", "issuerPublic2"),
+                        new Account("issuerSecret2", "issuerPublic2"),
                         21,
                         "SOMEID-2"
                 )

@@ -2,7 +2,7 @@ package devote.blockchain.blockchainconfigwithnodefaultctr.blockchainwithmissing
 
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.IssuerAccountOperation;
-import devote.blockchain.api.KeyPair;
+import devote.blockchain.api.Account;
 
 public class BlockchainWihMissingImplementationIssuerOperation implements IssuerAccountOperation {
     @Override
@@ -11,8 +11,8 @@ public class BlockchainWihMissingImplementationIssuerOperation implements Issuer
     }
 
     @Override
-    public KeyPair create(long votesCap) {
-        return new KeyPair("42", "84");
+    public Account create(long votesCap) {
+        return new Account("42", "84");
     }
 
     @Override

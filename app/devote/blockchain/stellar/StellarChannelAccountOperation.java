@@ -3,9 +3,10 @@ package devote.blockchain.stellar;
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.BlockchainException;
 import devote.blockchain.api.ChannelAccountOperation;
-import devote.blockchain.api.KeyPair;
+import devote.blockchain.api.Account;
 import org.stellar.sdk.AccountRequiresMemoException;
 import org.stellar.sdk.CreateAccountOperation;
+import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Network;
 import org.stellar.sdk.Server;
 import org.stellar.sdk.Transaction;
@@ -33,15 +34,15 @@ public class StellarChannelAccountOperation implements ChannelAccountOperation {
     }
 
     @Override
-    public KeyPair create(long votesCap, KeyPair issuerKeyPair) {
+    public Account create(long votesCap, Account issuerAccount) {
         try {
-            org.stellar.sdk.KeyPair stellarIssuerKeyPair = StellarUtils.fromDevoteKeyPair(issuerKeyPair);
+            KeyPair issuer = StellarUtils.fromAccount(issuerAccount);
 
-            Transaction.Builder txBuilder = prepareTransaction(stellarIssuerKeyPair.getAccountId());
-            org.stellar.sdk.KeyPair stellarChannelKeyPair = prepareChannelCreationOn(txBuilder);
-            submitTransaction(txBuilder, stellarIssuerKeyPair);
+            Transaction.Builder txBuilder = prepareTransaction(issuer.getAccountId());
+            KeyPair channel = prepareChannelCreationOn(txBuilder);
+            submitTransaction(txBuilder, issuer);
 
-            return new KeyPair(new String(stellarChannelKeyPair.getSecretSeed()), stellarChannelKeyPair.getAccountId());
+            return new Account(new String(channel.getSecretSeed()), channel.getAccountId());
         } catch (IOException | AccountRequiresMemoException e) {
             logger.warn("[STELLAR]: Failed to create channel account!", e);
             throw new BlockchainException("[STELLAR]: Failed to create channel account!", e);
@@ -55,22 +56,21 @@ public class StellarChannelAccountOperation implements ChannelAccountOperation {
         return StellarUtils.createTransactionBuilder(server, network, issuerAccountId);
     }
 
-    private org.stellar.sdk.KeyPair prepareChannelCreationOn(Transaction.Builder txBuilder) {
-        org.stellar.sdk.KeyPair stellarChannelKeyPair = org.stellar.sdk.KeyPair.random();
-        CreateAccountOperation createAccountOperation =
-                new CreateAccountOperation.Builder(stellarChannelKeyPair.getAccountId(), STARTING_BALANCE_STR)
-                        .build();
+    private KeyPair prepareChannelCreationOn(Transaction.Builder txBuilder) {
+        KeyPair channel = KeyPair.random();
+        CreateAccountOperation createAccount = new CreateAccountOperation.Builder(channel.getAccountId(), STARTING_BALANCE_STR)
+                .build();
 
-        txBuilder.addOperation(createAccountOperation);
+        txBuilder.addOperation(createAccount);
 
         logger.info("[STELLAR]: Attempting to create channel account: {} with starting balance: {}",
-                StringUtils.redactWithEllipsis(stellarChannelKeyPair.getAccountId(), 5),
+                StringUtils.redactWithEllipsis(channel.getAccountId(), 5),
                 STARTING_BALANCE_STR);
 
-        return stellarChannelKeyPair;
+        return channel;
     }
 
-    private void submitTransaction(Transaction.Builder txBuilder, org.stellar.sdk.KeyPair issuerKeyPair) throws AccountRequiresMemoException, IOException {
+    private void submitTransaction(Transaction.Builder txBuilder, KeyPair issuerKeyPair) throws AccountRequiresMemoException, IOException {
         Transaction transaction = txBuilder.build();
         transaction.sign(issuerKeyPair);
 

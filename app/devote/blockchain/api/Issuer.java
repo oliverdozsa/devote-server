@@ -1,12 +1,12 @@
 package devote.blockchain.api;
 
 public class Issuer {
-    public final KeyPair keyPair;
+    public final Account account;
     public final long votesCap;
     public final String assetCode;
 
-    public Issuer(KeyPair keyPair, long votesCap, String assetCode) {
-        this.keyPair = keyPair;
+    public Issuer(Account account, long votesCap, String assetCode) {
+        this.account = account;
         this.votesCap = votesCap;
         this.assetCode = assetCode;
     }

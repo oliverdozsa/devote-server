@@ -26,7 +26,7 @@ public class CommissionBlockchainOperations {
         this.blockchains = blockchains;
     }
 
-    public CompletionStage<String> createTransaction(String network, VoterAccountOperation.CreationData data) {
+    public CompletionStage<String> createTransaction(String network, VoterAccountOperation.CreateTransactionParams data) {
         logger.info("createTransaction(): network = {}, data = {}", network, data);
 
         BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(network);

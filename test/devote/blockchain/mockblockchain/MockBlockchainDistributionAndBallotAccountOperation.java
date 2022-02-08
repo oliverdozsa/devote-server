@@ -3,11 +3,9 @@ package devote.blockchain.mockblockchain;
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.DistributionAndBallotAccountOperation;
 import devote.blockchain.api.Issuer;
-import devote.blockchain.api.KeyPair;
+import devote.blockchain.api.Account;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MockBlockchainDistributionAndBallotAccountOperation implements DistributionAndBallotAccountOperation {
     private static int currentDistributionAccountId = 0;
@@ -25,10 +23,10 @@ public class MockBlockchainDistributionAndBallotAccountOperation implements Dist
         String currentDistributionAccountIdAsString = Integer.toString(currentDistributionAccountId);
         String currentBallotAccountIdAsString = Integer.toString(currentBallotAccountId);
 
-        KeyPair distributionKeyPair = new KeyPair(currentDistributionAccountIdAsString, currentDistributionAccountIdAsString);
-        KeyPair ballotKeyPair = new KeyPair(currentBallotAccountIdAsString, currentBallotAccountIdAsString);
+        Account distributionAccount = new Account(currentDistributionAccountIdAsString, currentDistributionAccountIdAsString);
+        Account ballotAccount = new Account(currentBallotAccountIdAsString, currentBallotAccountIdAsString);
 
-        return new TransactionResult(distributionKeyPair, ballotKeyPair);
+        return new TransactionResult(distributionAccount, ballotAccount);
     }
 
     public static boolean isDistributionAccountCreated(String account) {

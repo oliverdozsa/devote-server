@@ -4,7 +4,7 @@ import devote.blockchain.BlockchainFactory;
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.BlockchainException;
 import devote.blockchain.api.IssuerAccountOperation;
-import devote.blockchain.api.KeyPair;
+import devote.blockchain.api.Account;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -63,7 +63,7 @@ public class BlockchainFactoryTest {
         }
 
         @Override
-        public KeyPair create(long votesCap) {
+        public Account create(long votesCap) {
             return null;
         }
 

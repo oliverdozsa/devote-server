@@ -6,7 +6,7 @@ import data.entities.JpaVotingIssuerAccount;
 import data.operations.CommissionDbOperations;
 import data.operations.VotingDbOperations;
 import devote.blockchain.api.Issuer;
-import devote.blockchain.api.KeyPair;
+import devote.blockchain.api.Account;
 import devote.blockchain.api.VoterAccountOperation;
 import devote.blockchain.operations.CommissionBlockchainOperations;
 import exceptions.ForbiddenException;
@@ -111,18 +111,18 @@ public class CommissionCreateAccountSubService {
                 .thenAccept(i -> collectedData.issuer = i);
     }
 
-    private VoterAccountOperation.CreationData prepareForBlockchainOperation(AccountCreationCollectedData accountCreationData) {
-        VoterAccountOperation.CreationData voterCreationData = new VoterAccountOperation.CreationData();
-        voterCreationData.issuer = toIssuer(accountCreationData.issuer);
-        voterCreationData.channelKeyPair = new KeyPair(
+    private VoterAccountOperation.CreateTransactionParams prepareForBlockchainOperation(AccountCreationCollectedData accountCreationData) {
+        VoterAccountOperation.CreateTransactionParams params = new VoterAccountOperation.CreateTransactionParams();
+        params.issuer = toIssuer(accountCreationData.issuer);
+        params.channel = new Account(
                 accountCreationData.channelAccount.getAccountSecret(), accountCreationData.channelAccount.getAccountPublic()
         );
-        voterCreationData.voterPublicKey = accountCreationData.voterPublic;
-        voterCreationData.distributionKeyPair = new KeyPair(
+        params.voterAccountPublic = accountCreationData.voterPublic;
+        params.distribution = new Account(
                 accountCreationData.voting.getDistributionAccountSecret(), accountCreationData.voting.getDistributionAccountPublic()
         );
 
-        return voterCreationData;
+        return params;
     }
 
     private CompletionStage<String> storeTransaction(Long votingId, String signature, String transaction) {
@@ -138,8 +138,8 @@ public class CommissionCreateAccountSubService {
     }
 
     private static Issuer toIssuer(JpaVotingIssuerAccount jpaVotingIssuer) {
-        KeyPair keyPair = new KeyPair(jpaVotingIssuer.getAccountSecret(), jpaVotingIssuer.getAccountPublic());
-        return new Issuer(keyPair, jpaVotingIssuer.getVotesCap(), jpaVotingIssuer.getAssetCode());
+        Account account = new Account(jpaVotingIssuer.getAccountSecret(), jpaVotingIssuer.getAccountPublic());
+        return new Issuer(account, jpaVotingIssuer.getVotesCap(), jpaVotingIssuer.getAssetCode());
     }
 
     private static class ParsedMessage {

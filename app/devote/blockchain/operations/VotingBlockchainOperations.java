@@ -5,7 +5,7 @@ import devote.blockchain.Blockchains;
 import devote.blockchain.api.DistributionAndBallotAccountOperation;
 import devote.blockchain.api.Issuer;
 import devote.blockchain.api.IssuerAccountOperation;
-import devote.blockchain.api.KeyPair;
+import devote.blockchain.api.Account;
 import executioncontexts.BlockchainExecutionContext;
 import play.Logger;
 import requests.CreateVotingRequest;
@@ -59,14 +59,14 @@ public class VotingBlockchainOperations {
 
 
             for (int i = 0; i < numOfAccountsNeeded - 1; i++) {
-                KeyPair issuerKeyPair = issuerAccountOperation.create(votesCapForIssuer);
-                issuers.add(new Issuer(issuerKeyPair, votesCapForIssuer, assetCodes.get(i)));
+                Account issuerAccount = issuerAccountOperation.create(votesCapForIssuer);
+                issuers.add(new Issuer(issuerAccount, votesCapForIssuer, assetCodes.get(i)));
             }
 
             // For last one the remainder is also needed
             votesCapForIssuer = votesCapPerIssuer + votesCapRemainder;
-            KeyPair issuerKeyPair = issuerAccountOperation.create(votesCapForIssuer);
-            issuers.add(new Issuer(issuerKeyPair, votesCapForIssuer, assetCodes.get(assetCodes.size() - 1)));
+            Account issuerAccount = issuerAccountOperation.create(votesCapForIssuer);
+            issuers.add(new Issuer(issuerAccount, votesCapForIssuer, assetCodes.get(assetCodes.size() - 1)));
 
             return issuers;
         }, blockchainExecContext);

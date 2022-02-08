@@ -1,5 +1,6 @@
 package devote.blockchain.stellar;
 
+import devote.blockchain.api.Account;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Network;
 import org.stellar.sdk.Server;
@@ -35,11 +36,11 @@ public class StellarUtils {
                 .setTimeout(STELLAR_TIMEOUT_SECONDS);
     }
 
-    public static KeyPair fromDevoteKeyPair(devote.blockchain.api.KeyPair devoteKeyPair) {
-        return KeyPair.fromSecretSeed(devoteKeyPair.secretKey);
+    public static KeyPair fromAccount(Account account) {
+        return KeyPair.fromSecretSeed(account.secret);
     }
 
-    public static devote.blockchain.api.KeyPair toDevoteKeyPair(KeyPair keyPair) {
-        return new devote.blockchain.api.KeyPair(new String(keyPair.getSecretSeed()), keyPair.getAccountId());
+    public static Account toAccount(KeyPair keyPair) {
+        return new Account(new String(keyPair.getSecretSeed()), keyPair.getAccountId());
     }
 }

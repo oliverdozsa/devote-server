@@ -3,7 +3,6 @@ package devote.blockchain.stellar;
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.BlockchainException;
 import devote.blockchain.api.VoterAccountOperation;
-import org.stellar.sdk.AccountRequiresMemoException;
 import org.stellar.sdk.Asset;
 import org.stellar.sdk.ChangeTrustAsset;
 import org.stellar.sdk.ChangeTrustOperation;
@@ -29,15 +28,15 @@ public class StellarVoterAccountOperation implements VoterAccountOperation {
     }
 
     @Override
-    public String createTransaction(CreationData creationData) {
-        KeyPair channel = StellarUtils.fromDevoteKeyPair(creationData.channelKeyPair);
+    public String createTransaction(CreateTransactionParams params) {
+        KeyPair channel = StellarUtils.fromAccount(params.channel);
 
         try {
             Transaction.Builder txBuilder = prepareTransaction(channel);
-            allowVoterToHaveVoteToken(txBuilder, creationData);
-            sendTheTokenToVoter(txBuilder, creationData);
+            allowVoterToHaveVoteToken(txBuilder, params);
+            sendTheTokenToVoter(txBuilder, params);
 
-            Transaction transaction = createSignedTransaction(txBuilder, creationData);
+            Transaction transaction = createSignedTransaction(txBuilder, params);
             return transaction.toEnvelopeXdrBase64();
         } catch (IOException e) {
             logger.warn("[STELLAR]: Failed to create voter account transaction!", e);
@@ -52,34 +51,34 @@ public class StellarVoterAccountOperation implements VoterAccountOperation {
         return StellarUtils.createTransactionBuilder(server, network, channel.getAccountId());
     }
 
-    private void allowVoterToHaveVoteToken(Transaction.Builder txBuilder, CreationData creationData) {
-        ChangeTrustAsset changeTrustAsset = StellarIssuerUtils.obtainsChangeTrustAssetFrom(creationData.issuer);
-        String allVoteTokensOfIssuer = StellarIssuerUtils.calcNumOfAllVoteTokensOf(creationData.issuer);
+    private void allowVoterToHaveVoteToken(Transaction.Builder txBuilder, CreateTransactionParams params) {
+        ChangeTrustAsset asset = StellarIssuerUtils.obtainsChangeTrustAssetFrom(params.issuer);
+        String allVoteTokensOfIssuer = StellarIssuerUtils.calcNumOfAllVoteTokensOf(params.issuer);
 
-        ChangeTrustOperation changeTrustOperation = new ChangeTrustOperation.Builder(changeTrustAsset, allVoteTokensOfIssuer)
-                .setSourceAccount(creationData.voterPublicKey)
+        ChangeTrustOperation changeTrust = new ChangeTrustOperation.Builder(asset, allVoteTokensOfIssuer)
+                .setSourceAccount(params.voterAccountPublic)
                 .build();
 
-        txBuilder.addOperation(changeTrustOperation);
+        txBuilder.addOperation(changeTrust);
     }
 
-    private void sendTheTokenToVoter(Transaction.Builder txBuilder, CreationData creationData) {
-        Asset asset = StellarIssuerUtils.obtainAssetFrom(creationData.issuer);
+    private void sendTheTokenToVoter(Transaction.Builder txBuilder, CreateTransactionParams params) {
+        Asset asset = StellarIssuerUtils.obtainAssetFrom(params.issuer);
 
-        PaymentOperation paymentOperation = new PaymentOperation.Builder(creationData.voterPublicKey, asset, UNIT_TOKEN_AMOUNT)
-                .setSourceAccount(creationData.distributionKeyPair.publicKey)
+        PaymentOperation paymentOperation = new PaymentOperation.Builder(params.voterAccountPublic, asset, UNIT_TOKEN_AMOUNT)
+                .setSourceAccount(params.distribution.publik)
                 .build();
 
         txBuilder.addOperation(paymentOperation);
     }
 
-    private Transaction createSignedTransaction(Transaction.Builder txBuilder, CreationData creationData) {
-        KeyPair stellarDistribution = StellarUtils.fromDevoteKeyPair(creationData.distributionKeyPair);
-        KeyPair stellarChannel = StellarUtils.fromDevoteKeyPair(creationData.channelKeyPair);
+    private Transaction createSignedTransaction(Transaction.Builder txBuilder, CreateTransactionParams params) {
+        KeyPair distribution = StellarUtils.fromAccount(params.distribution);
+        KeyPair channel = StellarUtils.fromAccount(params.channel);
 
         Transaction transaction = txBuilder.build();
-        transaction.sign(stellarChannel);
-        transaction.sign(stellarDistribution);
+        transaction.sign(channel);
+        transaction.sign(distribution);
 
         return transaction;
     }

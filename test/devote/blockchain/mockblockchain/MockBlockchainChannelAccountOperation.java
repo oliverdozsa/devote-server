@@ -2,7 +2,7 @@ package devote.blockchain.mockblockchain;
 
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.ChannelAccountOperation;
-import devote.blockchain.api.KeyPair;
+import devote.blockchain.api.Account;
 
 public class MockBlockchainChannelAccountOperation implements ChannelAccountOperation {
     public static final int NUM_OF_CHANNEL_ACCOUNTS_TO_CREATE_IN_ON_BATCH = 11;
@@ -19,10 +19,10 @@ public class MockBlockchainChannelAccountOperation implements ChannelAccountOper
     }
 
     @Override
-    public KeyPair create(long votesCap, KeyPair issuerKeyPair) {
+    public Account create(long votesCap, Account issuerAccount) {
         currentChannelAccountId++;
         String currentChannelAccountIdAsString = Integer.toString(currentChannelAccountId);
-        return new KeyPair(currentChannelAccountIdAsString, currentChannelAccountIdAsString);
+        return new Account(currentChannelAccountIdAsString, currentChannelAccountIdAsString);
     }
 
     public static boolean isCreated(String accountSecret) {

@@ -3,7 +3,7 @@ package units.devote.blockchain.stellar;
 import devote.blockchain.api.BlockchainException;
 import devote.blockchain.api.DistributionAndBallotAccountOperation;
 import devote.blockchain.api.Issuer;
-import devote.blockchain.api.KeyPair;
+import devote.blockchain.api.Account;
 import devote.blockchain.stellar.StellarDistributionAndBallotAccountOperation;
 import devote.blockchain.stellar.StellarUtils;
 import org.junit.Before;
@@ -65,11 +65,11 @@ public class StellarDistributionAndBallotAccountOperationTest {
     }
 
     private static List<Issuer> createIssuers() {
-        KeyPair anIssuerKeyPair = StellarUtils.toDevoteKeyPair(org.stellar.sdk.KeyPair.random());
-        Issuer anIssuer = new Issuer(anIssuerKeyPair, 42, "ISSUER-1");
+        Account anIssuerAccount = StellarUtils.toAccount(org.stellar.sdk.KeyPair.random());
+        Issuer anIssuer = new Issuer(anIssuerAccount, 42, "ISSUER-1");
 
-        KeyPair anotherIssuerKeyPair = StellarUtils.toDevoteKeyPair(org.stellar.sdk.KeyPair.random());
-        Issuer anotherIssuer = new Issuer(anotherIssuerKeyPair, 42, "ISSUER-2");
+        Account anotherIssuerAccount = StellarUtils.toAccount(org.stellar.sdk.KeyPair.random());
+        Issuer anotherIssuer = new Issuer(anotherIssuerAccount, 42, "ISSUER-2");
 
         return Arrays.asList(anIssuer, anotherIssuer);
     }
