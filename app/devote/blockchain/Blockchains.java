@@ -2,6 +2,7 @@ package devote.blockchain;
 
 import com.typesafe.config.Config;
 import devote.blockchain.api.BlockchainConfiguration;
+import devote.blockchain.api.BlockchainException;
 import devote.blockchain.api.BlockchainOperation;
 import org.reflections.Reflections;
 import play.Logger;
@@ -41,6 +42,10 @@ public class Blockchains {
     }
 
     public BlockchainFactory getFactoryByNetwork(String networkName) {
+        if (!factories.containsKey(networkName)) {
+            throw new BlockchainException("Not found blockchain factory for network: " + networkName);
+        }
+
         return factories.get(networkName);
     }
 
@@ -62,7 +67,7 @@ public class Blockchains {
 
     private BlockchainFactory assembleFactory(Class<? extends BlockchainConfiguration> blockchainConfigClass) {
         BlockchainConfiguration blockchainConfiguration = createConfigInstance(blockchainConfigClass);
-        if(blockchainConfiguration == null) {
+        if (blockchainConfiguration == null) {
             return null;
         }
 
@@ -83,7 +88,7 @@ public class Blockchains {
         String packageName = blockchainConfiguration.getClass().getPackage().getName();
         Reflections blockchainReflections = new Reflections(packageName);
 
-        if(doAllRequiredImplementationsExist(blockchainReflections)) {
+        if (doAllRequiredImplementationsExist(blockchainReflections)) {
             blockchainConfiguration.init(config.withOnlyPath(packageName));
             return new BlockchainFactory(blockchainConfiguration, blockchainReflections);
         } else {

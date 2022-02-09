@@ -2,7 +2,9 @@ package devote.blockchain.operations;
 
 import devote.blockchain.BlockchainFactory;
 import devote.blockchain.Blockchains;
+import devote.blockchain.api.BlockchainException;
 import devote.blockchain.api.DistributionAndBallotAccountOperation;
+import devote.blockchain.api.FundingAccountOperation;
 import devote.blockchain.api.Issuer;
 import devote.blockchain.api.IssuerAccountOperation;
 import devote.blockchain.api.Account;
@@ -91,16 +93,30 @@ public class VotingBlockchainOperations {
     }
 
     public CompletionStage<Void> checkFundingAccountOf(CreateVotingRequest createVotingRequest) {
-        String accountLogMessage = redactWithEllipsis(createVotingRequest.getFundingAccountPublic(), 5);
-        logger.info("checkFundingAccountOf(): checking {}", accountLogMessage);
-        // TODO: Check that account exists and has sufficient balance.
-        return runAsync(() -> {}, blockchainExecContext);
+        return runAsync(() -> {
+            String loggableAccount = redactWithEllipsis(createVotingRequest.getFundingAccountPublic(), 5);
+            logger.info("checkFundingAccountOf(): checking {}", loggableAccount);
+
+            BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(createVotingRequest.getNetwork());
+            FundingAccountOperation fundingAccountOperation = blockchainFactory.createFundingAccountOperation();
+
+            String fundingAccountPublic = createVotingRequest.getFundingAccountPublic();
+            long votesCap = createVotingRequest.getVotesCap();
+            if(fundingAccountOperation.doesAccountNotHaveEnoughBalanceForVotesCap(fundingAccountPublic, votesCap)) {
+                String message = String.format("%s does not have enough balance for votes cap %d", loggableAccount, votesCap);
+
+                logger.warn("checkFundingAccountOf(): {}", message);
+                throw new BlockchainException(message);
+            } else {
+                logger.info("checkFundingAccountOf(): Account {} has enough balance for the voting.", loggableAccount);
+            }
+        }, blockchainExecContext);
     }
 
     private static List<String> generateUniqueAssetCodes(CreateVotingRequest request, long numsToCreate) {
         Set<String> uniqueAssetCodes = new HashSet<>();
 
-        while(uniqueAssetCodes.size() != numsToCreate) {
+        while (uniqueAssetCodes.size() != numsToCreate) {
             uniqueAssetCodes.add(generateAssetCode(request));
         }
 

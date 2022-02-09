@@ -5,6 +5,7 @@ import devote.blockchain.api.BlockchainException;
 import devote.blockchain.api.BlockchainOperation;
 import devote.blockchain.api.ChannelAccountOperation;
 import devote.blockchain.api.DistributionAndBallotAccountOperation;
+import devote.blockchain.api.FundingAccountOperation;
 import devote.blockchain.api.IssuerAccountOperation;
 import devote.blockchain.api.VoterAccountOperation;
 import org.reflections.Reflections;
@@ -41,6 +42,10 @@ public class BlockchainFactory {
         return createBlockchainOperation(VoterAccountOperation.class);
     }
 
+    public FundingAccountOperation createFundingAccountOperation() {
+        return createBlockchainOperation(FundingAccountOperation.class);
+    }
+
     private <T extends BlockchainOperation> T createBlockchainOperation(Class<T> blockChainOperationParentClass) {
         Class<? extends T> implementationClass = findUniqueSubtypeOfOrNull(blockChainOperationParentClass, blockchainReflections);
 
@@ -53,7 +58,7 @@ public class BlockchainFactory {
 
             return blockchainOperation;
         } catch (Exception e) {
-            logger.error("createIssuerAccount(): failed to create instance of " + implementationClass.getName() + "; {}!", e);
+            logger.error("createBlockchainOperation(): failed to create instance of " + implementationClass.getName() + "; {}!", e);
             throw new BlockchainException("Failed to create instance of " + implementationClass.getName(), e);
         }
     }

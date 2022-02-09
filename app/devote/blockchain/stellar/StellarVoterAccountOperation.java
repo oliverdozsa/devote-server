@@ -65,11 +65,11 @@ public class StellarVoterAccountOperation implements VoterAccountOperation {
     private void sendTheTokenToVoter(Transaction.Builder txBuilder, CreateTransactionParams params) {
         Asset asset = StellarIssuerUtils.obtainAssetFrom(params.issuer);
 
-        PaymentOperation paymentOperation = new PaymentOperation.Builder(params.voterAccountPublic, asset, UNIT_TOKEN_AMOUNT)
+        PaymentOperation payment = new PaymentOperation.Builder(params.voterAccountPublic, asset, UNIT_TOKEN_AMOUNT)
                 .setSourceAccount(params.distribution.publik)
                 .build();
 
-        txBuilder.addOperation(paymentOperation);
+        txBuilder.addOperation(payment);
     }
 
     private Transaction createSignedTransaction(Transaction.Builder txBuilder, CreateTransactionParams params) {

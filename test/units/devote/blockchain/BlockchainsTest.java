@@ -3,6 +3,7 @@ package units.devote.blockchain;
 import com.typesafe.config.Config;
 import devote.blockchain.BlockchainFactory;
 import devote.blockchain.Blockchains;
+import devote.blockchain.api.BlockchainException;
 import devote.blockchain.api.IssuerAccountOperation;
 import devote.blockchain.mockblockchain.MockBlockchainIssuerAccountOperation;
 import org.junit.Before;
@@ -13,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -50,30 +52,35 @@ public class BlockchainsTest {
     public void testWithConfigInNotCorrectPackageName() {
         // Given
         // When
-        BlockchainFactory factoryForNotCorrectPackagename = blockchains.getFactoryByNetwork("blockchain_with_not_correct_package_name");
-
         // Then
-        assertThat(factoryForNotCorrectPackagename, is(nullValue()));
+        BlockchainException exception =
+                assertThrows(BlockchainException.class, () -> blockchains.getFactoryByNetwork("blockchain_with_not_correct_package_name"));
+
+        assertThat(exception.getMessage(), equalTo("Not found blockchain factory for network: blockchain_with_not_correct_package_name"));
     }
 
     @Test
     public void testWithNoDefaultConstructor() {
         // Given
         // When
-        BlockchainFactory factory = blockchains.getFactoryByNetwork("blockchain_with_no_default_constructor");
-
         // Then
-        assertThat(factory, is(nullValue()));
+        BlockchainException exception =
+                assertThrows(BlockchainException.class, () -> blockchains.getFactoryByNetwork("blockchain_with_no_default_constructor"));
+
+
+        assertThat(exception.getMessage(), equalTo("Not found blockchain factory for network: blockchain_with_no_default_constructor"));
     }
 
     @Test
     public void testWithMissingImplementation() {
         // Given
         // When
-        BlockchainFactory factory = blockchains.getFactoryByNetwork("blockchain_with_missing_implementation");
-
         // Then
-        assertThat(factory, is(nullValue()));
+        BlockchainException exception =
+                assertThrows(BlockchainException.class, () -> blockchains.getFactoryByNetwork("blockchain_with_missing_implementation"));
+
+
+        assertThat(exception.getMessage(), equalTo("Not found blockchain factory for network: blockchain_with_missing_implementation"));
     }
 
     private void assertBlockchainConfigInitCalled(MockBlockchainIssuerAccountOperation mockIssuerAccount) {
