@@ -29,4 +29,7 @@ public class BlockchainUtils {
 
         return packageString;
     }
+
+    private BlockchainUtils() {
+    }
 }

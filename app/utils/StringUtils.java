@@ -30,4 +30,7 @@ public class StringUtils {
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
     }
+
+    private StringUtils() {
+    }
 }

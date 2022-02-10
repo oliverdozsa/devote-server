@@ -5,4 +5,7 @@ import security.VerifiedJwt;
 
 public class Attrs {
     public static final TypedKey<VerifiedJwt> VERIFIED_JWT = TypedKey.create("verifiedJwt");
+
+    private Attrs() {
+    }
 }

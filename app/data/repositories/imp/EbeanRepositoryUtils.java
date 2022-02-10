@@ -14,4 +14,7 @@ public class EbeanRepositoryUtils {
             throw new NotFoundException(message);
         }
     }
+
+    private EbeanRepositoryUtils() {
+    }
 }

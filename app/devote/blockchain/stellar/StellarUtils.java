@@ -20,12 +20,12 @@ public class StellarUtils {
 
     public static String resultCodesOf(SubmitTransactionResponse response) {
         List<String> operationResultCodes = response.getExtras().getResultCodes().getOperationsResultCodes();
-        if(operationResultCodes == null) {
+        if (operationResultCodes == null) {
             operationResultCodes = Collections.emptyList();
         }
 
         String transactionResultCode = response.getExtras().getResultCodes().getTransactionResultCode();
-        return "TX: " +  transactionResultCode + ", OP: " + String.join(", ", operationResultCodes);
+        return "TX: " + transactionResultCode + ", OP: " + String.join(", ", operationResultCodes);
     }
 
     public static Transaction.Builder createTransactionBuilder(Server server, Network network, String accountId)
@@ -42,5 +42,8 @@ public class StellarUtils {
 
     public static Account toAccount(KeyPair keyPair) {
         return new Account(new String(keyPair.getSecretSeed()), keyPair.getAccountId());
+    }
+
+    private StellarUtils() {
     }
 }

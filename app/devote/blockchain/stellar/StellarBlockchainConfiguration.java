@@ -10,7 +10,6 @@ import play.Logger;
 public class StellarBlockchainConfiguration implements BlockchainConfiguration {
     private Server server;
     private Network network;
-    private KeyPair masterKeyPair;
     private Config config;
 
     private static final Logger.ALogger logger = Logger.of(StellarBlockchainConfiguration.class);
@@ -39,14 +38,6 @@ public class StellarBlockchainConfiguration implements BlockchainConfiguration {
 
     public long getNumOfVoteBuckets() {
         return config.getLong("devote.blockchain.stellar.votebuckets");
-    }
-
-    public KeyPair getMasterKeyPair() {
-        if (masterKeyPair == null) {
-            masterKeyPair = KeyPair.fromSecretSeed(config.getString("devote.blockchain.stellar.secret"));
-        }
-
-        return masterKeyPair;
     }
 
     private void initServerAndNetworkIfNeeded() {

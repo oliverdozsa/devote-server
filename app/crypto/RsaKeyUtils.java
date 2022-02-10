@@ -63,4 +63,7 @@ public class RsaKeyUtils {
 
         return keyStringWriter.toString().replace("\n", "");
     }
+
+    private RsaKeyUtils() {
+    }
 }

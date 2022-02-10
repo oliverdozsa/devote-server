@@ -24,4 +24,7 @@ public class StellarSubmitTransaction {
             throw new BlockchainException(logMessage);
         }
     }
+
+    private StellarSubmitTransaction() {
+    }
 }

@@ -64,7 +64,7 @@ public class VotingBlockchainOperationsTest {
         when(mockBlockchainFactory.createIssuerAccountOperation()).thenReturn(mockIssuerAccountOperation);
         when(mockBlockchainFactory.createDistributionAndBallotAccountOperation()).thenReturn(mockDistributionAndBallotAccountOperation);
         when(mockIssuerAccountOperation.calcNumOfAccountsNeeded(anyLong())).thenReturn(3L);
-        when(mockIssuerAccountOperation.create(anyLong())).thenReturn(
+        when(mockIssuerAccountOperation.create(anyLong(), any(Account.class))).thenReturn(
                 new Account("sA", "pA"),
                 new Account("sB", "pB"),
                 new Account("sC", "pC")

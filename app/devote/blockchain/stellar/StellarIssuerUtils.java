@@ -28,4 +28,7 @@ public class StellarIssuerUtils {
         BigDecimal divisor = new BigDecimal(10).pow(7);
         return votesCap.divide(divisor).toString();
     }
+
+    private StellarIssuerUtils() {
+    }
 }

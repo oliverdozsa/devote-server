@@ -19,7 +19,7 @@ public class MockBlockchainIssuerAccountOperation implements IssuerAccountOperat
     }
 
     @Override
-    public Account create(long votesCap) {
+    public Account create(long votesCap, Account funding) {
         currentIssuerAccountId++;
         String currentIssuerAccountIdAsString = Integer.toString(currentIssuerAccountId);
         return new Account(currentIssuerAccountIdAsString, currentIssuerAccountIdAsString);

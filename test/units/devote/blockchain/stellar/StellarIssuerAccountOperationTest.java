@@ -6,6 +6,7 @@ import devote.blockchain.stellar.StellarIssuerAccountOperation;
 import org.junit.Before;
 import org.junit.Test;
 import org.stellar.sdk.AccountRequiresMemoException;
+import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Transaction;
 
 import java.io.IOException;
@@ -34,7 +35,8 @@ public class StellarIssuerAccountOperationTest {
     public void testCreate() throws AccountRequiresMemoException, IOException {
         // Given
         // When
-        Account account = operation.create(42L);
+        KeyPair testKeyPair = KeyPair.random();
+        Account account = operation.create(42L, new Account(new String(testKeyPair.getSecretSeed()), testKeyPair.getAccountId()));
 
         // Then
         assertThat(account, notNullValue());
@@ -48,7 +50,9 @@ public class StellarIssuerAccountOperationTest {
 
         // When
         // Then
-        BlockchainException exception = assertThrows(BlockchainException.class, () -> operation.create(42L));
+        KeyPair testKeyPair = KeyPair.random();
+        BlockchainException exception = assertThrows(BlockchainException.class, () -> operation
+                .create(42L, new Account(new String(testKeyPair.getSecretSeed()), testKeyPair.getAccountId())));
         assertThat(exception.getMessage(), equalTo("[STELLAR]: Failed to create issuer account!"));
         assertThat(exception.getCause(), instanceOf(IOException.class));
     }

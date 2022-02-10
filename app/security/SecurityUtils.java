@@ -12,4 +12,7 @@ public class SecurityUtils {
     public static boolean hasVerifiedJwt(Http.Request request) {
         return request.attrs().containsKey(Attrs.VERIFIED_JWT);
     }
+
+    private SecurityUtils() {
+    }
 }

@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Network;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -49,22 +48,6 @@ public class StellarBlockchainConfigurationTest {
         // Then
         assertThat(configuration.getServer(), notNullValue());
         assertThat(configuration.getNetwork(), equalTo(Network.TESTNET));
-    }
-
-    @Test
-    public void testGetMasterKeyPair() {
-        // Given
-        when(mockConfig.getString("devote.blockchain.stellar.secret"))
-                .thenReturn("SBAN2HTEKACVBTWYR5IRBI6DKYW4HPBWO44TVTAULNGCGMAAKL4USTPN");
-
-        // When
-        StellarBlockchainConfiguration configuration = new StellarBlockchainConfiguration();
-        configuration.init(mockConfig);
-
-        // Then
-        KeyPair masterKeyPair = configuration.getMasterKeyPair();
-        assertThat(masterKeyPair, notNullValue());
-        assertThat(new String(masterKeyPair.getSecretSeed()), equalTo("SBAN2HTEKACVBTWYR5IRBI6DKYW4HPBWO44TVTAULNGCGMAAKL4USTPN"));
     }
 
     @Test

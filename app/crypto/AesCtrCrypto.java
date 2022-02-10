@@ -81,4 +81,7 @@ public class AesCtrCrypto {
         secureRandom.nextBytes(result);
         return result;
     }
+
+    private AesCtrCrypto() {
+    }
 }

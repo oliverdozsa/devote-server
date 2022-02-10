@@ -37,14 +37,13 @@ class StellarMock {
     public StellarMock() throws IOException, AccountRequiresMemoException {
         MockitoAnnotations.initMocks(this);
 
-        KeyPair randomMasterKeyPair = KeyPair.random();
+        KeyPair randomFundingKey = KeyPair.random();
 
         when(configuration.getServer()).thenReturn(server);
         when(configuration.getNetwork()).thenReturn(Network.TESTNET);
-        when(configuration.getMasterKeyPair()).thenReturn(randomMasterKeyPair);
         when(server.accounts()).thenReturn(accountsRequestBuilder);
         when(accountsRequestBuilder.account(anyString())).thenReturn(accountResponse);
-        when(accountResponse.getAccountId()).thenReturn(randomMasterKeyPair.getAccountId());
+        when(accountResponse.getAccountId()).thenReturn(randomFundingKey.getAccountId());
         when(server.submitTransaction(any(Transaction.class))).thenReturn(mockSubmitTxResponse);
         when(mockSubmitTxResponse.isSuccess()).thenReturn(true);
     }

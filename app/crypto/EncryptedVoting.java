@@ -7,4 +7,7 @@ public class EncryptedVoting {
         byte[] keyBytes = AesCtrCrypto.generateKey();
         return Base64.getEncoder().encodeToString(keyBytes);
     }
+
+    private EncryptedVoting() {
+    }
 }

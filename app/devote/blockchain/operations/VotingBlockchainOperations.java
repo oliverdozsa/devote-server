@@ -54,20 +54,19 @@ public class VotingBlockchainOperations {
             long votesCapPerIssuer = request.getVotesCap() / numOfAccountsNeeded;
             long votesCapRemainder = request.getVotesCap() % numOfAccountsNeeded;
 
-
             List<Issuer> issuers = new ArrayList<>();
             List<String> assetCodes = generateUniqueAssetCodes(request, numOfAccountsNeeded);
             long votesCapForIssuer = votesCapPerIssuer;
 
-
+            Account funding = new Account(request.getFundingAccountSecret(), request.getFundingAccountPublic());
             for (int i = 0; i < numOfAccountsNeeded - 1; i++) {
-                Account issuerAccount = issuerAccountOperation.create(votesCapForIssuer);
+                Account issuerAccount = issuerAccountOperation.create(votesCapForIssuer, funding);
                 issuers.add(new Issuer(issuerAccount, votesCapForIssuer, assetCodes.get(i)));
             }
 
             // For last one the remainder is also needed
             votesCapForIssuer = votesCapPerIssuer + votesCapRemainder;
-            Account issuerAccount = issuerAccountOperation.create(votesCapForIssuer);
+            Account issuerAccount = issuerAccountOperation.create(votesCapForIssuer, funding);
             issuers.add(new Issuer(issuerAccount, votesCapForIssuer, assetCodes.get(assetCodes.size() - 1)));
 
             return issuers;

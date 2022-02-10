@@ -11,7 +11,7 @@ public class BlockchainWihMissingImplementationIssuerOperation implements Issuer
     }
 
     @Override
-    public Account create(long votesCap) {
+    public Account create(long votesCap, Account funding) {
         return new Account("42", "84");
     }
 

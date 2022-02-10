@@ -15,6 +15,7 @@ import utils.StringUtils;
 
 import java.io.IOException;
 
+import static devote.blockchain.stellar.StellarUtils.fromAccount;
 import static devote.blockchain.stellar.StellarUtils.toAccount;
 
 public class StellarIssuerAccountOperation implements IssuerAccountOperation {
@@ -29,11 +30,11 @@ public class StellarIssuerAccountOperation implements IssuerAccountOperation {
     }
 
     @Override
-    public Account create(long votesCap) {
+    public Account create(long votesCap, Account funding) {
         try {
-            Transaction.Builder txBuilder = prepareTransaction();
+            Transaction.Builder txBuilder = prepareTransaction(funding);
             KeyPair issuer = prepareIssuerCreationOn(txBuilder, votesCap);
-            submitTransaction(txBuilder);
+            submitTransaction(txBuilder, funding);
 
             return toAccount(issuer);
         } catch (IOException | AccountRequiresMemoException e) {
@@ -47,12 +48,11 @@ public class StellarIssuerAccountOperation implements IssuerAccountOperation {
         return configuration.getNumOfVoteBuckets();
     }
 
-    private Transaction.Builder prepareTransaction() throws IOException {
+    private Transaction.Builder prepareTransaction(Account funding) throws IOException {
         Server server = configuration.getServer();
         Network network = configuration.getNetwork();
-        KeyPair masterKeyPair = configuration.getMasterKeyPair();
 
-        return StellarUtils.createTransactionBuilder(server, network, masterKeyPair.getAccountId());
+        return StellarUtils.createTransactionBuilder(server, network, funding.publik);
     }
 
     private org.stellar.sdk.KeyPair prepareIssuerCreationOn(Transaction.Builder txBuilder, long votesCapForIssuer) {
@@ -73,12 +73,12 @@ public class StellarIssuerAccountOperation implements IssuerAccountOperation {
         return Long.toString((4 * votesCapPerIssuer) + 10);
     }
 
-    private void submitTransaction(Transaction.Builder txBuilder) throws AccountRequiresMemoException, IOException {
+    private void submitTransaction(Transaction.Builder txBuilder, Account fundingAccount) throws AccountRequiresMemoException, IOException {
         Server server = configuration.getServer();
-        KeyPair masterKeyPair = configuration.getMasterKeyPair();
+        KeyPair funding = fromAccount(fundingAccount);
 
         Transaction transaction = txBuilder.build();
-        transaction.sign(masterKeyPair);
+        transaction.sign(funding);
 
         StellarSubmitTransaction.submit(transaction, server);
     }

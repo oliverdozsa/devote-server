@@ -35,8 +35,8 @@ public class StellarFundingAccountOperation implements FundingAccountOperation {
             BigDecimal xlmBalance = findXlmBalance(accountResponse.getBalances());
             logger.info("[STELLAR]: Funding account balance (XLM): {}", xlmBalance);
 
-            long minBalance = 4 * votesCap;
-            return xlmBalance.compareTo(new BigDecimal(minBalance)) < 0;
+            long minRequiredBalance = 4 * votesCap;
+            return xlmBalance.compareTo(new BigDecimal(minRequiredBalance)) < 0;
         } catch (IOException e) {
             String logMessage = "[STELLAR]: Failed to get info about funding account!";
             logger.warn(logMessage);

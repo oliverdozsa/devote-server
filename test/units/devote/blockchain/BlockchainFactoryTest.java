@@ -63,7 +63,7 @@ public class BlockchainFactoryTest {
         }
 
         @Override
-        public Account create(long votesCap) {
+        public Account create(long votesCap, Account funding) {
             return null;
         }
 
