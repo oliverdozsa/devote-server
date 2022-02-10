@@ -13,7 +13,7 @@ public class VotingRequestMaker {
         InputStream sampleVotingIS = VotingControllerTest.class
                 .getClassLoader().getResourceAsStream("voting-request-base.json");
 
-        CreateVotingRequest votingRequest = null;
+        CreateVotingRequest votingRequest;
         try {
             votingRequest = Json.mapper().readValue(sampleVotingIS, CreateVotingRequest.class);
         } catch (IOException e) {

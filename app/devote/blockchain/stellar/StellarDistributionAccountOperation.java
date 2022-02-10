@@ -9,14 +9,18 @@ import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.PaymentOperation;
 import org.stellar.sdk.SetOptionsOperation;
 import org.stellar.sdk.Transaction;
+import play.Logger;
 
 import java.util.List;
 
 import static devote.blockchain.stellar.StellarIssuerUtils.*;
+import static utils.StringUtils.redactWithEllipsis;
 
 class StellarDistributionAccountOperation {
     private final Transaction.Builder txBuilder;
     private final List<Issuer> issuers;
+
+    private static final Logger.ALogger logger = Logger.of(StellarDistributionAccountOperation.class);
 
     public StellarDistributionAccountOperation(Transaction.Builder txBuilder, List<Issuer> issuers) {
         this.txBuilder = txBuilder;
@@ -36,6 +40,9 @@ class StellarDistributionAccountOperation {
         long totalVotesCap = totalVotesCapOf(issuers);
         KeyPair distribution = KeyPair.random();
         String startingBalance = Long.toString(totalVotesCap * 2);
+
+        String loggableAccount = redactWithEllipsis(distribution.getAccountId(), 5);
+        logger.info("[STELLAR]: About to create distribution account {} with balance {}", loggableAccount, startingBalance);
 
         CreateAccountOperation createAccount = new CreateAccountOperation.Builder(distribution.getAccountId(), startingBalance)
                 .build();

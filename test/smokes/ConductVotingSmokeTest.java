@@ -2,18 +2,24 @@ package smokes;
 
 import components.clients.CommissionTestClient;
 import components.clients.VotingTestClient;
+import devote.blockchain.api.Account;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import play.inject.guice.GuiceApplicationBuilder;
+import play.libs.ws.WSClient;
 import play.mvc.Result;
 import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
+import smokes.fixtures.BlockchainTestNet;
+import smokes.fixtures.StellarBlockchainTestNet;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static asserts.DbAsserts.assertThatTransactionIsStoredFor;
 import static components.controllers.VotingRequestMaker.createValidVotingRequest;
@@ -21,7 +27,6 @@ import static components.extractors.CommissionResponseFromResult.*;
 import static components.extractors.GenericDataFromResult.statusOf;
 import static matchers.ResultHasHeader.hasLocationHeader;
 import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.isEmptyString;
@@ -42,6 +47,8 @@ public class ConductVotingSmokeTest {
             "stellar"
     };
 
+    private static Map<String, BlockchainTestNet> testNets = new HashMap<>();
+
     public ConductVotingSmokeTest() {
         GuiceApplicationBuilder applicationBuilder = new GuiceApplicationBuilder();
 
@@ -53,6 +60,8 @@ public class ConductVotingSmokeTest {
     public void setup() {
         testClient = new CommissionTestClient(ruleChainForTests.getApplication());
         votingTestClient = new VotingTestClient(ruleChainForTests.getApplication());
+
+        initTestNets();
     }
 
     @Test
@@ -62,10 +71,17 @@ public class ConductVotingSmokeTest {
         }
     }
 
+    private void initTestNets() {
+        WSClient wsClient = ruleChainForTests.getApplication().injector().instanceOf(WSClient.class);
+
+        StellarBlockchainTestNet stellarTestNet = new StellarBlockchainTestNet(wsClient);
+        testNets.put("stellar", stellarTestNet);
+    }
+
     private void testVotingOnNetwork(String networkName) throws InterruptedException {
         // Given
         InitData votingInitData = initVotingFor("Bob", networkName);
-        Thread.sleep(15 * 1000); // So that some channel accounts are present.
+        Thread.sleep(45 * 1000); // So that some channel accounts are present.
 
         String message = createMessage(votingInitData.votingId, "someAccountId");
 
@@ -112,10 +128,15 @@ public class ConductVotingSmokeTest {
     }
 
     private String createValidVoting(String network) {
+        Account funding = createFundingAccountIn(network, 10000);
+
         CreateVotingRequest createVotingRequest = createValidVotingRequest();
         createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
         createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
         createVotingRequest.setNetwork(network);
+        createVotingRequest.setVotesCap(168L);
+        createVotingRequest.setFundingAccountPublic(funding.publik);
+        createVotingRequest.setFundingAccountSecret(funding.secret);
 
         Result result = votingTestClient.createVoting(createVotingRequest);
         assertThat(statusOf(result), equalTo(CREATED));
@@ -130,6 +151,11 @@ public class ConductVotingSmokeTest {
 
     private String createMessage(String votingId, String voterPublicAccountId) {
         return votingId + "|" + voterPublicAccountId;
+    }
+
+    private Account createFundingAccountIn(String network, long withBalance) {
+        BlockchainTestNet testNet = testNets.get(network);
+        return testNet.createAccountWithBalance(withBalance);
     }
 
     private static class InitData {

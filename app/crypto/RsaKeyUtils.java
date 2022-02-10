@@ -28,7 +28,7 @@ public class RsaKeyUtils {
             byte[] publicKeyBytes =  SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(publicKey).getEncoded();
             return keyToPemString("PUBLIC KEY", publicKeyBytes);
         } catch (IOException e) {
-            throw new CryptoException("Failed to create publiy key PEM string", e);
+            throw new CryptoException("Failed to create public key PEM string", e);
         }
     }
 

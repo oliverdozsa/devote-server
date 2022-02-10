@@ -22,7 +22,7 @@ public class VotingTestClient extends TestClient {
                 .header(CONTENT_TYPE, Http.MimeTypes.JSON)
                 .uri(routes.VotingController.create().url());
 
-        return route(application, httpRequest);
+        return route(application, httpRequest, 75 * 1000);
     }
 
     public Result single(String votingId) {
