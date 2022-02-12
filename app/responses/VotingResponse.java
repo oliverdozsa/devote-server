@@ -9,13 +9,14 @@ public class VotingResponse {
     private String title;
     private Long votesCap;
     private List<VotingPollResponse> polls;
-    private List<VotingIssuerResponse> issuers;
     private Instant createdAt;
     private Instant encryptedUntil;
     private Instant startDate;
     private Instant endDate;
     private String distributionAccountId;
     private String ballotAccountId;
+    private String issuerAccountId;
+    private String assetCode;
     private String authorization;
     private String authOptionKeybase;
     private String visibility;
@@ -58,14 +59,6 @@ public class VotingResponse {
 
     public void setPolls(List<VotingPollResponse> polls) {
         this.polls = polls;
-    }
-
-    public List<VotingIssuerResponse> getIssuers() {
-        return issuers;
-    }
-
-    public void setIssuers(List<VotingIssuerResponse> issuers) {
-        this.issuers = issuers;
     }
 
     public Instant getCreatedAt() {
@@ -138,5 +131,21 @@ public class VotingResponse {
 
     public void setVisibility(String visibility) {
         this.visibility = visibility;
+    }
+
+    public String getIssuerAccountId() {
+        return issuerAccountId;
+    }
+
+    public void setIssuerAccountId(String issuerAccountId) {
+        this.issuerAccountId = issuerAccountId;
+    }
+
+    public String getAssetCode() {
+        return assetCode;
+    }
+
+    public void setAssetCode(String assetCode) {
+        this.assetCode = assetCode;
     }
 }

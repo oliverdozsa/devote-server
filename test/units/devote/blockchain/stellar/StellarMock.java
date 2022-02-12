@@ -46,5 +46,6 @@ class StellarMock {
         when(accountResponse.getAccountId()).thenReturn(randomFundingKey.getAccountId());
         when(server.submitTransaction(any(Transaction.class))).thenReturn(mockSubmitTxResponse);
         when(mockSubmitTxResponse.isSuccess()).thenReturn(true);
+        when(configuration.getNumOfVoteBuckets()).thenReturn(3L);
     }
 }

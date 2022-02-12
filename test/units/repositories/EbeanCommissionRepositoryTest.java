@@ -3,7 +3,7 @@ package units.repositories;
 import data.entities.JpaChannelAccountProgress;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
-import data.entities.JpaVotingIssuerAccount;
+import data.entities.JpaChannelGeneratorAccount;
 import data.repositories.imp.EbeanCommissionRepository;
 import exceptions.InternalErrorException;
 import io.ebean.EbeanServer;
@@ -40,7 +40,7 @@ public class EbeanCommissionRepositoryTest {
     public void testConsumeOneChannel_NoMoreChannelsLeft() {
         // Given
         JpaVoting mockJpaVoting = prepareConsumeOneChannelTest();
-        when(mockJpaVoting.getIssuerAccounts()).thenReturn(Collections.emptyList());
+        when(mockJpaVoting.getChannelGeneratorAccounts()).thenReturn(Collections.emptyList());
 
         // When
         // Then
@@ -52,10 +52,10 @@ public class EbeanCommissionRepositoryTest {
     public void testConsumeOneChannel_MoreChannelWillBeCreated() {
         // Given
         JpaVoting mockJpaVoting = prepareConsumeOneChannelTest();
-        JpaVotingIssuerAccount mockVotingIssuerAccount = Mockito.mock(JpaVotingIssuerAccount.class);
+        JpaChannelGeneratorAccount mockVotingIssuerAccount = Mockito.mock(JpaChannelGeneratorAccount.class);
         JpaChannelAccountProgress mockChannelAccountProgress = Mockito.mock(JpaChannelAccountProgress.class);
 
-        when(mockJpaVoting.getIssuerAccounts()).thenReturn(Collections.singletonList(mockVotingIssuerAccount));
+        when(mockJpaVoting.getChannelGeneratorAccounts()).thenReturn(Collections.singletonList(mockVotingIssuerAccount));
         when(mockVotingIssuerAccount.getChannelAccountProgress()).thenReturn(mockChannelAccountProgress);
         when(mockChannelAccountProgress.getNumOfAccountsLeftToCreate()).thenReturn(1L);
 

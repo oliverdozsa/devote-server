@@ -2,7 +2,6 @@ package data.entities;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -35,7 +34,7 @@ public class JpaVoting {
     private Long votesCap;
 
     @OneToMany(mappedBy = "voting", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
-    private List<JpaVotingIssuerAccount> issuerAccounts;
+    private List<JpaChannelGeneratorAccount> channelGeneratorAccounts;
 
     @OneToMany(mappedBy = "voting", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     private List<JpaVotingChannelAccount> channelAccounts;
@@ -80,6 +79,12 @@ public class JpaVoting {
     @Lob
     private String fundingAccountSecret;
 
+    @Column(name = "asset_code", length = 20)
+    private String assetCode;
+
+    @Column(name = "issuer_account_public")
+    private String issuerAccountPublic;
+
     @Column(name = "authorization", nullable = false)
     @Enumerated(EnumType.STRING)
     private Authorization authorization;
@@ -119,12 +124,12 @@ public class JpaVoting {
         this.network = network;
     }
 
-    public List<JpaVotingIssuerAccount> getIssuerAccounts() {
-        return issuerAccounts;
+    public List<JpaChannelGeneratorAccount> getChannelGeneratorAccounts() {
+        return channelGeneratorAccounts;
     }
 
-    public void setIssuerAccounts(List<JpaVotingIssuerAccount> issuerAccounts) {
-        this.issuerAccounts = issuerAccounts;
+    public void setChannelGeneratorAccounts(List<JpaChannelGeneratorAccount> channelGeneratorAccounts) {
+        this.channelGeneratorAccounts = channelGeneratorAccounts;
     }
 
     public Long getVotesCap() {
@@ -293,5 +298,21 @@ public class JpaVoting {
 
     public void setFundingAccountSecret(String fundingAccountSecret) {
         this.fundingAccountSecret = fundingAccountSecret;
+    }
+
+    public String getAssetCode() {
+        return assetCode;
+    }
+
+    public void setAssetCode(String assetCode) {
+        this.assetCode = assetCode;
+    }
+
+    public String getIssuerAccountPublic() {
+        return issuerAccountPublic;
+    }
+
+    public void setIssuerAccountPublic(String issuerAccountPublic) {
+        this.issuerAccountPublic = issuerAccountPublic;
     }
 }

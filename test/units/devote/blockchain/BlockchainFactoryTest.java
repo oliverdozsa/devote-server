@@ -3,7 +3,8 @@ package units.devote.blockchain;
 import devote.blockchain.BlockchainFactory;
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.BlockchainException;
-import devote.blockchain.api.IssuerAccountOperation;
+import devote.blockchain.api.ChannelGenerator;
+import devote.blockchain.api.ChannelGeneratorAccountOperation;
 import devote.blockchain.api.Account;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.reflections.Reflections;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -40,7 +42,7 @@ public class BlockchainFactoryTest {
     public void testCreateIssuerAccountFails() {
         // Given
         Set<Class<?>> mockIssuerClassSet = new HashSet<>();
-        mockIssuerClassSet.add(SomeMockIssuerClassWithNoDefaultCtorOperation.class);
+        mockIssuerClassSet.add(SomeMockChannelGeneratorClassWithNoDefaultCtorOperation.class);
 
         when(mockReflections.getSubTypesOf(any())).thenReturn(mockIssuerClassSet);
 
@@ -53,8 +55,8 @@ public class BlockchainFactoryTest {
         assertThat(exception.getMessage(), containsString("Failed to create instance of"));
     }
 
-    private static class SomeMockIssuerClassWithNoDefaultCtorOperation implements IssuerAccountOperation {
-        public SomeMockIssuerClassWithNoDefaultCtorOperation(int someArg) {
+    private static class SomeMockChannelGeneratorClassWithNoDefaultCtorOperation implements ChannelGeneratorAccountOperation {
+        public SomeMockChannelGeneratorClassWithNoDefaultCtorOperation(int someArg) {
         }
 
         @Override
@@ -63,7 +65,7 @@ public class BlockchainFactoryTest {
         }
 
         @Override
-        public Account create(long votesCap, Account funding) {
+        public List<ChannelGenerator> create(long totalVotesCap, Account funding) {
             return null;
         }
 

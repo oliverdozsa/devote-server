@@ -2,24 +2,20 @@ package devote.blockchain.operations;
 
 import devote.blockchain.BlockchainFactory;
 import devote.blockchain.Blockchains;
+import devote.blockchain.api.Account;
 import devote.blockchain.api.BlockchainException;
+import devote.blockchain.api.ChannelGenerator;
+import devote.blockchain.api.ChannelGeneratorAccountOperation;
 import devote.blockchain.api.DistributionAndBallotAccountOperation;
 import devote.blockchain.api.FundingAccountOperation;
-import devote.blockchain.api.Issuer;
-import devote.blockchain.api.IssuerAccountOperation;
-import devote.blockchain.api.Account;
 import executioncontexts.BlockchainExecutionContext;
 import play.Logger;
 import requests.CreateVotingRequest;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.concurrent.CompletionStage;
-import java.util.stream.Collectors;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
@@ -43,53 +39,30 @@ public class VotingBlockchainOperations {
         this.blockchains = blockchains;
     }
 
-    public CompletionStage<List<Issuer>> createIssuerAccounts(CreateVotingRequest request) {
+    public CompletionStage<List<ChannelGenerator>> createChannelGeneratorAccounts(CreateVotingRequest request) {
         return supplyAsync(() -> {
             logger.info("createIssuerAccounts(): request = {}", request);
             BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(request.getNetwork());
-            IssuerAccountOperation issuerAccountOperation = blockchainFactory.createIssuerAccountOperation();
-
-            long numOfAccountsNeeded = issuerAccountOperation.calcNumOfAccountsNeeded(request.getVotesCap());
-
-            long votesCapPerIssuer = request.getVotesCap() / numOfAccountsNeeded;
-            long votesCapRemainder = request.getVotesCap() % numOfAccountsNeeded;
-
-            List<Issuer> issuers = new ArrayList<>();
-            List<String> assetCodes = generateUniqueAssetCodes(request, numOfAccountsNeeded);
-            long votesCapForIssuer = votesCapPerIssuer;
+            ChannelGeneratorAccountOperation channelGeneratorAccountOperation = blockchainFactory.createIssuerAccountOperation();
 
             Account funding = new Account(request.getFundingAccountSecret(), request.getFundingAccountPublic());
-            for (int i = 0; i < numOfAccountsNeeded - 1; i++) {
-                Account issuerAccount = issuerAccountOperation.create(votesCapForIssuer, funding);
-                issuers.add(new Issuer(issuerAccount, votesCapForIssuer, assetCodes.get(i)));
-            }
-
-            // For last one the remainder is also needed
-            votesCapForIssuer = votesCapPerIssuer + votesCapRemainder;
-            Account issuerAccount = issuerAccountOperation.create(votesCapForIssuer, funding);
-            issuers.add(new Issuer(issuerAccount, votesCapForIssuer, assetCodes.get(assetCodes.size() - 1)));
-
-            return issuers;
+            return channelGeneratorAccountOperation.create(request.getVotesCap(), funding);
         }, blockchainExecContext);
     }
 
-    public CompletionStage<DistributionAndBallotAccountOperation.TransactionResult> createDistributionAndBallotAccounts(
-            CreateVotingRequest request,
-            List<Issuer> issuers) {
+    public CompletionStage<BallotAndDistributionResult> createDistributionAndBallotAccounts(CreateVotingRequest request) {
         return supplyAsync(() -> {
             String network = request.getNetwork();
-            logger.info("createDistributionAndBallotAccounts(): network = {}, issuers.size = {}", network, issuers.size());
+            logger.info("createDistributionAndBallotAccounts(): network = {}", network);
 
             BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(network);
             DistributionAndBallotAccountOperation distributionAndBallotAccountOperation = blockchainFactory.createDistributionAndBallotAccountOperation();
 
-            List<String> tokenTitles = issuers.stream()
-                    .map(issuer -> issuer.assetCode)
-                    .collect(Collectors.toList());
-            logger.info("createDistributionAndBallotAccounts(): About to create distribution and ballot accounts with tokens: {}", tokenTitles);
-
             Account funding = new Account(request.getFundingAccountSecret(), request.getFundingAccountPublic());
-            return distributionAndBallotAccountOperation.create(funding, issuers);
+            String assetCode = generateAssetCode(request);
+
+            DistributionAndBallotAccountOperation.TransactionResult txResult = distributionAndBallotAccountOperation.create(funding, assetCode, request.getVotesCap());
+            return new BallotAndDistributionResult(txResult, assetCode);
         }, blockchainExecContext);
     }
 
@@ -103,7 +76,7 @@ public class VotingBlockchainOperations {
 
             String fundingAccountPublic = createVotingRequest.getFundingAccountPublic();
             long votesCap = createVotingRequest.getVotesCap();
-            if(fundingAccount.doesNotHaveEnoughBalanceForVotesCap(fundingAccountPublic, votesCap)) {
+            if (fundingAccount.doesNotHaveEnoughBalanceForVotesCap(fundingAccountPublic, votesCap)) {
                 String message = String.format("%s does not have enough balance for votes cap %d", loggableAccount, votesCap);
 
                 logger.warn("checkFundingAccountOf(): {}", message);
@@ -114,14 +87,14 @@ public class VotingBlockchainOperations {
         }, blockchainExecContext);
     }
 
-    private static List<String> generateUniqueAssetCodes(CreateVotingRequest request, long numsToCreate) {
-        Set<String> uniqueAssetCodes = new HashSet<>();
+    public static class BallotAndDistributionResult {
+        public final DistributionAndBallotAccountOperation.TransactionResult transactionResult;
+        public final String assetCode;
 
-        while (uniqueAssetCodes.size() != numsToCreate) {
-            uniqueAssetCodes.add(generateAssetCode(request));
+        public BallotAndDistributionResult(DistributionAndBallotAccountOperation.TransactionResult transactionResult, String assetCode) {
+            this.transactionResult = transactionResult;
+            this.assetCode = assetCode;
         }
-
-        return new ArrayList<>(uniqueAssetCodes);
     }
 
     private static String generateAssetCode(CreateVotingRequest request) {

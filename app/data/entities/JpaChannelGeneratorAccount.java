@@ -12,8 +12,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "voting_issuer_account")
-public class JpaVotingIssuerAccount {
+@Table(name = "voting_channel_generator_account")
+public class JpaChannelGeneratorAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -30,9 +30,6 @@ public class JpaVotingIssuerAccount {
     @Column(name = "account_public")
     @Lob
     private String accountPublic;
-
-    @Column(name = "asset_code", length = 20)
-    private String assetCode;
 
     @Column(name = "votes_cap")
     private Long votesCap;
@@ -70,14 +67,6 @@ public class JpaVotingIssuerAccount {
 
     public void setChannelAccountProgress(JpaChannelAccountProgress channelAccountProgress) {
         this.channelAccountProgress = channelAccountProgress;
-    }
-
-    public String getAssetCode() {
-        return assetCode;
-    }
-
-    public void setAssetCode(String assetCode) {
-        this.assetCode = assetCode;
     }
 
     public String getAccountPublic() {

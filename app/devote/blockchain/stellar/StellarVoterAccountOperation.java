@@ -16,6 +16,8 @@ import play.Logger;
 import java.io.IOException;
 import java.math.BigDecimal;
 
+import static devote.blockchain.stellar.StellarUtils.toAssetAmount;
+
 public class StellarVoterAccountOperation implements VoterAccountOperation {
     private StellarBlockchainConfiguration configuration;
 
@@ -52,10 +54,10 @@ public class StellarVoterAccountOperation implements VoterAccountOperation {
     }
 
     private void allowVoterToHaveVoteToken(Transaction.Builder txBuilder, CreateTransactionParams params) {
-        ChangeTrustAsset asset = StellarIssuerUtils.obtainsChangeTrustAssetFrom(params.issuer);
-        String allVoteTokensOfIssuer = StellarIssuerUtils.calcNumOfAllVoteTokensOf(params.issuer);
+        ChangeTrustAsset changeTrustAsset = getChangeTrustAssetFrom(params);
+        String limit = toAssetAmount(params.votesCap);
 
-        ChangeTrustOperation changeTrust = new ChangeTrustOperation.Builder(asset, allVoteTokensOfIssuer)
+        ChangeTrustOperation changeTrust = new ChangeTrustOperation.Builder(changeTrustAsset, limit)
                 .setSourceAccount(params.voterAccountPublic)
                 .build();
 
@@ -63,7 +65,7 @@ public class StellarVoterAccountOperation implements VoterAccountOperation {
     }
 
     private void sendTheTokenToVoter(Transaction.Builder txBuilder, CreateTransactionParams params) {
-        Asset asset = StellarIssuerUtils.obtainAssetFrom(params.issuer);
+        Asset asset = getAssetFrom(params);
 
         PaymentOperation payment = new PaymentOperation.Builder(params.voterAccountPublic, asset, UNIT_TOKEN_AMOUNT)
                 .setSourceAccount(params.distribution.publik)
@@ -87,5 +89,13 @@ public class StellarVoterAccountOperation implements VoterAccountOperation {
         BigDecimal one = new BigDecimal(1);
         BigDecimal divisor = new BigDecimal(10).pow(7);
         return one.divide(divisor).toString();
+    }
+
+    private static Asset getAssetFrom(CreateTransactionParams params) {
+        return Asset.create(null, params.assetCode, params.issuerAccountPublic);
+    }
+
+    private static ChangeTrustAsset getChangeTrustAssetFrom(CreateTransactionParams params) {
+        return ChangeTrustAsset.create(getAssetFrom(params));
     }
 }

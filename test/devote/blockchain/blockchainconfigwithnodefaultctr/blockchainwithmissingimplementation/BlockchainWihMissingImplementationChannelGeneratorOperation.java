@@ -1,18 +1,21 @@
 package devote.blockchain.blockchainconfigwithnodefaultctr.blockchainwithmissingimplementation;
 
 import devote.blockchain.api.BlockchainConfiguration;
-import devote.blockchain.api.IssuerAccountOperation;
+import devote.blockchain.api.ChannelGenerator;
+import devote.blockchain.api.ChannelGeneratorAccountOperation;
 import devote.blockchain.api.Account;
 
-public class BlockchainWihMissingImplementationIssuerOperation implements IssuerAccountOperation {
+import java.util.List;
+
+public class BlockchainWihMissingImplementationChannelGeneratorOperation implements ChannelGeneratorAccountOperation {
     @Override
     public void init(BlockchainConfiguration configuration) {
 
     }
 
     @Override
-    public Account create(long votesCap, Account funding) {
-        return new Account("42", "84");
+    public List<ChannelGenerator> create(long totalVotesCap, Account funding) {
+        return null;
     }
 
     @Override

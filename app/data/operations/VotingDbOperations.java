@@ -3,11 +3,11 @@ package data.operations;
 import data.entities.JpaVoting;
 import data.repositories.ChannelProgressRepository;
 import data.repositories.VotingRepository;
+import devote.blockchain.api.ChannelGenerator;
 import devote.blockchain.api.DistributionAndBallotAccountOperation;
-import devote.blockchain.api.Issuer;
-import requests.CreateVotingRequest;
 import executioncontexts.DatabaseExecutionContext;
 import play.Logger;
+import requests.CreateVotingRequest;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -47,18 +47,18 @@ public class VotingDbOperations {
         }, dbExecContext);
     }
 
-    public CompletionStage<Void> issuerAccountsCreated(Long votingId, List<Issuer> issuers) {
+    public CompletionStage<Void> channelGeneratorsCreated(Long votingId, List<ChannelGenerator> channelGenerators) {
         return runAsync(() -> {
-            logger.info("issuerAccountsCreated(): votingId = {}, accounts size = {}", votingId, issuers.size());
-            votingRepository.issuerAccountsCreated(votingId, issuers);
+            logger.info("channelGeneratorsCreated(): votingId = {}, accounts size = {}", votingId, channelGenerators.size());
+            votingRepository.channelGeneratorsCreated(votingId, channelGenerators);
             channelProgressRepository.issuersCreated(votingId);
         }, dbExecContext);
     }
 
-    public CompletionStage<Void> distributionAndBallotAccountsCreated(Long votingId, DistributionAndBallotAccountOperation.TransactionResult transactionResult) {
+    public CompletionStage<Void> distributionAndBallotAccountsCreated(Long votingId, DistributionAndBallotAccountOperation.TransactionResult txResult, String assetCode) {
         return runAsync(() -> {
             logger.info("distributionAndBallotAccountsCreated(): votingId = {}", votingId);
-            votingRepository.distributionAndBallotAccountsCreated(votingId, transactionResult);
+            votingRepository.distributionAndBallotAccountsCreated(votingId, txResult, assetCode);
         }, dbExecContext);
     }
 

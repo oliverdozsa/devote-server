@@ -6,7 +6,7 @@ import devote.blockchain.api.BlockchainOperation;
 import devote.blockchain.api.ChannelAccountOperation;
 import devote.blockchain.api.DistributionAndBallotAccountOperation;
 import devote.blockchain.api.FundingAccountOperation;
-import devote.blockchain.api.IssuerAccountOperation;
+import devote.blockchain.api.ChannelGeneratorAccountOperation;
 import devote.blockchain.api.VoterAccountOperation;
 import org.reflections.Reflections;
 import play.Logger;
@@ -26,8 +26,8 @@ public class BlockchainFactory {
         this.networkName = configuration.getNetworkName();
     }
 
-    public IssuerAccountOperation createIssuerAccountOperation() {
-        return createBlockchainOperation(IssuerAccountOperation.class);
+    public ChannelGeneratorAccountOperation createIssuerAccountOperation() {
+        return createBlockchainOperation(ChannelGeneratorAccountOperation.class);
     }
 
     public ChannelAccountOperation createChannelAccountOperation() {

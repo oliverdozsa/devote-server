@@ -1,7 +1,7 @@
 package services;
 
 import data.operations.VotingDbOperations;
-import devote.blockchain.api.Issuer;
+import devote.blockchain.api.ChannelGenerator;
 import devote.blockchain.operations.VotingBlockchainOperations;
 import ipfs.VotingIpfsOperations;
 import play.Logger;
@@ -42,11 +42,11 @@ public class VotingService {
                 .checkFundingAccountOf(request)
                 .thenCompose(v -> votingDbOperations.initialize(request))
                 .thenAccept(createdVotingData::setId)
-                .thenCompose(v -> votingBlockchainOperations.createIssuerAccounts(request))
-                .thenAccept(issuers -> createdVotingData.issuers = issuers)
-                .thenCompose(v -> votingDbOperations.issuerAccountsCreated(createdVotingData.id, createdVotingData.issuers))
-                .thenCompose(v -> votingBlockchainOperations.createDistributionAndBallotAccounts(request, createdVotingData.issuers))
-                .thenCompose(tr -> votingDbOperations.distributionAndBallotAccountsCreated(createdVotingData.id, tr))
+                .thenCompose(v -> votingBlockchainOperations.createChannelGeneratorAccounts(request))
+                .thenAccept(channelGenerators -> createdVotingData.channelGenerators = channelGenerators)
+                .thenCompose(v -> votingDbOperations.channelGeneratorsCreated(createdVotingData.id, createdVotingData.channelGenerators))
+                .thenCompose(v -> votingBlockchainOperations.createDistributionAndBallotAccounts(request))
+                .thenCompose(tr -> votingDbOperations.distributionAndBallotAccountsCreated(createdVotingData.id, tr.transactionResult, tr.assetCode))
                 .thenCompose(v -> votingIpfsOperations.saveVotingToIpfs(createdVotingData.id))
                 .thenCompose(cid -> votingDbOperations.votingSavedToIpfs(createdVotingData.id, cid))
                 .thenApply(v -> createdVotingData.encodedId);
@@ -62,7 +62,7 @@ public class VotingService {
 
     private static class CreatedVotingData {
         public Long id;
-        public List<Issuer> issuers;
+        public List<ChannelGenerator> channelGenerators;
         public String encodedId;
 
         public void setId(Long id) {

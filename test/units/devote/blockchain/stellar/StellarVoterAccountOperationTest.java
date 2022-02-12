@@ -1,7 +1,6 @@
 package units.devote.blockchain.stellar;
 
 import devote.blockchain.api.BlockchainException;
-import devote.blockchain.api.Issuer;
 import devote.blockchain.api.Account;
 import devote.blockchain.api.VoterAccountOperation;
 import devote.blockchain.stellar.StellarUtils;
@@ -9,6 +8,7 @@ import devote.blockchain.stellar.StellarVoterAccountOperation;
 import org.junit.Before;
 import org.junit.Test;
 import org.stellar.sdk.AccountRequiresMemoException;
+import org.stellar.sdk.KeyPair;
 
 import java.io.IOException;
 
@@ -63,17 +63,18 @@ public class StellarVoterAccountOperationTest {
         VoterAccountOperation.CreateTransactionParams params =
                 new VoterAccountOperation.CreateTransactionParams();
 
-        Account anIssuerAccount = StellarUtils.toAccount(org.stellar.sdk.KeyPair.random());
-        Issuer anIssuer = new Issuer(anIssuerAccount, 42, "ISSUER-1");
-        params.issuer = anIssuer;
+        params.issuerAccountPublic = KeyPair.random().getAccountId();
 
-        Account aChannelAccount = StellarUtils.toAccount(org.stellar.sdk.KeyPair.random());
+        Account aChannelAccount = StellarUtils.toAccount(KeyPair.random());
         params.channel = aChannelAccount;
 
-        params.voterAccountPublic = org.stellar.sdk.KeyPair.random().getAccountId();
+        params.voterAccountPublic = KeyPair.random().getAccountId();
 
-        Account aDistributionAccount = StellarUtils.toAccount(org.stellar.sdk.KeyPair.random());
+        Account aDistributionAccount = StellarUtils.toAccount(KeyPair.random());
         params.distribution = aDistributionAccount;
+
+        params.assetCode = "SOMECEDE";
+        params.votesCap = 42L;
 
         return params;
     }

@@ -4,7 +4,7 @@ import data.entities.JpaCommissionSession;
 import data.entities.JpaStoredTransaction;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
-import data.entities.JpaVotingIssuerAccount;
+import data.entities.JpaChannelGeneratorAccount;
 import data.repositories.CommissionRepository;
 import exceptions.InternalErrorException;
 import exceptions.NotFoundException;
@@ -108,11 +108,11 @@ public class EbeanCommissionRepository implements CommissionRepository {
     }
 
     @Override
-    public JpaVotingIssuerAccount selectAnIssuer(Long votingId) {
+    public JpaChannelGeneratorAccount selectAnIssuer(Long votingId) {
         logger.info("selectAnIssuer(): votingId = {}", votingId);
 
         assertEntityExists(ebeanServer, JpaVoting.class, votingId);
-        List<JpaVotingIssuerAccount> issuers = ebeanServer.createQuery(JpaVotingIssuerAccount.class)
+        List<JpaChannelGeneratorAccount> issuers = ebeanServer.createQuery(JpaChannelGeneratorAccount.class)
                 .where()
                 .eq("voting.id", votingId)
                 .findList();
@@ -122,7 +122,7 @@ public class EbeanCommissionRepository implements CommissionRepository {
         }
 
         int randomIssuerIndex = ThreadLocalRandom.current().nextInt(issuers.size());
-        JpaVotingIssuerAccount randomIssuer = issuers.get(randomIssuerIndex);
+        JpaChannelGeneratorAccount randomIssuer = issuers.get(randomIssuerIndex);
 
         logger.info("selectAnIssuer(): selected issuer: {}", randomIssuer.getId());
         return issuers.get(randomIssuerIndex);
@@ -199,7 +199,7 @@ public class EbeanCommissionRepository implements CommissionRepository {
         assertEntityExists(ebeanServer, JpaVoting.class, votingId);
         JpaVoting voting = ebeanServer.find(JpaVoting.class, votingId);
 
-        for (JpaVotingIssuerAccount issuer : voting.getIssuerAccounts()) {
+        for (JpaChannelGeneratorAccount issuer : voting.getChannelGeneratorAccounts()) {
             if (issuer.getChannelAccountProgress().getNumOfAccountsLeftToCreate() > 0) {
                 return false;
             }

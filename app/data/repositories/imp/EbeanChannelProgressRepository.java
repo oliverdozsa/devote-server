@@ -2,7 +2,7 @@ package data.repositories.imp;
 
 import data.entities.JpaChannelAccountProgress;
 import data.entities.JpaVoting;
-import data.entities.JpaVotingIssuerAccount;
+import data.entities.JpaChannelGeneratorAccount;
 import data.repositories.ChannelProgressRepository;
 import io.ebean.EbeanServer;
 import play.Logger;
@@ -52,13 +52,13 @@ public class EbeanChannelProgressRepository implements ChannelProgressRepository
     @Override
     public void issuersCreated(Long votingId) {
         JpaVoting voting = ebeanServer.find(JpaVoting.class, votingId);
-        List<JpaVotingIssuerAccount> issuers = voting.getIssuerAccounts();
+        List<JpaChannelGeneratorAccount> issuers = voting.getChannelGeneratorAccounts();
 
         logger.info("issuersCreated(): Total channel accounts to create: {}", voting.getVotesCap());
         logger.info("issuersCreated(): Creating {} channel progresses for voting with id = {}.",
                 issuers.size(), votingId);
         List<Long> votesCapOfIssuers = issuers.stream()
-                .map(JpaVotingIssuerAccount::getVotesCap)
+                .map(JpaChannelGeneratorAccount::getVotesCap)
                 .collect(Collectors.toList());
         logger.info("issuersCreated(): Number of channel accounts to create for issuers: {}", votesCapOfIssuers);
 
@@ -69,7 +69,7 @@ public class EbeanChannelProgressRepository implements ChannelProgressRepository
         progresses.forEach(ebeanServer::save);
     }
 
-    private JpaChannelAccountProgress fromIssuer(JpaVotingIssuerAccount issuer) {
+    private JpaChannelAccountProgress fromIssuer(JpaChannelGeneratorAccount issuer) {
         JpaChannelAccountProgress progress = new JpaChannelAccountProgress();
         progress.setIssuer(issuer);
         progress.setNumOfAccountsToCreate(issuer.getVotesCap());

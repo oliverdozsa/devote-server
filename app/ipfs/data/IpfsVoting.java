@@ -8,13 +8,14 @@ public class IpfsVoting {
     private String network;
     private Long votesCap;
     private List<IpfsPoll> polls;
-    private List<IpfsVotingIssuer> issuers;
     private Instant createdAt;
     private Instant encryptedUntil;
     private Instant startDate;
     private Instant endDate;
     private String distributionAccountId;
     private String ballotAccountId;
+    private String issuerAccountId;
+    private String assetCode;
     private String authorization;
     private String authOptionKeybase;
     private String visibility;
@@ -49,14 +50,6 @@ public class IpfsVoting {
 
     public void setPolls(List<IpfsPoll> polls) {
         this.polls = polls;
-    }
-
-    public List<IpfsVotingIssuer> getIssuers() {
-        return issuers;
-    }
-
-    public void setIssuers(List<IpfsVotingIssuer> issuers) {
-        this.issuers = issuers;
     }
 
     public Instant getCreatedAt() {
@@ -129,5 +122,21 @@ public class IpfsVoting {
 
     public void setVisibility(String visibility) {
         this.visibility = visibility;
+    }
+
+    public String getIssuerAccountId() {
+        return issuerAccountId;
+    }
+
+    public void setIssuerAccountId(String issuerAccountId) {
+        this.issuerAccountId = issuerAccountId;
+    }
+
+    public String getAssetCode() {
+        return assetCode;
+    }
+
+    public void setAssetCode(String assetCode) {
+        this.assetCode = assetCode;
     }
 }

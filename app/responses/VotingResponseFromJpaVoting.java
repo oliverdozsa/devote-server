@@ -2,7 +2,6 @@ package responses;
 
 import data.entities.Authorization;
 import data.entities.JpaVoting;
-import data.entities.JpaVotingIssuerAccount;
 import data.entities.JpaVotingPoll;
 import data.entities.JpaVotingPollOption;
 
@@ -24,7 +23,6 @@ public class VotingResponseFromJpaVoting {
         votingResponse.setTitle(jpaVoting.getTitle());
         votingResponse.setNetwork(jpaVoting.getNetwork());
         votingResponse.setVotesCap(jpaVoting.getVotesCap());
-        setIssuers(votingResponse, jpaVoting);
         votingResponse.setCreatedAt(jpaVoting.getCreatedAt());
         votingResponse.setEncryptedUntil(jpaVoting.getEncryptedUntil());
         votingResponse.setStartDate(jpaVoting.getStartDate());
@@ -33,23 +31,8 @@ public class VotingResponseFromJpaVoting {
         votingResponse.setAuthorization(jpaVoting.getAuthorization().name());
         setAuthOptionKeybase(votingResponse, jpaVoting);
         votingResponse.setVisibility(jpaVoting.getVisibility().name());
-    }
-
-    private void setIssuers(VotingResponse votingResponse, JpaVoting jpaVoting) {
-        List<VotingIssuerResponse> votingResponseIssuers = jpaVoting.getIssuerAccounts().stream()
-                .map(this::toVotingResponseIssuer)
-                .collect(Collectors.toList());
-        votingResponse.setIssuers(votingResponseIssuers);
-    }
-
-    private VotingIssuerResponse toVotingResponseIssuer(JpaVotingIssuerAccount jpaVotingIssuer) {
-        String issuerPublic = jpaVotingIssuer.getAccountPublic();
-
-        VotingIssuerResponse votingIssuerResponse = new VotingIssuerResponse();
-        votingIssuerResponse.setIssuerAccountId(issuerPublic);
-        votingIssuerResponse.setAssetCode(jpaVotingIssuer.getAssetCode());
-
-        return votingIssuerResponse;
+        votingResponse.setIssuerAccountId(jpaVoting.getIssuerAccountPublic());
+        votingResponse.setAssetCode(jpaVoting.getAssetCode());
     }
 
     private void setDistributionAndBallotAccountId(VotingResponse ipfsVoting, JpaVoting jpaVoting) {

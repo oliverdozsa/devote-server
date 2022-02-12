@@ -2,7 +2,8 @@ package units.devote.blockchain.stellar;
 
 import devote.blockchain.api.Account;
 import devote.blockchain.api.BlockchainException;
-import devote.blockchain.stellar.StellarIssuerAccountOperation;
+import devote.blockchain.api.ChannelGenerator;
+import devote.blockchain.stellar.StellarChannelGeneratorAccountOperation;
 import org.junit.Before;
 import org.junit.Test;
 import org.stellar.sdk.AccountRequiresMemoException;
@@ -10,6 +11,7 @@ import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Transaction;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -18,16 +20,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class StellarIssuerAccountOperationTest {
+public class StellarChannelGeneratorAccountOperationTest {
     private StellarMock stellarMock;
 
-    private StellarIssuerAccountOperation operation;
+    private StellarChannelGeneratorAccountOperation operation;
 
     @Before
     public void setup() throws IOException, AccountRequiresMemoException {
         stellarMock = new StellarMock();
 
-        operation = new StellarIssuerAccountOperation();
+        operation = new StellarChannelGeneratorAccountOperation();
         operation.init(stellarMock.configuration);
     }
 
@@ -36,10 +38,11 @@ public class StellarIssuerAccountOperationTest {
         // Given
         // When
         KeyPair testKeyPair = KeyPair.random();
-        Account account = operation.create(42L, new Account(new String(testKeyPair.getSecretSeed()), testKeyPair.getAccountId()));
+        List<ChannelGenerator> channelGenerators = operation
+                .create(42L, new Account(new String(testKeyPair.getSecretSeed()), testKeyPair.getAccountId()));
 
         // Then
-        assertThat(account, notNullValue());
+        assertThat(channelGenerators, notNullValue());
         verify(stellarMock.server).submitTransaction(any(Transaction.class));
     }
 

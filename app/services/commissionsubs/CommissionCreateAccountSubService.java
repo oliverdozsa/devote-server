@@ -2,10 +2,9 @@ package services.commissionsubs;
 
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
-import data.entities.JpaVotingIssuerAccount;
+import data.entities.JpaChannelGeneratorAccount;
 import data.operations.CommissionDbOperations;
 import data.operations.VotingDbOperations;
-import devote.blockchain.api.Issuer;
 import devote.blockchain.api.Account;
 import devote.blockchain.api.VoterAccountOperation;
 import devote.blockchain.operations.CommissionBlockchainOperations;
@@ -57,7 +56,6 @@ public class CommissionCreateAccountSubService {
                 .thenCompose(v -> checkIfAlreadyRequestedAccount(request))
                 .thenCompose(v -> consumeChannel(votingId, accountCreationData))
                 .thenCompose(v -> retrieveVoting(votingId, accountCreationData))
-                .thenCompose(v -> selectAnIssuer(votingId, accountCreationData))
                 .thenApply(v -> prepareForBlockchainOperation(accountCreationData))
                 .thenCompose(c -> commissionBlockchainOperations.createTransaction(accountCreationData.voting.getNetwork(), c))
                 .thenCompose(tx -> storeTransaction(accountCreationData.voting.getId(), request.getRevealedSignatureBase64(), tx))
@@ -106,14 +104,11 @@ public class CommissionCreateAccountSubService {
                 .thenAccept(v -> collectedData.voting = v);
     }
 
-    private CompletionStage<Void> selectAnIssuer(Long votingId, AccountCreationCollectedData collectedData) {
-        return commissionDbOperations.selectAnIssuer(votingId)
-                .thenAccept(i -> collectedData.issuer = i);
-    }
-
     private VoterAccountOperation.CreateTransactionParams prepareForBlockchainOperation(AccountCreationCollectedData accountCreationData) {
         VoterAccountOperation.CreateTransactionParams params = new VoterAccountOperation.CreateTransactionParams();
-        params.issuer = toIssuer(accountCreationData.issuer);
+        params.issuerAccountPublic = accountCreationData.voting.getIssuerAccountPublic();
+        params.assetCode = accountCreationData.voting.getAssetCode();
+        params.votesCap = accountCreationData.voting.getVotesCap();
         params.channel = new Account(
                 accountCreationData.channelAccount.getAccountSecret(), accountCreationData.channelAccount.getAccountPublic()
         );
@@ -137,11 +132,6 @@ public class CommissionCreateAccountSubService {
         return response;
     }
 
-    private static Issuer toIssuer(JpaVotingIssuerAccount jpaVotingIssuer) {
-        Account account = new Account(jpaVotingIssuer.getAccountSecret(), jpaVotingIssuer.getAccountPublic());
-        return new Issuer(account, jpaVotingIssuer.getVotesCap(), jpaVotingIssuer.getAssetCode());
-    }
-
     private static class ParsedMessage {
         public final String votingId;
         public final String voterPublic;
@@ -156,7 +146,6 @@ public class CommissionCreateAccountSubService {
     private static class AccountCreationCollectedData {
         public JpaVotingChannelAccount channelAccount;
         public JpaVoting voting;
-        public JpaVotingIssuerAccount issuer;
         public String voterPublic;
     }
 }

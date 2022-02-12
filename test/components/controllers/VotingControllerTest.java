@@ -83,7 +83,7 @@ public class VotingControllerTest {
         assertThat(networkOf(getByLocationResult), equalTo("mockblockchain"));
         assertIssuerAccountsCreatedOnBlockchain(votingId);
         assertDistributionAndBallotAccountsCreatedOnBlockchain(votingId);
-        assertVoteTokensAreSavedInDb(votingId);
+        assertVoteTokenIsSavedInDb(votingId);
         assertVotingEncryptionSavedInDb(votingId);
         assertVotingStartEndDateSavedInDb(votingId);
         assertAuthorizationEmailsSavedInDb(votingId, "john@mail.com", "doe@where.de", "some@one.com");

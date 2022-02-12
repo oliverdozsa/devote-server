@@ -2,7 +2,8 @@ package devote.blockchain.stellar;
 
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.BlockchainException;
-import devote.blockchain.api.IssuerAccountOperation;
+import devote.blockchain.api.ChannelGenerator;
+import devote.blockchain.api.ChannelGeneratorAccountOperation;
 import devote.blockchain.api.Account;
 import org.stellar.sdk.AccountRequiresMemoException;
 import org.stellar.sdk.CreateAccountOperation;
@@ -14,14 +15,16 @@ import play.Logger;
 import utils.StringUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static devote.blockchain.stellar.StellarUtils.fromAccount;
 import static devote.blockchain.stellar.StellarUtils.toAccount;
 
-public class StellarIssuerAccountOperation implements IssuerAccountOperation {
+public class StellarChannelGeneratorAccountOperation implements ChannelGeneratorAccountOperation {
     private StellarBlockchainConfiguration configuration;
 
-    private static final Logger.ALogger logger = Logger.of(StellarIssuerAccountOperation.class);
+    private static final Logger.ALogger logger = Logger.of(StellarChannelGeneratorAccountOperation.class);
 
 
     @Override
@@ -30,13 +33,26 @@ public class StellarIssuerAccountOperation implements IssuerAccountOperation {
     }
 
     @Override
-    public Account create(long votesCap, Account funding) {
+    public List<ChannelGenerator> create(long totalVotesCap, Account funding) {
         try {
+            long numOfAccountsNeeded = calcNumOfAccountsNeeded(totalVotesCap);
+            long votesCapPerIssuer = totalVotesCap / numOfAccountsNeeded;
+            long votesCapRemainder = totalVotesCap % numOfAccountsNeeded;
+
+            List<ChannelGenerator> channelGenerators = new ArrayList<>();
+
             Transaction.Builder txBuilder = prepareTransaction(funding);
-            KeyPair issuer = prepareIssuerCreationOn(txBuilder, votesCap);
+            for(int i = 0; i < numOfAccountsNeeded - 1; i++) {
+                KeyPair channelGenKeyPair = prepareAccountCreationOn(txBuilder, votesCapPerIssuer);
+                channelGenerators.add(toChannelGenerator(channelGenKeyPair, votesCapPerIssuer));
+            }
+
+            KeyPair channelGenKeyPair = prepareAccountCreationOn(txBuilder, votesCapPerIssuer + votesCapRemainder);
+            channelGenerators.add(toChannelGenerator(channelGenKeyPair, votesCapPerIssuer + votesCapRemainder));
+
             submitTransaction(txBuilder, funding);
 
-            return toAccount(issuer);
+            return channelGenerators;
         } catch (IOException | AccountRequiresMemoException e) {
             logger.warn("[STELLAR]: Failed to create issuer account!", e);
             throw new BlockchainException("[STELLAR]: Failed to create issuer account!", e);
@@ -59,22 +75,23 @@ public class StellarIssuerAccountOperation implements IssuerAccountOperation {
         return StellarUtils.createTransactionBuilder(server, network, funding.publik);
     }
 
-    private org.stellar.sdk.KeyPair prepareIssuerCreationOn(Transaction.Builder txBuilder, long votesCapForIssuer) {
-        KeyPair issuer = KeyPair.random();
-        String startingBalance = calcStartingBalanceFor(votesCapForIssuer);
-        CreateAccountOperation createAccount = new CreateAccountOperation.Builder(issuer.getAccountId(), startingBalance)
+    private KeyPair prepareAccountCreationOn(Transaction.Builder txBuilder, long votesCapPerAccount) {
+        KeyPair newAccount = KeyPair.random();
+        String startingBalance = calcStartingBalanceFor(votesCapPerAccount);
+        CreateAccountOperation createAccount = new CreateAccountOperation.Builder(newAccount.getAccountId(), startingBalance)
                 .build();
         txBuilder.addOperation(createAccount);
 
-        logger.info("[STELLAR]: About to create issuer account: {} with starting balance: {}",
-                StringUtils.redactWithEllipsis(issuer.getAccountId(), 5),
-                startingBalance);
+        logger.info("[STELLAR]: About to create channel generator account: {} with starting balance: {}",
+                StringUtils.redactWithEllipsis(newAccount.getAccountId(), 5),
+                startingBalance
+        );
 
-        return issuer;
+        return newAccount;
     }
 
-    private String calcStartingBalanceFor(long votesCapPerIssuer) {
-        return Long.toString((2 * votesCapPerIssuer) + 10);
+    private String calcStartingBalanceFor(long votesCapPerAccount) {
+        return Long.toString((2 * votesCapPerAccount) + 10);
     }
 
     private void submitTransaction(Transaction.Builder txBuilder, Account fundingAccount) throws AccountRequiresMemoException, IOException {
@@ -85,5 +102,9 @@ public class StellarIssuerAccountOperation implements IssuerAccountOperation {
 
         Server server = configuration.getServer();
         StellarSubmitTransaction.submit(transaction, server);
+    }
+
+    private ChannelGenerator toChannelGenerator(KeyPair keyPair, long votesCapPerAccount) {
+        return new ChannelGenerator(toAccount(keyPair), votesCapPerAccount);
     }
 }

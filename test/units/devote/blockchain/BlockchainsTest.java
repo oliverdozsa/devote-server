@@ -4,8 +4,8 @@ import com.typesafe.config.Config;
 import devote.blockchain.BlockchainFactory;
 import devote.blockchain.Blockchains;
 import devote.blockchain.api.BlockchainException;
-import devote.blockchain.api.IssuerAccountOperation;
-import devote.blockchain.mockblockchain.MockBlockchainIssuerAccountOperation;
+import devote.blockchain.api.ChannelGeneratorAccountOperation;
+import devote.blockchain.mockblockchain.MockBlockchainChannelGeneratorAccountOperation;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -40,10 +40,10 @@ public class BlockchainsTest {
         // Then
         assertThat(factoryForMockBlockchain, notNullValue());
 
-        IssuerAccountOperation issuerAccountOperation = factoryForMockBlockchain.createIssuerAccountOperation();
-        assertThat(issuerAccountOperation, instanceOf(MockBlockchainIssuerAccountOperation.class));
+        ChannelGeneratorAccountOperation channelGeneratorAccountOperation = factoryForMockBlockchain.createIssuerAccountOperation();
+        assertThat(channelGeneratorAccountOperation, instanceOf(MockBlockchainChannelGeneratorAccountOperation.class));
 
-        MockBlockchainIssuerAccountOperation mockIssuerAccount = (MockBlockchainIssuerAccountOperation) factoryForMockBlockchain.createIssuerAccountOperation();
+        MockBlockchainChannelGeneratorAccountOperation mockIssuerAccount = (MockBlockchainChannelGeneratorAccountOperation) factoryForMockBlockchain.createIssuerAccountOperation();
         assertBlockchainConfigInitCalled(mockIssuerAccount);
         assertTrue(mockIssuerAccount.isInitCalled());
     }
@@ -83,7 +83,7 @@ public class BlockchainsTest {
         assertThat(exception.getMessage(), equalTo("Not found blockchain factory for network: blockchain_with_missing_implementation"));
     }
 
-    private void assertBlockchainConfigInitCalled(MockBlockchainIssuerAccountOperation mockIssuerAccount) {
+    private void assertBlockchainConfigInitCalled(MockBlockchainChannelGeneratorAccountOperation mockIssuerAccount) {
         assertTrue(mockIssuerAccount.getConfig().isInitCalled());
     }
 }

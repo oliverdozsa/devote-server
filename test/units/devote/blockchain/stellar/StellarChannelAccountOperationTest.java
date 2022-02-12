@@ -2,6 +2,7 @@ package units.devote.blockchain.stellar;
 
 import devote.blockchain.api.BlockchainException;
 import devote.blockchain.api.Account;
+import devote.blockchain.api.ChannelGenerator;
 import devote.blockchain.stellar.StellarChannelAccountOperation;
 import devote.blockchain.stellar.StellarUtils;
 import org.junit.Before;
@@ -10,6 +11,7 @@ import org.stellar.sdk.AccountRequiresMemoException;
 import org.stellar.sdk.Transaction;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -34,25 +36,27 @@ public class StellarChannelAccountOperationTest {
     @Test
     public void testCreate() throws AccountRequiresMemoException, IOException {
         // Given
-        Account someIssuerAccount = StellarUtils.toAccount(org.stellar.sdk.KeyPair.random());
+        Account someChannelGenAccount = StellarUtils.toAccount(org.stellar.sdk.KeyPair.random());
 
         // When
-        Account channelAccount = operation.create(42, someIssuerAccount);
+        ChannelGenerator channelGenerator = new ChannelGenerator(someChannelGenAccount, 42);
+        List<Account> channelAccounts = operation.create(channelGenerator, 84);
 
         // Then
-        assertThat(channelAccount, notNullValue());
+        assertThat(channelAccounts, notNullValue());
         verify(stellarMock.server).submitTransaction(any(Transaction.class));
     }
 
     @Test
     public void testCreateWithFailure() throws AccountRequiresMemoException, IOException {
         // Given
-        Account someIssuerAccount = StellarUtils.toAccount(org.stellar.sdk.KeyPair.random());
+        Account someChannelGenAccount = StellarUtils.toAccount(org.stellar.sdk.KeyPair.random());
         when(stellarMock.server.submitTransaction(any(Transaction.class))).thenThrow(new IOException("Some IO error!"));
 
         // When
+        ChannelGenerator channelGenerator = new ChannelGenerator(someChannelGenAccount, 42);
         BlockchainException exception =
-                assertThrows(BlockchainException.class, () -> operation.create(42, someIssuerAccount));
+                assertThrows(BlockchainException.class, () -> operation.create(channelGenerator, 84));
 
         // Then
         assertThat(exception.getMessage(), equalTo("[STELLAR]: Failed to create channel account!"));

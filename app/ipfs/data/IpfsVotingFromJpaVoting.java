@@ -2,7 +2,7 @@ package ipfs.data;
 
 import data.entities.Authorization;
 import data.entities.JpaVoting;
-import data.entities.JpaVotingIssuerAccount;
+import data.entities.JpaChannelGeneratorAccount;
 import data.entities.JpaVotingPoll;
 import data.entities.JpaVotingPollOption;
 
@@ -23,7 +23,6 @@ public class IpfsVotingFromJpaVoting {
         ipfsVoting.setTitle(jpaVoting.getTitle());
         ipfsVoting.setNetwork(jpaVoting.getNetwork());
         ipfsVoting.setVotesCap(jpaVoting.getVotesCap());
-        setIssuers(ipfsVoting, jpaVoting);
         ipfsVoting.setCreatedAt(jpaVoting.getCreatedAt());
         ipfsVoting.setEncryptedUntil(jpaVoting.getEncryptedUntil());
         ipfsVoting.setStartDate(jpaVoting.getStartDate());
@@ -32,23 +31,8 @@ public class IpfsVotingFromJpaVoting {
         ipfsVoting.setAuthorization(jpaVoting.getAuthorization().name());
         setAuthOptionKeybase(ipfsVoting, jpaVoting);
         ipfsVoting.setVisibility(jpaVoting.getVisibility().name());
-    }
-
-    private void setIssuers(IpfsVoting ipfsVoting, JpaVoting jpaVoting) {
-        List<IpfsVotingIssuer> ipfsVotingIssuers = jpaVoting.getIssuerAccounts().stream()
-                .map(this::toIpfsVotingIssuer)
-                .collect(Collectors.toList());
-        ipfsVoting.setIssuers(ipfsVotingIssuers);
-    }
-
-    private IpfsVotingIssuer toIpfsVotingIssuer(JpaVotingIssuerAccount jpaVotingIssuer) {
-        String issuerPublic = jpaVotingIssuer.getAccountPublic();
-
-        IpfsVotingIssuer ipfsVotingIssuer = new IpfsVotingIssuer();
-        ipfsVotingIssuer.setIssuerAccountId(issuerPublic);
-        ipfsVotingIssuer.setAssetCode(jpaVotingIssuer.getAssetCode());
-
-        return ipfsVotingIssuer;
+        ipfsVoting.setIssuerAccountId(jpaVoting.getIssuerAccountPublic());
+        ipfsVoting.setAssetCode(jpaVoting.getAssetCode());
     }
 
     private void setDistributionAndBallotAccountId(IpfsVoting ipfsVoting, JpaVoting jpaVoting) {

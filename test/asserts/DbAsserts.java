@@ -6,7 +6,7 @@ import data.entities.JpaStoredTransaction;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingAuthorizationEmail;
 import data.entities.JpaVotingChannelAccount;
-import data.entities.JpaVotingIssuerAccount;
+import data.entities.JpaChannelGeneratorAccount;
 import data.entities.JpaVotingPoll;
 import data.entities.JpaVotingPollOption;
 import io.ebean.Ebean;
@@ -38,10 +38,11 @@ public class DbAsserts {
         assertThat("total accounts created", channelAccountsOf(votingId), hasSize(totalChannelAccounts));
     }
 
-    public static void assertVoteTokensAreSavedInDb(Long votingId) {
-        List<String> voteTokens = voteTokensOf(votingId);
-        assertThat(voteTokens, notNullValue());
-        assertThat(voteTokens, hasSize(greaterThan(0)));
+    public static void assertVoteTokenIsSavedInDb(Long votingId) {
+        JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
+
+        assertThat(voting.getAssetCode(), notNullValue());
+        assertThat(voting.getAssetCode().length(), greaterThan(0));
     }
 
     public static void assertVotingEncryptionSavedInDb(Long votingId) {
@@ -102,21 +103,14 @@ public class DbAsserts {
 
     private static List<JpaChannelAccountProgress> channelProgressesOf(Long votingId) {
         JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
-        return voting.getIssuerAccounts().stream()
-                .map(JpaVotingIssuerAccount::getChannelAccountProgress)
+        return voting.getChannelGeneratorAccounts().stream()
+                .map(JpaChannelGeneratorAccount::getChannelAccountProgress)
                 .collect(Collectors.toList());
     }
 
     private static List<JpaVotingChannelAccount> channelAccountsOf(Long votingId) {
         JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
         return voting.getChannelAccounts();
-    }
-
-    private static List<String> voteTokensOf(Long votingId) {
-        JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
-        return voting.getIssuerAccounts().stream()
-                .map(JpaVotingIssuerAccount::getAssetCode)
-                .collect(Collectors.toList());
     }
 
     private static List<String> toEmailsList(List<JpaVotingAuthorizationEmail> votingAuthorizationEmails) {

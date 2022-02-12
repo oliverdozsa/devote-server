@@ -1,13 +1,11 @@
 package devote.blockchain.api;
 
-public class Issuer {
+public class ChannelGenerator {
     public final Account account;
     public final long votesCap;
-    public final String assetCode;
 
-    public Issuer(Account account, long votesCap, String assetCode) {
+    public ChannelGenerator(Account account, long votesCap) {
         this.account = account;
         this.votesCap = votesCap;
-        this.assetCode = assetCode;
     }
 }

@@ -9,6 +9,7 @@ import org.stellar.sdk.responses.AccountResponse;
 import org.stellar.sdk.responses.SubmitTransactionResponse;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,6 +43,12 @@ public class StellarUtils {
 
     public static Account toAccount(KeyPair keyPair) {
         return new Account(new String(keyPair.getSecretSeed()), keyPair.getAccountId());
+    }
+
+    public static String toAssetAmount(long value) {
+        BigDecimal votesCapBigDec = new BigDecimal(value);
+        BigDecimal divisor = new BigDecimal(10).pow(7);
+        return votesCapBigDec.divide(divisor).toString();
     }
 
     private StellarUtils() {

@@ -1,7 +1,9 @@
 package devote.blockchain.api;
 
+import java.util.List;
+
 public interface ChannelAccountOperation extends BlockchainOperation {
     int maxNumOfAccountsToCreateInOneBatch();
 
-    Account create(long votesCap, Account issuerAccount);
+    List<Account> create(ChannelGenerator channelGenerator, int numOfAccountsToCreate);
 }

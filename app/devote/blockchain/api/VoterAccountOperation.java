@@ -6,7 +6,9 @@ public interface VoterAccountOperation extends BlockchainOperation {
     class CreateTransactionParams {
         public Account channel;
         public Account distribution;
-        public Issuer issuer;
+        public String issuerAccountPublic;
+        public String assetCode;
+        public long votesCap;
         public String voterAccountPublic;
     }
 }
