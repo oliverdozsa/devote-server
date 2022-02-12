@@ -16,7 +16,7 @@ public class MockBlockchainDistributionAndBallotAccountOperation implements Dist
     }
 
     @Override
-    public TransactionResult create(List<Issuer> issuers) {
+    public TransactionResult create(Account funding, List<Issuer> issuers) {
         currentDistributionAccountId++;
         currentBallotAccountId++;
 

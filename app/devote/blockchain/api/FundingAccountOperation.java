@@ -1,5 +1,5 @@
 package devote.blockchain.api;
 
 public interface FundingAccountOperation extends BlockchainOperation {
-    boolean doesAccountNotHaveEnoughBalanceForVotesCap(String accountPublic, long votesCap);
+    boolean doesNotHaveEnoughBalanceForVotesCap(String accountPublic, long votesCap);
 }

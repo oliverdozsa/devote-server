@@ -9,12 +9,14 @@ import devote.blockchain.stellar.StellarUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.stellar.sdk.AccountRequiresMemoException;
+import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Transaction;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import static devote.blockchain.stellar.StellarUtils.toAccount;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThrows;
@@ -41,7 +43,8 @@ public class StellarDistributionAndBallotAccountOperationTest {
         List<Issuer> issuers = createIssuers();
 
         // When
-        DistributionAndBallotAccountOperation.TransactionResult transactionResult = operation.create(issuers);
+        Account someFunding = toAccount(KeyPair.random());
+        DistributionAndBallotAccountOperation.TransactionResult transactionResult = operation.create(someFunding, issuers);
 
         // Then
         assertThat(transactionResult, notNullValue());
@@ -56,7 +59,8 @@ public class StellarDistributionAndBallotAccountOperationTest {
 
         // When
         // Then
-        BlockchainException exception = assertThrows(BlockchainException.class, () -> operation.create(issuers));
+        Account someFunding = toAccount(KeyPair.random());
+        BlockchainException exception = assertThrows(BlockchainException.class, () -> operation.create(someFunding, issuers));
 
 
         // Then
@@ -65,10 +69,10 @@ public class StellarDistributionAndBallotAccountOperationTest {
     }
 
     private static List<Issuer> createIssuers() {
-        Account anIssuerAccount = StellarUtils.toAccount(org.stellar.sdk.KeyPair.random());
+        Account anIssuerAccount = toAccount(org.stellar.sdk.KeyPair.random());
         Issuer anIssuer = new Issuer(anIssuerAccount, 42, "ISSUER-1");
 
-        Account anotherIssuerAccount = StellarUtils.toAccount(org.stellar.sdk.KeyPair.random());
+        Account anotherIssuerAccount = toAccount(org.stellar.sdk.KeyPair.random());
         Issuer anotherIssuer = new Issuer(anotherIssuerAccount, 42, "ISSUER-2");
 
         return Arrays.asList(anIssuer, anotherIssuer);

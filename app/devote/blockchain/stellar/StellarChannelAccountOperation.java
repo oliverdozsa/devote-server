@@ -15,6 +15,8 @@ import utils.StringUtils;
 
 import java.io.IOException;
 
+import static devote.blockchain.stellar.StellarUtils.fromAccount;
+
 public class StellarChannelAccountOperation implements ChannelAccountOperation {
     private StellarBlockchainConfiguration configuration;
 
@@ -36,7 +38,7 @@ public class StellarChannelAccountOperation implements ChannelAccountOperation {
     @Override
     public Account create(long votesCap, Account issuerAccount) {
         try {
-            KeyPair issuer = StellarUtils.fromAccount(issuerAccount);
+            KeyPair issuer = fromAccount(issuerAccount);
 
             Transaction.Builder txBuilder = prepareTransaction(issuer.getAccountId());
             KeyPair channel = prepareChannelCreationOn(txBuilder);
@@ -60,7 +62,6 @@ public class StellarChannelAccountOperation implements ChannelAccountOperation {
         KeyPair channel = KeyPair.random();
         CreateAccountOperation createAccount = new CreateAccountOperation.Builder(channel.getAccountId(), STARTING_BALANCE_STR)
                 .build();
-
         txBuilder.addOperation(createAccount);
 
         logger.info("[STELLAR]: Attempting to create channel account: {} with starting balance: {}",
@@ -70,9 +71,11 @@ public class StellarChannelAccountOperation implements ChannelAccountOperation {
         return channel;
     }
 
-    private void submitTransaction(Transaction.Builder txBuilder, KeyPair issuerKeyPair) throws AccountRequiresMemoException, IOException {
+    private void submitTransaction(Transaction.Builder txBuilder, KeyPair issuer) throws AccountRequiresMemoException, IOException {
         Transaction transaction = txBuilder.build();
-        transaction.sign(issuerKeyPair);
+        logger.info("channel envelope xdr: {}", transaction.toEnvelopeXdrBase64());
+
+        transaction.sign(issuer);
 
         Server server = configuration.getServer();
         StellarSubmitTransaction.submit(transaction, server);

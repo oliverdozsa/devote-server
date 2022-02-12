@@ -31,7 +31,9 @@ class StellarDistributionAccountOperation {
         KeyPair distribution = prepareAccountCreation();
         allowToHaveVoteTokenOfIssuers(distribution);
         sendAllVoteTokensOfIssuersTo(distribution);
-        lockOutIssuers();
+
+        // TODO: Lock issuers only when all channel accounts are created OR one token issuer, and multiple channel issuer
+        // lockOutIssuers();
 
         return distribution;
     }

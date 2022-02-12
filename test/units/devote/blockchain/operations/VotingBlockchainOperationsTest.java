@@ -50,6 +50,9 @@ public class VotingBlockchainOperationsTest {
     @Captor
     private ArgumentCaptor<List<Issuer>> issuersCaptor;
 
+    @Captor
+    private ArgumentCaptor<Account> fundingCaptor;
+
     private VotingBlockchainOperations operations;
 
     @Before
@@ -69,7 +72,7 @@ public class VotingBlockchainOperationsTest {
                 new Account("sB", "pB"),
                 new Account("sC", "pC")
         );
-        when(mockDistributionAndBallotAccountOperation.create(anyList())).thenReturn(
+        when(mockDistributionAndBallotAccountOperation.create(any(Account.class), anyList())).thenReturn(
                 new DistributionAndBallotAccountOperation.TransactionResult(new Account("d", "d"), new Account("b", "b"))
         );
     }
@@ -115,10 +118,10 @@ public class VotingBlockchainOperationsTest {
         );
 
         CompletionStage<DistributionAndBallotAccountOperation.TransactionResult> resultCompletionStage =
-                operations.createDistributionAndBallotAccounts(request.getNetwork(), issuers);
+                operations.createDistributionAndBallotAccounts(request, issuers);
         resultCompletionStage.toCompletableFuture().get();
 
-        Mockito.verify(mockDistributionAndBallotAccountOperation).create(issuersCaptor.capture());
+        Mockito.verify(mockDistributionAndBallotAccountOperation).create(fundingCaptor.capture(), issuersCaptor.capture());
 
         List<Issuer> capturedIssuers = issuersCaptor.getValue();
         capturedIssuers.forEach(issuer -> assertThat(issuer.assetCode, Matchers.startsWith("SOMEID")));
@@ -146,10 +149,10 @@ public class VotingBlockchainOperationsTest {
         );
 
         CompletionStage<DistributionAndBallotAccountOperation.TransactionResult> resultCompletionStage =
-                operations.createDistributionAndBallotAccounts(request.getNetwork(), issuers);
+                operations.createDistributionAndBallotAccounts(request, issuers);
         resultCompletionStage.toCompletableFuture().get();
 
-        Mockito.verify(mockDistributionAndBallotAccountOperation).create(issuersCaptor.capture());
+        Mockito.verify(mockDistributionAndBallotAccountOperation).create(fundingCaptor.capture(), issuersCaptor.capture());
 
         List<Issuer> capturedIssuers = issuersCaptor.getValue();
         capturedIssuers.forEach(i -> assertThat(i.assetCode, Matchers.startsWith("SOMEID")));

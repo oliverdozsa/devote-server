@@ -10,7 +10,7 @@ public class MockBlockchainFundingAccountOperation implements FundingAccountOper
     }
 
     @Override
-    public boolean doesAccountNotHaveEnoughBalanceForVotesCap(String accountPublic, long votesCap) {
+    public boolean doesNotHaveEnoughBalanceForVotesCap(String accountPublic, long votesCap) {
         return false;
     }
 }

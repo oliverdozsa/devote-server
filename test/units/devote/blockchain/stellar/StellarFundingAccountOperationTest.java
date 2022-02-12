@@ -39,16 +39,16 @@ public class StellarFundingAccountOperationTest {
 
         when(stellarMock.server.accounts().account("someFundingAccount")).thenReturn(mockFundingAccount);
         when(mockFundingBalance.getAssetType()).thenReturn("native");
-        when(mockFundingBalance.getBalance()).thenReturn("84");
+        when(mockFundingBalance.getBalance()).thenReturn("168");
 
         when(mockFundingAccount.getBalances()).thenReturn(new AccountResponse.Balance[]{mockFundingBalance});
     }
 
     @Test
-    public void testHasEnoughBalance() throws IOException {
+    public void testHasEnoughBalance() {
         // Given
         // When
-        boolean doesNotHaveEnoughBalance = operation.doesAccountNotHaveEnoughBalanceForVotesCap("someFundingAccount", 21);
+        boolean doesNotHaveEnoughBalance = operation.doesNotHaveEnoughBalanceForVotesCap("someFundingAccount", 21);
 
         // Then
         assertThat(doesNotHaveEnoughBalance, is(false));
@@ -60,7 +60,7 @@ public class StellarFundingAccountOperationTest {
         when(mockFundingBalance.getBalance()).thenReturn("42");
 
         // When
-        boolean doesNotHaveEnoughBalance = operation.doesAccountNotHaveEnoughBalanceForVotesCap("someFundingAccount", 21);
+        boolean doesNotHaveEnoughBalance = operation.doesNotHaveEnoughBalanceForVotesCap("someFundingAccount", 21);
 
         // Then
         assertThat(doesNotHaveEnoughBalance, is(true));
@@ -75,7 +75,7 @@ public class StellarFundingAccountOperationTest {
         // Then
         BlockchainException exception = assertThrows(
                 BlockchainException.class,
-                () -> operation.doesAccountNotHaveEnoughBalanceForVotesCap("someFundingAccount", 21));
+                () -> operation.doesNotHaveEnoughBalanceForVotesCap("someFundingAccount", 21));
 
         assertThat(exception.getMessage(), equalTo("Could not find xlm balance!"));
     }
@@ -89,7 +89,7 @@ public class StellarFundingAccountOperationTest {
         // Then
         BlockchainException exception = assertThrows(
                 BlockchainException.class,
-                () -> operation.doesAccountNotHaveEnoughBalanceForVotesCap("someFundingAccount", 21));
+                () -> operation.doesNotHaveEnoughBalanceForVotesCap("someFundingAccount", 21));
 
         assertThat(exception.getMessage(), equalTo("[STELLAR]: Failed to get info about funding account!"));
         assertThat(exception.getCause(), instanceOf(IOException.class));

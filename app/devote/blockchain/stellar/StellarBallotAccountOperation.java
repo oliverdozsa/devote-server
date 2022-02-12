@@ -18,7 +18,7 @@ class StellarBallotAccountOperation {
     private final Transaction.Builder txBuilder;
     private final List<Issuer> issuers;
 
-    private static final String BALLOT_STARTING_BALANCE = "2";
+    private static final long BALLOT_STARTING_BALANCE_BASE = 2L;
 
     private static final Logger.ALogger logger = Logger.of(StellarBallotAccountOperation.class);
 
@@ -38,12 +38,11 @@ class StellarBallotAccountOperation {
         KeyPair ballot = KeyPair.random();
 
         String loggableAccount = redactWithEllipsis(ballot.getAccountId(), 5);
-        logger.info("[STELLAR]: About to create ballot account {} with balance {}", loggableAccount, BALLOT_STARTING_BALANCE);
+        String startingBalance = Long.toString(BALLOT_STARTING_BALANCE_BASE * issuers.size());
+        logger.info("[STELLAR]: About to create ballot account {} with balance {}", loggableAccount, startingBalance);
 
-        CreateAccountOperation createAccount = new CreateAccountOperation.Builder(
-                ballot.getAccountId(),
-                BALLOT_STARTING_BALANCE
-        ).build();
+        CreateAccountOperation createAccount = new CreateAccountOperation.Builder(ballot.getAccountId(), startingBalance)
+                .build();
         txBuilder.addOperation(createAccount);
 
         return ballot;

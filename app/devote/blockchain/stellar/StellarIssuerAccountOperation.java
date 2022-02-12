@@ -45,6 +45,10 @@ public class StellarIssuerAccountOperation implements IssuerAccountOperation {
 
     @Override
     public long calcNumOfAccountsNeeded(long totalVotesCap) {
+        return calcNumOfAccountNeededBasedOn(configuration);
+    }
+
+    public static long calcNumOfAccountNeededBasedOn(StellarBlockchainConfiguration configuration) {
         return configuration.getNumOfVoteBuckets();
     }
 
@@ -59,7 +63,7 @@ public class StellarIssuerAccountOperation implements IssuerAccountOperation {
         KeyPair issuer = KeyPair.random();
         String startingBalance = calcStartingBalanceFor(votesCapForIssuer);
         CreateAccountOperation createAccount = new CreateAccountOperation.Builder(issuer.getAccountId(), startingBalance)
-                        .build();
+                .build();
         txBuilder.addOperation(createAccount);
 
         logger.info("[STELLAR]: About to create issuer account: {} with starting balance: {}",
@@ -70,16 +74,16 @@ public class StellarIssuerAccountOperation implements IssuerAccountOperation {
     }
 
     private String calcStartingBalanceFor(long votesCapPerIssuer) {
-        return Long.toString((4 * votesCapPerIssuer) + 10);
+        return Long.toString((2 * votesCapPerIssuer) + 10);
     }
 
     private void submitTransaction(Transaction.Builder txBuilder, Account fundingAccount) throws AccountRequiresMemoException, IOException {
-        Server server = configuration.getServer();
+        Transaction transaction = txBuilder.build();
         KeyPair funding = fromAccount(fundingAccount);
 
-        Transaction transaction = txBuilder.build();
         transaction.sign(funding);
 
+        Server server = configuration.getServer();
         StellarSubmitTransaction.submit(transaction, server);
     }
 }

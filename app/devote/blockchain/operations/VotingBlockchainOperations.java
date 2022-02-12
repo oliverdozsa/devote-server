@@ -74,9 +74,10 @@ public class VotingBlockchainOperations {
     }
 
     public CompletionStage<DistributionAndBallotAccountOperation.TransactionResult> createDistributionAndBallotAccounts(
-            String network,
+            CreateVotingRequest request,
             List<Issuer> issuers) {
         return supplyAsync(() -> {
+            String network = request.getNetwork();
             logger.info("createDistributionAndBallotAccounts(): network = {}, issuers.size = {}", network, issuers.size());
 
             BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(network);
@@ -87,7 +88,8 @@ public class VotingBlockchainOperations {
                     .collect(Collectors.toList());
             logger.info("createDistributionAndBallotAccounts(): About to create distribution and ballot accounts with tokens: {}", tokenTitles);
 
-            return distributionAndBallotAccountOperation.create(issuers);
+            Account funding = new Account(request.getFundingAccountSecret(), request.getFundingAccountPublic());
+            return distributionAndBallotAccountOperation.create(funding, issuers);
         }, blockchainExecContext);
     }
 
@@ -97,11 +99,11 @@ public class VotingBlockchainOperations {
             logger.info("checkFundingAccountOf(): checking {}", loggableAccount);
 
             BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(createVotingRequest.getNetwork());
-            FundingAccountOperation fundingAccountOperation = blockchainFactory.createFundingAccountOperation();
+            FundingAccountOperation fundingAccount = blockchainFactory.createFundingAccountOperation();
 
             String fundingAccountPublic = createVotingRequest.getFundingAccountPublic();
             long votesCap = createVotingRequest.getVotesCap();
-            if(fundingAccountOperation.doesAccountNotHaveEnoughBalanceForVotesCap(fundingAccountPublic, votesCap)) {
+            if(fundingAccount.doesNotHaveEnoughBalanceForVotesCap(fundingAccountPublic, votesCap)) {
                 String message = String.format("%s does not have enough balance for votes cap %d", loggableAccount, votesCap);
 
                 logger.warn("checkFundingAccountOf(): {}", message);
@@ -135,7 +137,7 @@ public class VotingBlockchainOperations {
             titleBase = request.getTokenIdentifier();
         }
 
-        titleBase = titleBase + "-" + createRandomAlphabeticString(3);
+        titleBase = titleBase + createRandomAlphabeticString(4);
         return titleBase.toUpperCase(Locale.ROOT);
     }
 

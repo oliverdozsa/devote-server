@@ -3,6 +3,8 @@ package smokes;
 import components.clients.CommissionTestClient;
 import components.clients.VotingTestClient;
 import devote.blockchain.api.Account;
+import io.ipfs.api.IPFS;
+import ipfs.api.IpfsApi;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,6 +18,8 @@ import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
 import smokes.fixtures.BlockchainTestNet;
 import smokes.fixtures.StellarBlockchainTestNet;
+import units.ipfs.api.imp.MockIpfsApi;
+import units.ipfs.api.imp.MockIpfsProvider;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,6 +34,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.isEmptyString;
+import static play.inject.Bindings.bind;
 import static play.mvc.Http.HeaderNames.LOCATION;
 import static play.mvc.Http.Status.CREATED;
 import static play.mvc.Http.Status.OK;
@@ -50,7 +55,10 @@ public class ConductVotingSmokeTest {
     private static Map<String, BlockchainTestNet> testNets = new HashMap<>();
 
     public ConductVotingSmokeTest() {
-        GuiceApplicationBuilder applicationBuilder = new GuiceApplicationBuilder();
+        // TODO: parametrize for IPFS (causes network issues when running ipfs desktop)?
+        GuiceApplicationBuilder applicationBuilder = new GuiceApplicationBuilder()
+                .overrides(bind(IpfsApi.class).to(MockIpfsApi.class))
+                .overrides(bind(IPFS.class).toProvider(MockIpfsProvider.class));
 
         ruleChainForTests = new RuleChainForTests(applicationBuilder);
         chain = ruleChainForTests.getRuleChain();

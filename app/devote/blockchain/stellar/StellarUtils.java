@@ -25,7 +25,7 @@ public class StellarUtils {
         }
 
         String transactionResultCode = response.getExtras().getResultCodes().getTransactionResultCode();
-        return "TX: " + transactionResultCode + ", OP: " + String.join(", ", operationResultCodes);
+        return "TX result: " + transactionResultCode + ", OPs results: " + String.join(", ", operationResultCodes);
     }
 
     public static Transaction.Builder createTransactionBuilder(Server server, Network network, String accountId)

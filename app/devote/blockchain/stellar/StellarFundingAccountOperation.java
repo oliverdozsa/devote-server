@@ -23,7 +23,7 @@ public class StellarFundingAccountOperation implements FundingAccountOperation {
     }
 
     @Override
-    public boolean doesAccountNotHaveEnoughBalanceForVotesCap(String accountPublic, long votesCap) {
+    public boolean doesNotHaveEnoughBalanceForVotesCap(String accountPublic, long votesCap) {
         Server server = configuration.getServer();
 
         try {
@@ -33,9 +33,11 @@ public class StellarFundingAccountOperation implements FundingAccountOperation {
             AccountResponse accountResponse = server.accounts().account(accountPublic);
 
             BigDecimal xlmBalance = findXlmBalance(accountResponse.getBalances());
-            logger.info("[STELLAR]: Funding account balance (XLM): {}", xlmBalance);
+            logger.info("[STELLAR]: Funding account balance: {} XLM", xlmBalance);
 
-            long minRequiredBalance = 4 * votesCap;
+            long minRequiredBalance = 4 * votesCap + 10 * StellarIssuerAccountOperation.calcNumOfAccountNeededBasedOn(configuration) + 50;
+            logger.info("[STELLAR]: The minimum required balance for funding account is: {} XLM", minRequiredBalance);
+
             return xlmBalance.compareTo(new BigDecimal(minRequiredBalance)) < 0;
         } catch (IOException e) {
             String logMessage = "[STELLAR]: Failed to get info about funding account!";

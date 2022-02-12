@@ -4,7 +4,7 @@ package devote.blockchain.api;
 import java.util.List;
 
 public interface DistributionAndBallotAccountOperation extends BlockchainOperation {
-    TransactionResult create(List<Issuer> issuers);
+    TransactionResult create(Account funding, List<Issuer> issuers);
 
 
     class TransactionResult {

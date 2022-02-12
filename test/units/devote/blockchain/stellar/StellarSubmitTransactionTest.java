@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.stellar.sdk.AccountRequiresMemoException;
+import org.stellar.sdk.Operation;
 import org.stellar.sdk.Server;
 import org.stellar.sdk.Transaction;
 import org.stellar.sdk.responses.SubmitTransactionResponse;
@@ -53,6 +54,8 @@ public class StellarSubmitTransactionTest {
         when(mockResultCodes.getOperationsResultCodes()).thenReturn(null);
 
         when(mockResultCodes.getTransactionResultCode()).thenReturn("42");
+
+        when(mockTransaction.getOperations()).thenReturn(new Operation[]{});
 
         // When
         // Then
