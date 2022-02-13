@@ -68,7 +68,7 @@ public class StellarChannelAccountOperation implements ChannelAccountOperation {
     private List<KeyPair> prepareChannelsCreationOn(Transaction.Builder txBuilder, int numOfAccountsToCreate) {
         List<KeyPair> newAccounts = generateNewAccounts(numOfAccountsToCreate);
 
-        logger.info("[STELLAR]: Attempting to create {} channel account: {} with starting balance: {}",
+        logger.info("[STELLAR]: Attempting to create {} channel accounts with starting balance: {}",
                 numOfAccountsToCreate, STARTING_BALANCE_STR);
         newAccounts.forEach(newAccount -> prepareAccountCreationOn(txBuilder, newAccount));
 

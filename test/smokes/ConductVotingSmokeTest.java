@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import org.stellar.sdk.KeyPair;
 import play.inject.guice.GuiceApplicationBuilder;
 import play.libs.ws.WSClient;
 import play.mvc.Result;
@@ -91,7 +92,7 @@ public class ConductVotingSmokeTest {
         InitData votingInitData = initVotingFor("Bob", networkName);
         Thread.sleep(45 * 1000); // So that some channel accounts are present.
 
-        String message = createMessage(votingInitData.votingId, "someAccountId");
+        String message = createMessage(votingInitData.votingId, generateVoterPublic(networkName));
 
         CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
         assertThat(statusOf(result.http), equalTo(OK));
@@ -115,9 +116,12 @@ public class ConductVotingSmokeTest {
         assertThat(transactionOfSignature(transactionOfSignatureResult), notNullValue());
     }
 
-    private InitData initVotingFor(String userId, String network) {
+    private InitData initVotingFor(String userId, String network) throws InterruptedException {
         // Given
         String votingId = createValidVoting(network);
+
+        // So that voting is initialized on blockchain.
+        Thread.sleep(30 * 1000);
         CommissionInitRequest initRequest = new CommissionInitRequest();
         initRequest.setVotingId(votingId);
 
@@ -164,6 +168,14 @@ public class ConductVotingSmokeTest {
     private Account createFundingAccountIn(String network, long withBalance) {
         BlockchainTestNet testNet = testNets.get(network);
         return testNet.createAccountWithBalance(withBalance);
+    }
+
+    private String generateVoterPublic(String network) {
+        if(network.equals("stellar")) {
+            return KeyPair.random().getAccountId();
+        }
+
+        return "someAccount";
     }
 
     private static class InitData {

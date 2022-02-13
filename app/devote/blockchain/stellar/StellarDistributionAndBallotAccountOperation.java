@@ -36,7 +36,7 @@ public class StellarDistributionAndBallotAccountOperation implements Distributio
             voteTokenOp.prepareAccountsCreation();
             voteTokenOp.prepareToken();
 
-            submitTransaction(txBuilder, voteTokenOp.ballot, voteTokenOp.distribution, voteTokenOp.issuer);
+            submitTransaction(txBuilder, funding, voteTokenOp.ballot, voteTokenOp.distribution, voteTokenOp.issuer);
 
             return voteTokenOp.toTransactionResult();
         } catch (IOException | AccountRequiresMemoException e) {

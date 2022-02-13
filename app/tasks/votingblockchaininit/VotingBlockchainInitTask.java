@@ -32,7 +32,7 @@ public class VotingBlockchainInitTask implements Runnable {
 
     @Override
     public void run() {
-        JpaVoting voting = getAVoting();
+        JpaVoting voting = getANotFullyInitializedVoting();
         if (voting == null) {
             logger.info("[VOTING-BC-INIT-TASK-{}]: Could not find a voting to init.", taskId);
             return;
@@ -41,7 +41,7 @@ public class VotingBlockchainInitTask implements Runnable {
         initializeOnBlockchain(voting);
     }
 
-    private JpaVoting getAVoting() {
+    private JpaVoting getANotFullyInitializedVoting() {
         List<JpaVoting> notInitializedVotings = context.votingRepository.notInitializedSampleOf(context.voteBuckets);
 
         for (JpaVoting candidate : notInitializedVotings) {
@@ -63,6 +63,8 @@ public class VotingBlockchainInitTask implements Runnable {
     private void initializeOnBlockchain(JpaVoting voting) {
         createChannelGeneratorAccountsIfNeeded(voting);
         createDistributionAndBallotAccountsIfNeeded(voting);
+
+        // This should be the last step (used for checking whether voting is fully initialized, or not).
         saveVotingToIpfs(voting);
     }
 

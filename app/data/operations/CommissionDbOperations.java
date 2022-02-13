@@ -60,8 +60,8 @@ public class CommissionDbOperations {
     }
 
     public CompletionStage<Void> storeTransaction(Long votingId, String signature, String transaction) {
-        String signatureToLog = signature.substring(0, 5);
-        String transactionToLog = transaction.substring(0, 5);
+        String signatureToLog = redactWithEllipsis(signature, 5);
+        String transactionToLog = redactWithEllipsis(transaction, 5);
         logger.info("storeTransaction(): votingId = {}, signature = {}, transaction = {}", votingId, signatureToLog, transactionToLog);
 
         return runAsync(() -> commissionRepository.storeTransactionForRevealedSignature(votingId, signature, transaction),
