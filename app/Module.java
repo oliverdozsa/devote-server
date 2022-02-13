@@ -28,7 +28,7 @@ import services.EnvelopKeyPairProvider;
 import services.VotingService;
 import tasks.TasksOrganizer;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
-import tasks.votinginit.VotingInitTaskContext;
+import tasks.votingblockchaininit.VotingBlockchainInitTaskContext;
 
 import java.security.Security;
 
@@ -63,7 +63,7 @@ public class Module extends AbstractModule {
 
         // Tasks
         bind(ChannelAccountBuilderTaskContext.class).asEagerSingleton();
-        bind(VotingInitTaskContext.class).asEagerSingleton();
+        bind(VotingBlockchainInitTaskContext.class).asEagerSingleton();
         bind(TasksOrganizer.class).asEagerSingleton();
 
         // Other

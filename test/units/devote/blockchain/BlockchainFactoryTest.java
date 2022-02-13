@@ -49,7 +49,7 @@ public class BlockchainFactoryTest {
         // When
         // Then
         BlockchainException exception = assertThrows(BlockchainException.class, () -> {
-            blockchainFactory.createIssuerAccountOperation();
+            blockchainFactory.createChannelGeneratorAccountOperation();
         });
 
         assertThat(exception.getMessage(), containsString("Failed to create instance of"));

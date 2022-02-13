@@ -29,10 +29,11 @@ public class EbeanVotingRepository implements VotingRepository {
     }
 
     @Override
-    public Long initialize(CreateVotingRequest request) {
+    public Long initialize(CreateVotingRequest request, String assetCode) {
         logger.info("initialize(): request = {}", request);
 
         JpaVoting voting = initVotingFrom(request);
+        voting.setAssetCode(assetCode);
 
         ebeanServer.save(voting);
         return voting.getId();
@@ -74,7 +75,7 @@ public class EbeanVotingRepository implements VotingRepository {
     }
 
     @Override
-    public void distributionAndBallotAccountsCreated(Long id, DistributionAndBallotAccountOperation.TransactionResult transactionResult, String assetCode) {
+    public void distributionAndBallotAccountsCreated(Long id, DistributionAndBallotAccountOperation.TransactionResult transactionResult) {
         logger.info("distributionAndBallotAccountsCreated(): id = {}", id);
 
         JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
@@ -83,7 +84,6 @@ public class EbeanVotingRepository implements VotingRepository {
         voting.setBallotAccountSecret(transactionResult.ballot.secret);
         voting.setBallotAccountPublic(transactionResult.ballot.publik);
         voting.setIssuerAccountPublic(transactionResult.issuer.publik);
-        voting.setAssetCode(assetCode);
 
         ebeanServer.update(voting);
     }

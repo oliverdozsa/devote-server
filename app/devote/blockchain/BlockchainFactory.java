@@ -26,7 +26,7 @@ public class BlockchainFactory {
         this.networkName = configuration.getNetworkName();
     }
 
-    public ChannelGeneratorAccountOperation createIssuerAccountOperation() {
+    public ChannelGeneratorAccountOperation createChannelGeneratorAccountOperation() {
         return createBlockchainOperation(ChannelGeneratorAccountOperation.class);
     }
 

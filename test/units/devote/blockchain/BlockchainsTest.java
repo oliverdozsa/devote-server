@@ -40,10 +40,10 @@ public class BlockchainsTest {
         // Then
         assertThat(factoryForMockBlockchain, notNullValue());
 
-        ChannelGeneratorAccountOperation channelGeneratorAccountOperation = factoryForMockBlockchain.createIssuerAccountOperation();
+        ChannelGeneratorAccountOperation channelGeneratorAccountOperation = factoryForMockBlockchain.createChannelGeneratorAccountOperation();
         assertThat(channelGeneratorAccountOperation, instanceOf(MockBlockchainChannelGeneratorAccountOperation.class));
 
-        MockBlockchainChannelGeneratorAccountOperation mockIssuerAccount = (MockBlockchainChannelGeneratorAccountOperation) factoryForMockBlockchain.createIssuerAccountOperation();
+        MockBlockchainChannelGeneratorAccountOperation mockIssuerAccount = (MockBlockchainChannelGeneratorAccountOperation) factoryForMockBlockchain.createChannelGeneratorAccountOperation();
         assertBlockchainConfigInitCalled(mockIssuerAccount);
         assertTrue(mockIssuerAccount.isInitCalled());
     }

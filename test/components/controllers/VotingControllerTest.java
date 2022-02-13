@@ -79,6 +79,9 @@ public class VotingControllerTest {
         assertThat(statusOf(getByLocationResult), equalTo(OK));
 
         Long votingId = idOf(getByLocationResult);
+
+        // Wait for voting init & channel task
+        Thread.sleep(30 * 1000);
         assertThat(votingId, greaterThan(0L));
         assertThat(networkOf(getByLocationResult), equalTo("mockblockchain"));
         assertIssuerAccountsCreatedOnBlockchain(votingId);
@@ -90,7 +93,6 @@ public class VotingControllerTest {
         assertPollSavedInDb(votingId, createVotingRequest.getPolls());
         ipfsAsserts.assertVotingSavedToIpfs(votingId);
 
-        Thread.sleep(30 * 1000);
         assertChannelAccountsCreatedOnBlockchain(votingId);
         assertChannelProgressCompletedFor(votingId);
     }

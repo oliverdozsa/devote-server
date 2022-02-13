@@ -42,13 +42,6 @@ public class VotingService {
                 .checkFundingAccountOf(request)
                 .thenCompose(v -> votingDbOperations.initialize(request))
                 .thenAccept(createdVotingData::setId)
-                .thenCompose(v -> votingBlockchainOperations.createChannelGeneratorAccounts(request))
-                .thenAccept(channelGenerators -> createdVotingData.channelGenerators = channelGenerators)
-                .thenCompose(v -> votingDbOperations.channelGeneratorsCreated(createdVotingData.id, createdVotingData.channelGenerators))
-                .thenCompose(v -> votingBlockchainOperations.createDistributionAndBallotAccounts(request))
-                .thenCompose(tr -> votingDbOperations.distributionAndBallotAccountsCreated(createdVotingData.id, tr.transactionResult, tr.assetCode))
-                .thenCompose(v -> votingIpfsOperations.saveVotingToIpfs(createdVotingData.id))
-                .thenCompose(cid -> votingDbOperations.votingSavedToIpfs(createdVotingData.id, cid))
                 .thenApply(v -> createdVotingData.encodedId);
     }
 

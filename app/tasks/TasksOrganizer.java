@@ -6,8 +6,8 @@ import play.Logger;
 import scala.concurrent.ExecutionContext;
 import tasks.channelaccounts.ChannelAccountBuilderTask;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
-import tasks.votinginit.VotingInitTask;
-import tasks.votinginit.VotingInitTaskContext;
+import tasks.votingblockchaininit.VotingBlockchainInitTask;
+import tasks.votingblockchaininit.VotingBlockchainInitTaskContext;
 
 import javax.inject.Inject;
 import java.time.Duration;
@@ -19,7 +19,7 @@ public class TasksOrganizer {
     private final ExecutionContext executionContext;
     private final int numberOfWorkers;
     private final ChannelAccountBuilderTaskContext channelContext;
-    private final VotingInitTaskContext votingInitContext;
+    private final VotingBlockchainInitTaskContext votingInitContext;
 
     private static final Logger.ALogger logger = Logger.of(TasksOrganizer.class);
 
@@ -33,7 +33,7 @@ public class TasksOrganizer {
             ActorSystem actorSystem,
             ExecutionContext executionContext,
             ChannelAccountBuilderTaskContext channelContext,
-            VotingInitTaskContext votingInitContext) {
+            VotingBlockchainInitTaskContext votingInitContext) {
         this.actorSystem = actorSystem;
         this.executionContext = executionContext;
         this.channelContext = channelContext;
@@ -56,7 +56,7 @@ public class TasksOrganizer {
     private void initializeVotingInitTasks() {
         List<Runnable> votingInitTasks = new ArrayList<>();
         for (int i = 0; i < numberOfWorkers; i++) {
-            votingInitTasks.add(new VotingInitTask(i, votingInitContext));
+            votingInitTasks.add(new VotingBlockchainInitTask(i, votingInitContext));
         }
 
         initialize(votingInitTasks, "voting init", VOTING_INIT_TASK_INTERVAL_SEC);

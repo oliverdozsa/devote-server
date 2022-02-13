@@ -9,11 +9,11 @@ import requests.CreateVotingRequest;
 import java.util.List;
 
 public interface VotingRepository {
-    Long initialize(CreateVotingRequest request);
+    Long initialize(CreateVotingRequest request, String assetCode);
     JpaVoting single(Long id);
     void channelGeneratorsCreated(Long id, List<ChannelGenerator> issuers);
     void channelAccountCreated(Long id, List<Account> accounts);
-    void distributionAndBallotAccountsCreated(Long id, DistributionAndBallotAccountOperation.TransactionResult transactionResult, String assetCode);
+    void distributionAndBallotAccountsCreated(Long id, DistributionAndBallotAccountOperation.TransactionResult transactionResult);
     void votingSavedToIpfs(Long id, String ipfsCid);
     List<JpaVoting> notInitializedSampleOf(int size);
 }
