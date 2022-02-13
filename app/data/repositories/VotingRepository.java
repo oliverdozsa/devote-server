@@ -15,4 +15,5 @@ public interface VotingRepository {
     void channelAccountCreated(Long id, List<Account> accounts);
     void distributionAndBallotAccountsCreated(Long id, DistributionAndBallotAccountOperation.TransactionResult transactionResult, String assetCode);
     void votingSavedToIpfs(Long id, String ipfsCid);
+    List<JpaVoting> notInitializedSampleOf(int size);
 }

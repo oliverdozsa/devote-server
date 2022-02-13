@@ -26,8 +26,9 @@ import security.JwtCenter;
 import services.CommissionService;
 import services.EnvelopKeyPairProvider;
 import services.VotingService;
+import tasks.TasksOrganizer;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
-import tasks.channelaccounts.ChannelAccountTasksOrganizer;
+import tasks.votinginit.VotingInitTaskContext;
 
 import java.security.Security;
 
@@ -61,8 +62,9 @@ public class Module extends AbstractModule {
         bind(CommissionService.class).asEagerSingleton();
 
         // Tasks
-        bind(ChannelAccountTasksOrganizer.class).asEagerSingleton();
         bind(ChannelAccountBuilderTaskContext.class).asEagerSingleton();
+        bind(VotingInitTaskContext.class).asEagerSingleton();
+        bind(TasksOrganizer.class).asEagerSingleton();
 
         // Other
         bind(AsymmetricCipherKeyPair.class).annotatedWith(Names.named("envelope"))

@@ -97,6 +97,17 @@ public class EbeanVotingRepository implements VotingRepository {
         ebeanServer.update(voting);
     }
 
+    @Override
+    public List<JpaVoting> notInitializedSampleOf(int size) {
+        logger.info("notInitializedSampleOf(): size = {}", size);
+
+        return ebeanServer.createQuery(JpaVoting.class)
+                .where()
+                .isNull("ipfsCid")
+                .setMaxRows(size)
+                .findList();
+    }
+
     private JpaChannelGeneratorAccount fromChannelGenerator(ChannelGenerator channelGenerator) {
         JpaChannelGeneratorAccount votingIssuer = new JpaChannelGeneratorAccount();
         votingIssuer.setAccountSecret(channelGenerator.account.secret);
