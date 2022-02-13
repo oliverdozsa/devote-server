@@ -1,10 +1,10 @@
 package data.repositories.imp;
 
+import data.entities.JpaChannelGeneratorAccount;
 import data.entities.JpaCommissionSession;
 import data.entities.JpaStoredTransaction;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
-import data.entities.JpaChannelGeneratorAccount;
 import data.repositories.CommissionRepository;
 import exceptions.InternalErrorException;
 import exceptions.NotFoundException;
@@ -12,9 +12,7 @@ import io.ebean.EbeanServer;
 import play.Logger;
 
 import javax.inject.Inject;
-import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static data.repositories.imp.EbeanRepositoryUtils.assertEntityExists;
 import static utils.StringUtils.redact;
@@ -105,27 +103,6 @@ public class EbeanCommissionRepository implements CommissionRepository {
             logger.warn("consumeOneChannel(): {}", errorMessage);
             throw new InternalErrorException(errorMessage);
         }
-    }
-
-    @Override
-    public JpaChannelGeneratorAccount selectAnIssuer(Long votingId) {
-        logger.info("selectAnIssuer(): votingId = {}", votingId);
-
-        assertEntityExists(ebeanServer, JpaVoting.class, votingId);
-        List<JpaChannelGeneratorAccount> issuers = ebeanServer.createQuery(JpaChannelGeneratorAccount.class)
-                .where()
-                .eq("voting.id", votingId)
-                .findList();
-
-        if (issuers == null || issuers.size() == 0) {
-            throw new InternalErrorException("Not found any issuer account for voting: " + votingId);
-        }
-
-        int randomIssuerIndex = ThreadLocalRandom.current().nextInt(issuers.size());
-        JpaChannelGeneratorAccount randomIssuer = issuers.get(randomIssuerIndex);
-
-        logger.info("selectAnIssuer(): selected issuer: {}", randomIssuer.getId());
-        return issuers.get(randomIssuerIndex);
     }
 
     @Override

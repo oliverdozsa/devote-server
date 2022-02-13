@@ -1,6 +1,7 @@
 package components.controllers;
 
 import asserts.IpfsAsserts;
+import com.fasterxml.jackson.databind.JsonNode;
 import components.clients.VotingTestClient;
 import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;
@@ -24,6 +25,7 @@ import java.util.Arrays;
 import static asserts.BlockchainAsserts.*;
 import static asserts.DbAsserts.*;
 import static components.controllers.VotingRequestMaker.createValidVotingRequest;
+import static components.extractors.GenericDataFromResult.jsonOf;
 import static components.extractors.GenericDataFromResult.statusOf;
 import static components.extractors.VotingResponseFromResult.idOf;
 import static components.extractors.VotingResponseFromResult.networkOf;
@@ -31,6 +33,7 @@ import static matchers.ResultHasHeader.hasLocationHeader;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertTrue;
 import static play.inject.Bindings.bind;
 import static play.mvc.Http.HeaderNames.LOCATION;
 import static play.mvc.Http.Status.*;
@@ -74,14 +77,14 @@ public class VotingControllerTest {
         assertThat(result, hasLocationHeader());
 
         String locationUrl = result.headers().get(LOCATION);
+
+        // Wait for voting init & channel task
+        Thread.sleep(30 * 1000);
         Result getByLocationResult = client.byLocation(locationUrl);
 
         assertThat(statusOf(getByLocationResult), equalTo(OK));
 
         Long votingId = idOf(getByLocationResult);
-
-        // Wait for voting init & channel task
-        Thread.sleep(30 * 1000);
         assertThat(votingId, greaterThan(0L));
         assertThat(networkOf(getByLocationResult), equalTo("mockblockchain"));
         assertIssuerAccountsCreatedOnBlockchain(votingId);
@@ -152,5 +155,30 @@ public class VotingControllerTest {
 
         // Then
         assertThat(statusOf(result), equalTo(BAD_REQUEST));
+    }
+
+    @Test
+    public void testCreateThenGetImmediately() {
+        // Given
+        CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
+
+        // When
+        Result result = client.createVoting(createVotingRequest);
+
+        // Then
+        assertThat(statusOf(result), equalTo(CREATED));
+        assertThat(result, hasLocationHeader());
+
+        String locationUrl = result.headers().get(LOCATION);
+        Result getByLocationResult = client.byLocation(locationUrl);
+
+        assertThat(statusOf(getByLocationResult), equalTo(OK));
+
+        JsonNode votingResponseJson = jsonOf(getByLocationResult);
+        assertTrue(votingResponseJson.get("distributionAccountId").isNull());
+        assertTrue(votingResponseJson.get("ballotAccountId").isNull());
+        assertTrue(votingResponseJson.get("issuerAccountId").isNull());
     }
 }

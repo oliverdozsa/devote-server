@@ -16,7 +16,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class EbeanVotingInit {
+public class EbeanVotingInit {
     public static JpaVoting initVotingFrom(CreateVotingRequest request) {
         JpaVoting voting = new JpaVoting();
 
@@ -99,5 +99,8 @@ class EbeanVotingInit {
         pollOption.setName(pollOptionRequest.getName());
 
         return pollOption;
+    }
+
+    private EbeanVotingInit() {
     }
 }

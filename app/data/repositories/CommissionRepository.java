@@ -3,7 +3,6 @@ package data.repositories;
 import data.entities.JpaCommissionSession;
 import data.entities.JpaStoredTransaction;
 import data.entities.JpaVotingChannelAccount;
-import data.entities.JpaChannelGeneratorAccount;
 
 import java.util.Optional;
 
@@ -13,7 +12,6 @@ public interface CommissionRepository {
     Boolean hasAlreadySignedAnEnvelope(String userId, Long votingId);
     void storeEnvelopeSignature(String userId, Long votingId, String signature);
     JpaVotingChannelAccount consumeOneChannel(Long votingId);
-    JpaChannelGeneratorAccount selectAnIssuer(Long votingId);
     void storeTransactionForRevealedSignature(Long votingId, String signature, String transaction);
     boolean doesTransactionExistForSignature(String signature);
     JpaStoredTransaction getTransaction(String signature);

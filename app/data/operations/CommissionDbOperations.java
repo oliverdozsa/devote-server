@@ -3,7 +3,6 @@ package data.operations;
 import data.entities.JpaCommissionSession;
 import data.entities.JpaStoredTransaction;
 import data.entities.JpaVotingChannelAccount;
-import data.entities.JpaChannelGeneratorAccount;
 import data.repositories.CommissionRepository;
 import executioncontexts.DatabaseExecutionContext;
 import play.Logger;
@@ -58,11 +57,6 @@ public class CommissionDbOperations {
     public CompletionStage<JpaVotingChannelAccount> consumeOneChannel(Long votingId) {
         logger.info("consumeOneChannel(): votingId = {}", votingId);
         return supplyAsync(() -> commissionRepository.consumeOneChannel(votingId), dbExecContext);
-    }
-
-    public CompletionStage<JpaChannelGeneratorAccount> selectAnIssuer(Long votingId) {
-        logger.info("selectAnIssuer(): votingId = {}", votingId);
-        return supplyAsync(() -> commissionRepository.selectAnIssuer(votingId), dbExecContext);
     }
 
     public CompletionStage<Void> storeTransaction(Long votingId, String signature, String transaction) {
