@@ -52,28 +52,28 @@ public class EbeanChannelProgressRepository implements ChannelProgressRepository
     @Override
     public void channelGeneratorsCreated(Long votingId) {
         JpaVoting voting = ebeanServer.find(JpaVoting.class, votingId);
-        List<JpaChannelGeneratorAccount> issuers = voting.getChannelGeneratorAccounts();
+        List<JpaChannelGeneratorAccount> channelGenerators = voting.getChannelGeneratorAccounts();
 
-        logger.info("issuersCreated(): Total channel accounts to create: {}", voting.getVotesCap());
-        logger.info("issuersCreated(): Creating {} channel progresses for voting with id = {}.",
-                issuers.size(), votingId);
-        List<Long> votesCapOfChannelGenerators = issuers.stream()
+        logger.info("channelGeneratorsCreated(): Total channel accounts to create: {}", voting.getVotesCap());
+        logger.info("channelGeneratorsCreated(): Creating {} channel progresses for voting with id = {}.",
+                channelGenerators.size(), votingId);
+        List<Long> votesCapOfChannelGenerators = channelGenerators.stream()
                 .map(JpaChannelGeneratorAccount::getVotesCap)
                 .collect(Collectors.toList());
-        logger.info("issuersCreated(): Number of channel accounts to create in each bucket: {}", votesCapOfChannelGenerators);
+        logger.info("channelGeneratorsCreated(): Number of channel accounts to create in each bucket: {}", votesCapOfChannelGenerators);
 
-        List<JpaChannelAccountProgress> progresses = issuers.stream()
+        List<JpaChannelAccountProgress> progresses = channelGenerators.stream()
                 .map(this::fromChannelGenerator)
                 .collect(Collectors.toList());
 
         progresses.forEach(ebeanServer::save);
     }
 
-    private JpaChannelAccountProgress fromChannelGenerator(JpaChannelGeneratorAccount issuer) {
+    private JpaChannelAccountProgress fromChannelGenerator(JpaChannelGeneratorAccount channelGenerator) {
         JpaChannelAccountProgress progress = new JpaChannelAccountProgress();
-        progress.setIssuer(issuer);
-        progress.setNumOfAccountsToCreate(issuer.getVotesCap());
-        progress.setNumOfAccountsLeftToCreate(issuer.getVotesCap());
+        progress.setChannelGenerator(channelGenerator);
+        progress.setNumOfAccountsToCreate(channelGenerator.getVotesCap());
+        progress.setNumOfAccountsLeftToCreate(channelGenerator.getVotesCap());
         return progress;
     }
 }

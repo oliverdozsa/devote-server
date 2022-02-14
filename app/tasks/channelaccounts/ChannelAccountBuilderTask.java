@@ -37,32 +37,32 @@ public class ChannelAccountBuilderTask implements Runnable {
     }
 
     private List<Account> createChannelAccounts(JpaChannelAccountProgress channelProgress) {
-        JpaChannelGeneratorAccount issuer = channelProgress.getIssuer();
-        ChannelAccountOperation channelAccountOperation = getChannelAccountOperation(issuer);
+        JpaChannelGeneratorAccount channelGeneratorEntity = channelProgress.getChannelGenerator();
+        ChannelAccountOperation channelAccountOperation = getChannelAccountOperation(channelGeneratorEntity);
 
         int numOfAccountsToCreateInOneBatch = determineNumOfAccountsToCreateInOneBatch(channelProgress, channelAccountOperation);
         logger.info("[CHANNEL-TASK-{}]: createChannelAccounts(): about to create {} channel accounts on blockchain {} for progress {}",
-                taskId, numOfAccountsToCreateInOneBatch, issuer.getVoting().getNetwork(), channelProgress.getId());
+                taskId, numOfAccountsToCreateInOneBatch, channelGeneratorEntity.getVoting().getNetwork(), channelProgress.getId());
 
-        Account channelAccount = new Account(channelProgress.getIssuer().getAccountSecret(), channelProgress.getIssuer().getAccountPublic());
+        Account channelAccount = new Account(channelProgress.getChannelGenerator().getAccountSecret(), channelProgress.getChannelGenerator().getAccountPublic());
         ChannelGenerator channelGenerator = new ChannelGenerator(channelAccount, channelProgress.getNumOfAccountsToCreate());
 
         List<Account> createdAccounts = channelAccountOperation.create(channelGenerator, numOfAccountsToCreateInOneBatch);
         logger.info("[CHANNEL-TASK-{}]: createChannelAccounts(): successfully created {} channel accounts on blockchain {}",
-                taskId, createdAccounts.size(), issuer.getVoting().getNetwork());
+                taskId, createdAccounts.size(), channelGeneratorEntity.getVoting().getNetwork());
 
         return createdAccounts;
     }
 
     private void channelAccountsCreated(JpaChannelAccountProgress channelProgress, List<Account> channelAccounts) {
-        Long votingId = channelProgress.getIssuer().getVoting().getId();
+        Long votingId = channelProgress.getChannelGenerator().getVoting().getId();
 
         context.votingRepository.channelAccountCreated(votingId, channelAccounts);
         context.channelProgressRepository.channelAccountsCreated(channelProgress.getId(), channelAccounts.size());
     }
 
-    private ChannelAccountOperation getChannelAccountOperation(JpaChannelGeneratorAccount issuer) {
-        String network = issuer.getVoting().getNetwork();
+    private ChannelAccountOperation getChannelAccountOperation(JpaChannelGeneratorAccount channelGeneratorAccount) {
+        String network = channelGeneratorAccount.getVoting().getNetwork();
         BlockchainFactory blockchainFactory = context.blockchains.getFactoryByNetwork(network);
         return blockchainFactory.createChannelAccountOperation();
     }

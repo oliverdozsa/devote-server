@@ -42,12 +42,12 @@ public class StellarChannelAccountOperation implements ChannelAccountOperation {
     @Override
     public List<Account> create(ChannelGenerator channelGenerator, int numOfAccountsToCreate) {
         try {
-            KeyPair channel = fromAccount(channelGenerator.account);
+            KeyPair channelGeneratorKeyPair = fromAccount(channelGenerator.account);
 
-            Transaction.Builder txBuilder = prepareTransaction(channel.getAccountId());
+            Transaction.Builder txBuilder = prepareTransaction(channelGeneratorKeyPair.getAccountId());
             List<KeyPair> channels = prepareChannelsCreationOn(txBuilder, numOfAccountsToCreate);
 
-            submitTransaction(txBuilder, channel);
+            submitTransaction(txBuilder, channelGeneratorKeyPair);
 
             return channels.stream()
                     .map(StellarUtils::toAccount)
@@ -58,11 +58,11 @@ public class StellarChannelAccountOperation implements ChannelAccountOperation {
         }
     }
 
-    private Transaction.Builder prepareTransaction(String issuerAccountId) throws IOException {
+    private Transaction.Builder prepareTransaction(String channelGeneratorAccountId) throws IOException {
         Server server = configuration.getServer();
         Network network = configuration.getNetwork();
 
-        return StellarUtils.createTransactionBuilder(server, network, issuerAccountId);
+        return StellarUtils.createTransactionBuilder(server, network, channelGeneratorAccountId);
     }
 
     private List<KeyPair> prepareChannelsCreationOn(Transaction.Builder txBuilder, int numOfAccountsToCreate) {

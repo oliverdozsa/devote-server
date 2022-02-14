@@ -41,7 +41,7 @@ public class VotingBlockchainOperations {
 
     public CompletionStage<List<ChannelGenerator>> createChannelGeneratorAccounts(CreateVotingRequest request) {
         return supplyAsync(() -> {
-            logger.info("createIssuerAccounts(): request = {}", request);
+            logger.info("createChannelGeneratorAccounts(): request = {}", request);
             BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(request.getNetwork());
             ChannelGeneratorAccountOperation channelGeneratorAccountOperation = blockchainFactory.createChannelGeneratorAccountOperation();
 

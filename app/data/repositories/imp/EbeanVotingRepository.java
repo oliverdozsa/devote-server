@@ -90,7 +90,7 @@ public class EbeanVotingRepository implements VotingRepository {
 
     @Override
     public void votingSavedToIpfs(Long id, String ipfsCid) {
-        logger.info("id = {}, ipfsCid = {}", id, ipfsCid);
+        logger.info("votingSavedToIpfs(): id = {}, ipfsCid = {}", id, ipfsCid);
 
         JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
         voting.setIpfsCid(ipfsCid);
@@ -109,11 +109,11 @@ public class EbeanVotingRepository implements VotingRepository {
     }
 
     private JpaChannelGeneratorAccount fromChannelGenerator(ChannelGenerator channelGenerator) {
-        JpaChannelGeneratorAccount votingIssuer = new JpaChannelGeneratorAccount();
-        votingIssuer.setAccountSecret(channelGenerator.account.secret);
-        votingIssuer.setAccountPublic(channelGenerator.account.publik);
-        votingIssuer.setVotesCap(channelGenerator.votesCap);
-        return votingIssuer;
+        JpaChannelGeneratorAccount channelGeneratorEntity = new JpaChannelGeneratorAccount();
+        channelGeneratorEntity.setAccountSecret(channelGenerator.account.secret);
+        channelGeneratorEntity.setAccountPublic(channelGenerator.account.publik);
+        channelGeneratorEntity.setVotesCap(channelGenerator.votesCap);
+        return channelGeneratorEntity;
     }
 
     private JpaVotingChannelAccount fromChannelKeyPair(Account account) {

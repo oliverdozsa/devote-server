@@ -36,26 +36,26 @@ public class StellarChannelGeneratorAccountOperation implements ChannelGenerator
     public List<ChannelGenerator> create(long totalVotesCap, Account funding) {
         try {
             long numOfAccountsNeeded = calcNumOfAccountsNeeded(totalVotesCap);
-            long votesCapPerIssuer = totalVotesCap / numOfAccountsNeeded;
+            long votesCapPerChannelGen = totalVotesCap / numOfAccountsNeeded;
             long votesCapRemainder = totalVotesCap % numOfAccountsNeeded;
 
             List<ChannelGenerator> channelGenerators = new ArrayList<>();
 
             Transaction.Builder txBuilder = prepareTransaction(funding);
             for(int i = 0; i < numOfAccountsNeeded - 1; i++) {
-                KeyPair channelGenKeyPair = prepareAccountCreationOn(txBuilder, votesCapPerIssuer);
-                channelGenerators.add(toChannelGenerator(channelGenKeyPair, votesCapPerIssuer));
+                KeyPair channelGenKeyPair = prepareAccountCreationOn(txBuilder, votesCapPerChannelGen);
+                channelGenerators.add(toChannelGenerator(channelGenKeyPair, votesCapPerChannelGen));
             }
 
-            KeyPair channelGenKeyPair = prepareAccountCreationOn(txBuilder, votesCapPerIssuer + votesCapRemainder);
-            channelGenerators.add(toChannelGenerator(channelGenKeyPair, votesCapPerIssuer + votesCapRemainder));
+            KeyPair channelGenKeyPair = prepareAccountCreationOn(txBuilder, votesCapPerChannelGen + votesCapRemainder);
+            channelGenerators.add(toChannelGenerator(channelGenKeyPair, votesCapPerChannelGen + votesCapRemainder));
 
             submitTransaction(txBuilder, funding);
 
             return channelGenerators;
         } catch (IOException | AccountRequiresMemoException e) {
-            logger.warn("[STELLAR]: Failed to create issuer account!", e);
-            throw new BlockchainException("[STELLAR]: Failed to create issuer account!", e);
+            logger.warn("[STELLAR]: Failed to create channel generator accounts!", e);
+            throw new BlockchainException("[STELLAR]: Failed to create channel generator accounts!", e);
         }
     }
 

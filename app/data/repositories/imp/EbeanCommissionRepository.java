@@ -176,8 +176,8 @@ public class EbeanCommissionRepository implements CommissionRepository {
         assertEntityExists(ebeanServer, JpaVoting.class, votingId);
         JpaVoting voting = ebeanServer.find(JpaVoting.class, votingId);
 
-        for (JpaChannelGeneratorAccount issuer : voting.getChannelGeneratorAccounts()) {
-            if (issuer.getChannelAccountProgress().getNumOfAccountsLeftToCreate() > 0) {
+        for (JpaChannelGeneratorAccount channelGenerator : voting.getChannelGeneratorAccounts()) {
+            if (channelGenerator.getChannelAccountProgress().getNumOfAccountsLeftToCreate() > 0) {
                 return false;
             }
         }

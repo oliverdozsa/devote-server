@@ -34,7 +34,7 @@ public class JpaChannelGeneratorAccount {
     @Column(name = "votes_cap")
     private Long votesCap;
 
-    @OneToOne(mappedBy = "issuer")
+    @OneToOne(mappedBy = "channelGenerator")
     private JpaChannelAccountProgress channelAccountProgress;
 
     public Long getId() {

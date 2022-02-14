@@ -56,7 +56,7 @@ public class StellarChannelGeneratorAccountOperationTest {
         KeyPair testKeyPair = KeyPair.random();
         BlockchainException exception = assertThrows(BlockchainException.class, () -> operation
                 .create(42L, new Account(new String(testKeyPair.getSecretSeed()), testKeyPair.getAccountId())));
-        assertThat(exception.getMessage(), equalTo("[STELLAR]: Failed to create issuer account!"));
+        assertThat(exception.getMessage(), equalTo("[STELLAR]: Failed to create channel generator accounts!"));
         assertThat(exception.getCause(), instanceOf(IOException.class));
     }
 

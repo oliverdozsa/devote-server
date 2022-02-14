@@ -11,7 +11,7 @@ import java.util.List;
 public interface VotingRepository {
     Long initialize(CreateVotingRequest request, String assetCode);
     JpaVoting single(Long id);
-    void channelGeneratorsCreated(Long id, List<ChannelGenerator> issuers);
+    void channelGeneratorsCreated(Long id, List<ChannelGenerator> channelGenerators);
     void channelAccountCreated(Long id, List<Account> accounts);
     void distributionAndBallotAccountsCreated(Long id, DistributionAndBallotAccountOperation.TransactionResult transactionResult);
     void votingSavedToIpfs(Long id, String ipfsCid);
