@@ -68,7 +68,7 @@ public class CommissionControllerTest {
     }
 
     @Test
-    public void testInit() {
+    public void testInit() throws InterruptedException {
         // Given
         String votingId = createValidVoting();
         CommissionInitRequest initRequest = new CommissionInitRequest();
@@ -82,6 +82,20 @@ public class CommissionControllerTest {
 
         assertThat(sessionJwtOf(result), notNullValue());
         assertThat(publicKeyOf(result), notNullValue());
+    }
+
+    @Test
+    public void testInitVotingIsNotInitializedProperly() throws InterruptedException {
+        // Given
+        String votingId = createValidVoting(false);
+        CommissionInitRequest initRequest = new CommissionInitRequest();
+        initRequest.setVotingId(votingId);
+
+        // When
+        Result result = testClient.init(initRequest, "Alice");
+
+        // Then
+        assertThat(statusOf(result), equalTo(FORBIDDEN));
     }
 
     @Test
@@ -128,7 +142,7 @@ public class CommissionControllerTest {
     }
 
     @Test
-    public void testSignOnEnvelope() {
+    public void testSignOnEnvelope() throws InterruptedException {
         // Given
         InitData votingInitData = initVotingFor("Bob");
         String message = createMessage(votingInitData.votingId, "someAccountId");
@@ -143,7 +157,7 @@ public class CommissionControllerTest {
     }
 
     @Test
-    public void testDoubleEnvelope() {
+    public void testDoubleEnvelope() throws InterruptedException {
         // Given
         InitData votingInitData = initVotingFor("Bob");
         String message = createMessage(votingInitData.votingId, "someAccountId");
@@ -294,7 +308,7 @@ public class CommissionControllerTest {
     }
 
     @Test
-    public void testGetEnvelopeSignatureForUserInVoting() {
+    public void testGetEnvelopeSignatureForUserInVoting() throws InterruptedException {
         // Given
         InitData votingInitData = initVotingFor("Bob");
         String message = createMessage(votingInitData.votingId, "someAccountId");
@@ -318,7 +332,7 @@ public class CommissionControllerTest {
     }
 
     @Test
-    public void testGetEnvelopeSignatureForUserInVoting_NotSignedEnvelopeBefore() {
+    public void testGetEnvelopeSignatureForUserInVoting_NotSignedEnvelopeBefore() throws InterruptedException {
         // Given
         InitData votingInitData = initVotingFor("Bob");
 
@@ -329,13 +343,17 @@ public class CommissionControllerTest {
         assertThat(statusOf(getEnvelopeSignatureResult), equalTo(NOT_FOUND));
     }
 
-    private String createValidVoting() {
+    private String createValidVoting(boolean shouldWait) throws InterruptedException {
         CreateVotingRequest createVotingRequest = createValidVotingRequest();
         createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
         createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
         Result result = votingTestClient.createVoting(createVotingRequest);
         assertThat(statusOf(result), equalTo(CREATED));
         assertThat(result, hasLocationHeader());
+
+        if(shouldWait) {
+            Thread.sleep(8 * 1000);
+        }
 
         String locationUrl = result.headers().get(LOCATION);
         String[] locationUrlParts = locationUrl.split("/");
@@ -344,7 +362,11 @@ public class CommissionControllerTest {
         return votingId;
     }
 
-    private InitData initVotingFor(String userId) {
+    private String createValidVoting() throws InterruptedException {
+        return createValidVoting(true);
+    }
+
+    private InitData initVotingFor(String userId) throws InterruptedException {
         // Given
         String votingId = createValidVoting();
         CommissionInitRequest initRequest = new CommissionInitRequest();

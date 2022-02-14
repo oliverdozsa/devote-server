@@ -82,5 +82,10 @@ public class CommissionDbOperations {
         logger.info("getCommissionSession(): votingId = {}, user = {}", votingId, user);
         return supplyAsync(() -> commissionRepository.getCommissionSessionWithExistingEnvelopeSignature(votingId, user), dbExecContext);
     }
+
+    public CompletionStage<Boolean> isVotingInitializedProperly(Long votingId) {
+        logger.info("isVotingInitializedProperly(): votingId = {}", votingId);
+        return supplyAsync(() -> commissionRepository.isVotingInitializedProperly(votingId), dbExecContext);
+    }
 }
 

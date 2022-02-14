@@ -28,6 +28,7 @@ public class CommissionInitSubService {
     public CompletionStage<CommissionInitResponse> init(CommissionInitRequest request, VerifiedJwt jwt) {
         logger.info("init(): request = {}, userId = {}", request.toString(), jwt.getUserId());
         return Base62Conversions.decodeAsStage(request.getVotingId())
+                .thenCompose(this::checkIfVotingIsInitializedProperly)
                 .thenCompose(decodedVotingId -> checkIfUserIsAuthorizedToInitSession(decodedVotingId, jwt.getUserId()))
                 .thenCompose(votingId -> commissionDbOperations.createSession(votingId, jwt.getUserId()))
                 .thenApply(this::toInitResponse);
@@ -56,5 +57,18 @@ public class CommissionInitSubService {
         initResponse.setPublicKey(envelopePublicKeyPem);
 
         return initResponse;
+    }
+
+    private CompletionStage<Long> checkIfVotingIsInitializedProperly(Long votingId) {
+        return commissionDbOperations.isVotingInitializedProperly(votingId).thenApply(isProperlyInitialized -> {
+           if(isProperlyInitialized) {
+               logger.info("checkIfVotingIsInitializedProperly(): Voting is initialized properly.");
+               return votingId;
+           } else {
+               String message = String.format("Voting %d is not initialized properly.", votingId);
+               logger.warn("checkIfVotingIsInitializedProperly(): {}", message);
+               throw new ForbiddenException(message);
+           }
+        });
     }
 }

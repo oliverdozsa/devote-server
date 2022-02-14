@@ -6,6 +6,7 @@ import data.entities.JpaStoredTransaction;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
 import data.repositories.CommissionRepository;
+import exceptions.ForbiddenException;
 import exceptions.InternalErrorException;
 import exceptions.NotFoundException;
 import io.ebean.EbeanServer;
@@ -58,6 +59,8 @@ public class EbeanCommissionRepository implements CommissionRepository {
 
     @Override
     public Boolean hasAlreadySignedAnEnvelope(String userId, Long votingId) {
+        logger.info("hasAlreadySignedAnEnvelope(): votingId = {}, userId = {}", votingId, userId);
+
         JpaCommissionSession commissionSession = find(userId, votingId);
         boolean hasAlreadySigned = commissionSession.getEnvelopeSignature() != null;
 
@@ -162,6 +165,16 @@ public class EbeanCommissionRepository implements CommissionRepository {
         {
             return commissionSession;
         }
+    }
+
+    @Override
+    public boolean isVotingInitializedProperly(Long votingId) {
+        assertEntityExists(ebeanServer, JpaVoting.class, votingId);
+        JpaVoting voting = ebeanServer.find(JpaVoting.class, votingId);
+
+        return voting.getDistributionAccountPublic() != null && voting.getDistributionAccountPublic().length() > 0 &&
+                voting.getIssuerAccountPublic() != null && voting.getIssuerAccountPublic().length() > 0 &&
+                voting.getBallotAccountPublic() != null && voting.getBallotAccountPublic().length() > 0;
     }
 
     private JpaCommissionSession find(String userId, Long votingId) {
