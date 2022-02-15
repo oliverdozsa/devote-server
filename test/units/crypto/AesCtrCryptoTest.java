@@ -67,6 +67,19 @@ public class AesCtrCryptoTest {
         assertThrows(CryptoException.class, () -> AesCtrCrypto.encrypt(wrongKey, new byte[]{1, 2, 3}));
     }
 
+    public static void main(String[] args) {
+        byte[] randomKey = AesCtrCrypto.generateKey();
+        String message = "123";
+        byte[] messageBytes = message.getBytes();
+
+        // When
+        byte[] cipher_a = AesCtrCrypto.encrypt(randomKey, messageBytes);
+        byte[] cipher_b = AesCtrCrypto.encrypt(randomKey, messageBytes);
+
+        System.out.println(Arrays.toString(cipher_a));
+        System.out.println(Arrays.toString(cipher_b));
+    }
+
     private static String decryptToString(byte[] key, byte[] cipher) {
         byte[] decodedMessageBytes = AesCtrCrypto.decrypt(key, cipher);
         return new String(decodedMessageBytes);

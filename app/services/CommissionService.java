@@ -1,14 +1,19 @@
 package services;
 
+import crypto.EncryptedVoting;
+import crypto.RsaKeyUtils;
+import data.entities.JpaVoting;
 import data.operations.CommissionDbOperations;
 import data.operations.VotingDbOperations;
 import devote.blockchain.operations.CommissionBlockchainOperations;
+import exceptions.BusinessLogicViolationException;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import play.Logger;
 import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
 import responses.CommissionAccountCreationResponse;
+import responses.CommissionGetAnEncryptedOptionCodeResponse;
 import responses.CommissionGetEnvelopeSignatureResponse;
 import responses.CommissionInitResponse;
 import responses.CommissionSignEnvelopeResponse;
@@ -25,6 +30,7 @@ import javax.inject.Named;
 import java.util.concurrent.CompletionStage;
 
 import static crypto.RsaKeyUtils.publicKeyToPemString;
+import static java.util.concurrent.CompletableFuture.runAsync;
 import static utils.StringUtils.redactWithEllipsis;
 
 public class CommissionService {
@@ -34,6 +40,7 @@ public class CommissionService {
     private final CommissionSignEnvelopeSubService signEnvelopeSubService;
     private final CommissionCreateAccountSubService createAccountSubService;
     private final CommissionStoredDataSubService storedDataSubService;
+    private final VotingDbOperations votingDbOperations;
 
     @Inject
     public CommissionService(
@@ -47,6 +54,7 @@ public class CommissionService {
         signEnvelopeSubService = new CommissionSignEnvelopeSubService(envelopeKeyPair, commissionDbOperations);
         createAccountSubService = new CommissionCreateAccountSubService(commissionDbOperations, votingDbOperations, commissionBlockchainOperations, envelopeKeyPair);
         storedDataSubService = new CommissionStoredDataSubService(commissionDbOperations);
+        this.votingDbOperations = votingDbOperations;
     }
 
     public CompletionStage<CommissionInitResponse> init(CommissionInitRequest request, VerifiedJwt jwt) {
@@ -72,5 +80,42 @@ public class CommissionService {
     public CompletionStage<CommissionGetEnvelopeSignatureResponse> signatureOfEnvelope(String votingId, String user) {
         logger.info("signatureOfEnvelope(): votingId = {}, user = {}", votingId, user);
         return storedDataSubService.signatureOfEnvelope(votingId, user);
+    }
+
+    public CompletionStage<CommissionGetAnEncryptedOptionCodeResponse> encryptOptionCode(String votingId, Integer optionCode) {
+        logger.info("encryptOptionCode(): votingId = {}", Base62Conversions.decode(votingId));
+        return checkIfOptionCodeIsValid(optionCode)
+                .thenCompose(v -> Base62Conversions.decodeAsStage(votingId))
+                .thenCompose(votingDbOperations::single)
+                .thenApply(CommissionService::getEncryptionKeyFrom)
+                .thenApply(key -> EncryptedVoting.encryptOptionCode(key, optionCode))
+                .thenApply(CommissionService::toResponse);
+
+    }
+
+    private static CompletionStage<Void> checkIfOptionCodeIsValid(Integer optionCode) {
+        return runAsync(() -> {
+            if (optionCode < 1 || optionCode > 999) {
+                String message = "Option code must be > 0 and < 1000, but it was " + optionCode;
+                logger.warn("checkIfOptionCodeIsValid()" + message);
+                throw new BusinessLogicViolationException(message);
+            }
+        });
+    }
+
+    private static String getEncryptionKeyFrom(JpaVoting voting) {
+        if (voting.getEncryptionKey() == null || voting.getEncryptionKey().length() == 0) {
+            String message = String.format("Encrpytion of option code has been requested, but voting %d is not encrypted!", voting.getId());
+            logger.warn("getEncryptionKeyFrom()" + message);
+            throw new BusinessLogicViolationException(message);
+        }
+
+        return voting.getEncryptionKey();
+    }
+
+    private static CommissionGetAnEncryptedOptionCodeResponse toResponse(String encryptedOptionCode) {
+        CommissionGetAnEncryptedOptionCodeResponse response = new CommissionGetAnEncryptedOptionCodeResponse();
+        response.setResult(encryptedOptionCode);
+        return response;
     }
 }

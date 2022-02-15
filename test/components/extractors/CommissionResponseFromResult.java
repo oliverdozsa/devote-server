@@ -30,4 +30,9 @@ public class CommissionResponseFromResult {
         JsonNode accountCreationResponse = jsonOf(result);
         return accountCreationResponse.get("transaction").asText();
     }
+
+    public static String encryptedOptionCodeOf(Result result) {
+        JsonNode encryptedOptionCodeJson = jsonOf(result);
+        return encryptedOptionCodeJson.get("result").asText();
+    }
 }

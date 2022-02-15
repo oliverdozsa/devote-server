@@ -12,6 +12,7 @@ import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
 import responses.CommissionAccountCreationResponse;
+import responses.CommissionGetAnEncryptedOptionCodeResponse;
 import responses.CommissionGetEnvelopeSignatureResponse;
 import responses.CommissionInitResponse;
 import responses.CommissionSignEnvelopeResponse;
@@ -115,6 +116,13 @@ public class CommissionController extends Controller {
                 .exceptionally(mapExceptionWithUnpack);
     }
 
+    public CompletionStage<Result> getAnEncryptedOptionsCode(String votingId, Integer optionCode) {
+        logger.info("getAnEncryptedOptionsCode(): votingId = {}", votingId);
+        return commissionService.encryptOptionCode(votingId, optionCode)
+                .thenApply(this::toResult)
+                .exceptionally(mapExceptionWithUnpack);
+    }
+
     private Result toResult(CommissionInitResponse initResponse) {
         Result result = ok(Json.toJson(initResponse));
         return result.withHeader("SESSION-TOKEN", initResponse.getSessionJwt());
@@ -134,5 +142,9 @@ public class CommissionController extends Controller {
 
     private Result toResult(CommissionGetEnvelopeSignatureResponse getEnvelopeSignatureResponse) {
         return ok(Json.toJson(getEnvelopeSignatureResponse));
+    }
+
+    private Result toResult(CommissionGetAnEncryptedOptionCodeResponse encryptedOptionCodeResponse) {
+        return ok(Json.toJson(encryptedOptionCodeResponse));
     }
 }

@@ -100,6 +100,14 @@ public class CommissionTestClient extends TestClient {
         return route(application, httpRequest);
     }
 
+    public Result encryptOptionCode(String votingId, Integer optionCode) {
+        Http.RequestBuilder httpRequest = new Http.RequestBuilder()
+                .method(GET)
+                .uri(routes.CommissionController.getAnEncryptedOptionsCode(votingId, optionCode).url());
+
+        return route(application, httpRequest);
+    }
+
     public static class SignOnEnvelopeResult {
         public Result http;
         public RsaEnvelope envelope;

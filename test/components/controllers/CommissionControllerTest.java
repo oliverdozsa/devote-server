@@ -5,6 +5,7 @@ import components.clients.VotingTestClient;
 import controllers.routes;
 import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;
+import services.Base62Conversions;
 import units.ipfs.api.imp.MockIpfsApi;
 import units.ipfs.api.imp.MockIpfsProvider;
 import org.junit.Before;
@@ -35,6 +36,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.isEmptyString;
+import static org.junit.Assert.fail;
 import static play.inject.Bindings.bind;
 import static play.mvc.Http.HeaderNames.CONTENT_TYPE;
 import static play.mvc.Http.HeaderNames.LOCATION;
@@ -70,7 +72,7 @@ public class CommissionControllerTest {
     @Test
     public void testInit() throws InterruptedException {
         // Given
-        String votingId = createValidVoting();
+        String votingId = createValidVotingWithWaitingForFullInit();
         CommissionInitRequest initRequest = new CommissionInitRequest();
         initRequest.setVotingId(votingId);
 
@@ -87,7 +89,7 @@ public class CommissionControllerTest {
     @Test
     public void testInitVotingIsNotInitializedProperly() throws InterruptedException {
         // Given
-        String votingId = createValidVoting(false);
+        String votingId = createValidVoting();
         CommissionInitRequest initRequest = new CommissionInitRequest();
         initRequest.setVotingId(votingId);
 
@@ -343,17 +345,98 @@ public class CommissionControllerTest {
         assertThat(statusOf(getEnvelopeSignatureResult), equalTo(NOT_FOUND));
     }
 
-    private String createValidVoting(boolean shouldWait) throws InterruptedException {
+    @Test
+    public void testEncryptOptionCodeForVoting() throws InterruptedException {
+        // Given
+        String votingId = createValidVoting();
+
+        // When
+        int anOptionCode = 42;
+        Result anEncryptedOptionResult = testClient.encryptOptionCode(votingId, anOptionCode);
+        Result anotherEncryptedOptionResult = testClient.encryptOptionCode(votingId, anOptionCode);
+
+        // Then
+        assertThat(statusOf(anEncryptedOptionResult), equalTo(OK));
+        assertThat(statusOf(anotherEncryptedOptionResult), equalTo(OK));
+
+        String firstEncryptedOptionCode = encryptedOptionCodeOf(anEncryptedOptionResult);
+        String secondEncryptedOptionCode = encryptedOptionCodeOf(anotherEncryptedOptionResult);
+
+        assertThat(firstEncryptedOptionCode, notNullValue());
+        assertThat(firstEncryptedOptionCode.length(), greaterThan(0));
+        assertThat(secondEncryptedOptionCode, notNullValue());
+        assertThat(secondEncryptedOptionCode.length(), greaterThan(0));
+        assertThat(firstEncryptedOptionCode, not(equalTo(secondEncryptedOptionCode)));
+    }
+
+    @Test
+    public void testEncryptOptionCodeForVoting_InvalidOptionCode() throws InterruptedException {
+        // Given
+        String votingId = createValidVoting();
+
+        // When
+        int anOptionCode = 4200;
+        Result anEncryptedOptionResult = testClient.encryptOptionCode(votingId, anOptionCode);
+
+        // Then
+        assertThat(statusOf(anEncryptedOptionResult), equalTo(BAD_REQUEST));
+
+    }
+
+    @Test
+    public void testEncryptOptionCodeForVoting_VotingDoesNotExist() throws InterruptedException {
+        // Given
+        createValidVoting();
+
+        // When
+        int anOptionCode = 42;
+        Result anEncryptedOptionResult = testClient.encryptOptionCode(Base62Conversions.encode(42L), anOptionCode);
+
+        // Then
+        assertThat(statusOf(anEncryptedOptionResult), equalTo(NOT_FOUND));
+    }
+
+    @Test
+    public void testEncryptOptionCodeForVoting_VotingIsNotEncrypted() throws InterruptedException {
+        // Given
+        String votingId = createValidNotEncyptedVoting();
+
+        // When
+        int anOptionCode = 42;
+        Result anEncryptedOptionResult = testClient.encryptOptionCode(votingId, anOptionCode);
+
+
+        // Then
+        assertThat(statusOf(anEncryptedOptionResult), equalTo(BAD_REQUEST));
+    }
+
+    private String createValidVotingWithWaitingForFullInit() throws InterruptedException {
+        String votingId = createValidVoting();
+        Thread.sleep(8 * 1000);
+        return votingId;
+    }
+
+    private String createValidVoting() {
         CreateVotingRequest createVotingRequest = createValidVotingRequest();
         createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
         createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
+
+        return createVoting(createVotingRequest);
+    }
+
+    private String createValidNotEncyptedVoting() {
+        CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
+        createVotingRequest.setEncryptedUntil(null);
+
+        return createVoting(createVotingRequest);
+    }
+
+    private String createVoting(CreateVotingRequest createVotingRequest) {
         Result result = votingTestClient.createVoting(createVotingRequest);
         assertThat(statusOf(result), equalTo(CREATED));
         assertThat(result, hasLocationHeader());
-
-        if(shouldWait) {
-            Thread.sleep(8 * 1000);
-        }
 
         String locationUrl = result.headers().get(LOCATION);
         String[] locationUrlParts = locationUrl.split("/");
@@ -362,13 +445,9 @@ public class CommissionControllerTest {
         return votingId;
     }
 
-    private String createValidVoting() throws InterruptedException {
-        return createValidVoting(true);
-    }
-
     private InitData initVotingFor(String userId) throws InterruptedException {
         // Given
-        String votingId = createValidVoting();
+        String votingId = createValidVotingWithWaitingForFullInit();
         CommissionInitRequest initRequest = new CommissionInitRequest();
         initRequest.setVotingId(votingId);
 

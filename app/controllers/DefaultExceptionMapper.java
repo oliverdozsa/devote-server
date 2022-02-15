@@ -24,7 +24,7 @@ public class DefaultExceptionMapper implements Function<Throwable, Result> {
     public Result apply(Throwable input) {
         logger.info("apply(): input class = {}", input.getClass().getCanonicalName());
         if (input instanceof BusinessLogicViolationException) {
-            logger.warn("Bad Request due to business logic violation!", input);
+            logger.warn("Bad request due to business logic violation!", input);
             return badRequest(((BusinessLogicViolationException) input).errorContent);
         }
 
