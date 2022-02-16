@@ -4,11 +4,15 @@ import data.entities.Authorization;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingPoll;
 import data.entities.JpaVotingPollOption;
+import play.Logger;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class VotingResponseFromJpaVoting {
+    private static final Logger.ALogger logger = Logger.of(VotingResponseFromJpaVoting.class);
+
     public VotingResponse convert(JpaVoting jpaVoting) {
         VotingResponse votingResponse = new VotingResponse();
 
@@ -33,6 +37,7 @@ public class VotingResponseFromJpaVoting {
         votingResponse.setVisibility(jpaVoting.getVisibility().name());
         votingResponse.setIssuerAccountId(jpaVoting.getIssuerAccountPublic());
         votingResponse.setAssetCode(jpaVoting.getAssetCode());
+        setDecryptionKeyIfNeeded(votingResponse, jpaVoting);
     }
 
     private void setDistributionAndBallotAccountId(VotingResponse ipfsVoting, JpaVoting jpaVoting) {
@@ -76,5 +81,12 @@ public class VotingResponseFromJpaVoting {
         votingPollOptionResponse.setName(jpaPollOption.getName());
 
         return votingPollOptionResponse;
+    }
+
+    private static void setDecryptionKeyIfNeeded(VotingResponse votingResponse, JpaVoting jpaVoting) {
+        if(jpaVoting.getEncryptedUntil().compareTo(Instant.now()) <= 0) {
+            logger.info("Encrypted until expired for voting {}, giving decryption key in response.", jpaVoting.getId());
+            votingResponse.setDecryptionKey(jpaVoting.getEncryptionKey());
+        }
     }
 }

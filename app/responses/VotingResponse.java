@@ -11,6 +11,7 @@ public class VotingResponse {
     private List<VotingPollResponse> polls;
     private Instant createdAt;
     private Instant encryptedUntil;
+    private String decryptionKey;
     private Instant startDate;
     private Instant endDate;
     private String distributionAccountId;
@@ -147,5 +148,13 @@ public class VotingResponse {
 
     public void setAssetCode(String assetCode) {
         this.assetCode = assetCode;
+    }
+
+    public String getDecryptionKey() {
+        return decryptionKey;
+    }
+
+    public void setDecryptionKey(String decryptionKey) {
+        this.decryptionKey = decryptionKey;
     }
 }

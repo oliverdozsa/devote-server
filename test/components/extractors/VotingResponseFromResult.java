@@ -13,4 +13,9 @@ public class VotingResponseFromResult {
         JsonNode votingResponseJson = GenericDataFromResult.jsonOf(result);
         return votingResponseJson.get("network").asText();
     }
+
+    public static String decryptionKeyOf(Result result) {
+        JsonNode votingResponseJson = GenericDataFromResult.jsonOf(result);
+        return votingResponseJson.get("decryptionKey").asText();
+    }
 }
