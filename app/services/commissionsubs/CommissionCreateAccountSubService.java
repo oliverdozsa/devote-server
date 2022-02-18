@@ -2,7 +2,6 @@ package services.commissionsubs;
 
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
-import data.entities.JpaChannelGeneratorAccount;
 import data.operations.CommissionDbOperations;
 import data.operations.VotingDbOperations;
 import devote.blockchain.api.Account;

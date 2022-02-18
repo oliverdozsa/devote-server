@@ -29,7 +29,6 @@ public class IpfsVotingFromJpaVoting {
         ipfsVoting.setEndDate(jpaVoting.getEndDate());
         setDistributionAndBallotAccountId(ipfsVoting, jpaVoting);
         ipfsVoting.setAuthorization(jpaVoting.getAuthorization().name());
-        setAuthOptionKeybase(ipfsVoting, jpaVoting);
         ipfsVoting.setVisibility(jpaVoting.getVisibility().name());
         ipfsVoting.setIssuerAccountId(jpaVoting.getIssuerAccountPublic());
         ipfsVoting.setAssetCode(jpaVoting.getAssetCode());
@@ -41,12 +40,6 @@ public class IpfsVotingFromJpaVoting {
 
         String ballotAccountPublic = jpaVoting.getBallotAccountPublic();
         ipfsVoting.setBallotAccountId(ballotAccountPublic);
-    }
-
-    private static void setAuthOptionKeybase(IpfsVoting ipfsVoting, JpaVoting jpaVoting) {
-        if(jpaVoting.getAuthorization() == Authorization.KEYBASE) {
-            ipfsVoting.setAuthOptionKeybase(jpaVoting.getAuthOptionKeybase().getTeamName());
-        }
     }
 
     private static void setPollData(IpfsVoting ipfsVoting, JpaVoting jpaVoting) {

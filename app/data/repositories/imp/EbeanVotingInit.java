@@ -2,9 +2,8 @@ package data.repositories.imp;
 
 import crypto.EncryptedVoting;
 import data.entities.Authorization;
+import data.entities.JpaVoter;
 import data.entities.JpaVoting;
-import data.entities.JpaVotingAuthorizationEmail;
-import data.entities.JpaVotingAuthorizationKeybase;
 import data.entities.JpaVotingPoll;
 import data.entities.JpaVotingPollOption;
 import data.entities.Visibility;
@@ -51,8 +50,6 @@ public class EbeanVotingInit {
     private static void setAuthorization(CreateVotingRequest request, JpaVoting voting) {
         if (request.getAuthorization() == CreateVotingRequest.Authorization.EMAILS) {
             setAuthOptionEmails(request, voting);
-        } else if (request.getAuthorization() == CreateVotingRequest.Authorization.KEYBASE) {
-            setAuthOptionKeyBase(request, voting);
         }
 
         String authString = request.getAuthorization().name();
@@ -60,24 +57,11 @@ public class EbeanVotingInit {
     }
 
     private static void setAuthOptionEmails(CreateVotingRequest request, JpaVoting voting) {
-        List<JpaVotingAuthorizationEmail> votingAuthorizationEmails =
-                toVotingAuthorizationEmails(request.getAuthorizationEmailOptions());
-        voting.setAuthOptionsEmails(votingAuthorizationEmails);
-    }
-
-    private static void setAuthOptionKeyBase(CreateVotingRequest request, JpaVoting voting) {
-        JpaVotingAuthorizationKeybase votingAuthorizationKeybase = new JpaVotingAuthorizationKeybase();
-        votingAuthorizationKeybase.setTeamName(request.getAuthorizationKeybaseOptions());
-        voting.setAuthOptionKeybase(votingAuthorizationKeybase);
-    }
-
-    private static List<JpaVotingAuthorizationEmail> toVotingAuthorizationEmails(List<String> emails) {
-        return emails.stream().map(email -> {
-                    JpaVotingAuthorizationEmail votingAuthorizationEmail = new JpaVotingAuthorizationEmail();
-                    votingAuthorizationEmail.setEmailAddress(email);
-                    return votingAuthorizationEmail;
-                })
+        List<JpaVoter> voters = request.getAuthorizationEmailOptions().stream()
+                .map(EbeanVotingInit::emailToVoter)
                 .collect(Collectors.toList());
+
+        voting.setVoters(voters);
     }
 
     public static JpaVotingPoll toVotingPoll(CreatePollRequest pollRequest) {
@@ -99,6 +83,13 @@ public class EbeanVotingInit {
         pollOption.setName(pollOptionRequest.getName());
 
         return pollOption;
+    }
+
+    private static JpaVoter emailToVoter(String email) {
+        JpaVoter jpaVoter = new JpaVoter();
+        jpaVoter.setEmail(email);
+
+        return jpaVoter;
     }
 
     private EbeanVotingInit() {

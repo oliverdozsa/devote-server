@@ -1,11 +1,14 @@
 package data.operations;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import data.entities.JpaCommissionSession;
 import data.entities.JpaStoredTransaction;
+import data.entities.JpaVoter;
 import data.entities.JpaVotingChannelAccount;
 import data.repositories.CommissionRepository;
 import executioncontexts.DatabaseExecutionContext;
 import play.Logger;
+import services.commissionsubs.userinfo.UserInfoCollector;
 
 import javax.inject.Inject;
 import java.util.Optional;
@@ -18,13 +21,18 @@ import static utils.StringUtils.redactWithEllipsis;
 public class CommissionDbOperations {
     private final CommissionRepository commissionRepository;
     private final DatabaseExecutionContext dbExecContext;
+    private final UserInfoCollector userInfoCollector;
 
     private static final Logger.ALogger logger = Logger.of(CommissionDbOperations.class);
 
     @Inject
-    public CommissionDbOperations(CommissionRepository commissionRepository, DatabaseExecutionContext dbExecContext) {
+    public CommissionDbOperations(
+            CommissionRepository commissionRepository,
+            DatabaseExecutionContext dbExecContext,
+            UserInfoCollector userInfoCollector) {
         this.commissionRepository = commissionRepository;
         this.dbExecContext = dbExecContext;
+        this.userInfoCollector = userInfoCollector;
     }
 
     public CompletionStage<Boolean> doesSessionExistForUserInVoting(Long votingId, String userId) {
@@ -86,6 +94,51 @@ public class CommissionDbOperations {
     public CompletionStage<Boolean> isVotingInitializedProperly(Long votingId) {
         logger.info("isVotingInitializedProperly(): votingId = {}", votingId);
         return supplyAsync(() -> commissionRepository.isVotingInitializedProperly(votingId), dbExecContext);
+    }
+
+    public CompletionStage<Void> collectUserInfoIfNeeded(String accessToken, String userId) {
+        return runAsync(() -> {
+            if(shouldNotCollectUserInfo(userId)) {
+                logger.info("collectUserInfo(): Already have info for user: {}", userId);
+                return;
+            }
+
+            logger.info("collectUserInfoIfNeeded(): collecting info for userId: {}", userId);
+
+            JsonNode userInfoJson = userInfoCollector.collect(accessToken);
+            logger.debug("collectUserInfo(): userInfoJson = {}", userInfoJson.toPrettyString());
+
+            if(tryAttachToEmail(userInfoJson)) {
+                logger.info("collectUserInfo(): successfully collected info based on email!");
+            } else {
+                logger.warn("collectUserInfo(): failed to collect user info! userId = {}", userId);
+            }
+        }, dbExecContext);
+    }
+
+    public CompletionStage<Boolean> doesParticipateInVoting(String userId, Long votingId) {
+        logger.info("doesParticipateInVoting(): userId = {}, votingId = {}", userId, votingId);
+        return supplyAsync(() -> commissionRepository.doesParticipateInVoting(userId, votingId), dbExecContext);
+    }
+
+    private boolean shouldNotCollectUserInfo(String userId) {
+        JpaVoter voter = commissionRepository.getVoterByUserId(userId);
+        return voter != null;
+    }
+
+    private boolean tryAttachToEmail(JsonNode userInfoJson) {
+        String email = userInfoJson.get("email").isNull() ? "" : userInfoJson.get("email").asText();
+        String userId = userInfoJson.get("sub").asText();
+        boolean isVerified = userInfoJson.get("email_verified").asBoolean();
+
+        if(email.isEmpty() || !isVerified) {
+            String emailInfo = String.format("email: %s, isVerified: %s", email, isVerified);
+            logger.warn("tryAttachToEmail(): user email is not valid! {}", emailInfo);
+            return false;
+        } else {
+            commissionRepository.setUserIdForEmail(email, userId);
+            return true;
+        }
     }
 }
 

@@ -9,8 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.time.Instant;
 import java.util.List;
@@ -90,12 +90,6 @@ public class JpaVoting {
     private Authorization authorization;
 
     @OneToMany(mappedBy = "voting", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
-    private List<JpaVotingAuthorizationEmail> authOptionsEmails;
-
-    @OneToOne(mappedBy = "voting")
-    private JpaVotingAuthorizationKeybase authOptionKeybase;
-
-    @OneToMany(mappedBy = "voting", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     private List<JpaVotingPoll> polls;
 
     @Column(name = "visibility", nullable = false)
@@ -107,6 +101,9 @@ public class JpaVoting {
 
     @OneToMany(mappedBy = "voting", cascade = {CascadeType.REMOVE})
     private List<JpaCommissionSession> initSessions;
+
+    @ManyToMany(mappedBy = "votings", cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
+    private List<JpaVoter> voters;
 
     public Long getId() {
         return id;
@@ -212,22 +209,6 @@ public class JpaVoting {
         this.authorization = authorization;
     }
 
-    public List<JpaVotingAuthorizationEmail> getAuthOptionsEmails() {
-        return authOptionsEmails;
-    }
-
-    public void setAuthOptionsEmails(List<JpaVotingAuthorizationEmail> authOptionsEmails) {
-        this.authOptionsEmails = authOptionsEmails;
-    }
-
-    public JpaVotingAuthorizationKeybase getAuthOptionKeybase() {
-        return authOptionKeybase;
-    }
-
-    public void setAuthOptionKeybase(JpaVotingAuthorizationKeybase authOptionKeybase) {
-        this.authOptionKeybase = authOptionKeybase;
-    }
-
     public List<JpaVotingPoll> getPolls() {
         return polls;
     }
@@ -314,5 +295,13 @@ public class JpaVoting {
 
     public void setIssuerAccountPublic(String issuerAccountPublic) {
         this.issuerAccountPublic = issuerAccountPublic;
+    }
+
+    public List<JpaVoter> getVoters() {
+        return voters;
+    }
+
+    public void setVoters(List<JpaVoter> voters) {
+        this.voters = voters;
     }
 }

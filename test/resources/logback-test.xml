@@ -26,16 +26,16 @@
 
     <logger name="play" level="INFO"/>
     <logger name="application" level="DEBUG"/>
-    <logger name="controllers" level="INFO"/>
-    <logger name="models" level="INFO"/>
-    <logger name="services" level="INFO"/>
-    <logger name="data" level="INFO"/>
-    <logger name="rules" level="INFO"/>
-    <logger name="security" level="INFO"/>
-    <logger name="devote" level="INFO"/>
-    <logger name="smokes" level="INFO"/>
-    <logger name="tasks" level="INFO"/>
-    <logger name="ipfs" level="INFO"/>
+    <logger name="controllers" level="DEBUG"/>
+    <logger name="models" level="DEBUG"/>
+    <logger name="services" level="DEBUG"/>
+    <logger name="data" level="DEBUG"/>
+    <logger name="rules" level="DEBUG"/>
+    <logger name="security" level="DEBUG"/>
+    <logger name="devote" level="DEBUG"/>
+    <logger name="smokes" level="DEBUG"/>
+    <logger name="tasks" level="DEBUG"/>
+    <logger name="ipfs" level="DEBUG"/>
 
     <!-- Off these ones as they are annoying, and anyway we manage configuration ourselves -->
     <logger name="com.avaje.ebean.config.PropertyMapLoader" level="OFF"/>

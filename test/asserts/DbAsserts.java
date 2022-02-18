@@ -2,11 +2,11 @@ package asserts;
 
 import data.entities.Authorization;
 import data.entities.JpaChannelAccountProgress;
-import data.entities.JpaStoredTransaction;
-import data.entities.JpaVoting;
-import data.entities.JpaVotingAuthorizationEmail;
-import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaChannelGeneratorAccount;
+import data.entities.JpaStoredTransaction;
+import data.entities.JpaVoter;
+import data.entities.JpaVoting;
+import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingPoll;
 import data.entities.JpaVotingPollOption;
 import io.ebean.Ebean;
@@ -23,7 +23,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class DbAsserts {
     public static void assertChannelProgressCompletedFor(Long votingId) {
@@ -69,9 +68,11 @@ public class DbAsserts {
         JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
 
         assertThat(voting.getAuthorization(), equalTo(Authorization.EMAILS));
-        assertThat(voting.getAuthOptionsEmails(), hasSize(emails.length));
+        assertThat(voting.getVoters(), hasSize(emails.length));
 
-        List<String> storedEmailAddresses = toEmailsList(voting.getAuthOptionsEmails());
+        List<String> storedEmailAddresses = voting.getVoters().stream()
+                .map(JpaVoter::getEmail)
+                .collect(Collectors.toList());
         assertThat(storedEmailAddresses, containsInAnyOrder(emails));
     }
 
@@ -111,12 +112,6 @@ public class DbAsserts {
     private static List<JpaVotingChannelAccount> channelAccountsOf(Long votingId) {
         JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
         return voting.getChannelAccounts();
-    }
-
-    private static List<String> toEmailsList(List<JpaVotingAuthorizationEmail> votingAuthorizationEmails) {
-        return votingAuthorizationEmails.stream()
-                .map(v -> v.getEmailAddress())
-                .collect(Collectors.toList());
     }
 
     private static void assertSavedOptionAreTheSame(List<JpaVotingPollOption> savedOptions, List<CreatePollOptionRequest> expectedOptions) {

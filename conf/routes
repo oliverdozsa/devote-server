@@ -6,11 +6,11 @@ GET     /voting/:id                                 controllers.VotingController
 + jwtFilter
 POST    /castvote/init                              controllers.CommissionController.init(request: Request)
 + jwtFilter
-POST    /castvote/signEnvelope                      controllers.CommissionController.signEnvelope(request: Request)
+POST    /castvote/:votingId/signEnvelope            controllers.CommissionController.signEnvelope(votingId: String, request: Request)
 POST    /castvote/createAccount                     controllers.CommissionController.createAccount(request: Request)
 GET     /castvote/txOfSignature/:signature          controllers.CommissionController.transactionOfSignature(signature: String)
 + jwtFilter
-GET     /castvote/envlSignature/:votingId/:user     controllers.CommissionController.getEnvelopeSignature(votingId: String, user: String)
+GET     /castvote/envlSignature/:votingId           controllers.CommissionController.getEnvelopeSignature(votingId: String, request: Request)
 
 # Other
 GET     /encryptoptioncode/:votingId/:optionCode    controllers.CommissionController.getAnEncryptedOptionsCode(votingId: String, optionCode: Integer)

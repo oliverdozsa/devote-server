@@ -6,32 +6,66 @@ import exceptions.ForbiddenException;
 import play.Logger;
 import requests.CommissionInitRequest;
 import responses.CommissionInitResponse;
-import security.JwtCenter;
 import security.VerifiedJwt;
 import services.Base62Conversions;
 
 import java.util.concurrent.CompletionStage;
 
+import static java.util.concurrent.CompletableFuture.runAsync;
+
 public class CommissionInitSubService {
     private final String envelopePublicKeyPem;
-    private final JwtCenter jwtCenter;
     private final CommissionDbOperations commissionDbOperations;
 
     private static final Logger.ALogger logger = Logger.of(CommissionInitSubService.class);
 
-    public CommissionInitSubService(String envelopePublicKeyPem, JwtCenter jwtCenter, CommissionDbOperations commissionDbOperations) {
+    public CommissionInitSubService(String envelopePublicKeyPem, CommissionDbOperations commissionDbOperations) {
         this.envelopePublicKeyPem = envelopePublicKeyPem;
-        this.jwtCenter = jwtCenter;
         this.commissionDbOperations = commissionDbOperations;
     }
 
     public CompletionStage<CommissionInitResponse> init(CommissionInitRequest request, VerifiedJwt jwt) {
         logger.info("init(): request = {}, userId = {}", request.toString(), jwt.getUserId());
-        return Base62Conversions.decodeAsStage(request.getVotingId())
+        return collectVoterInfoIfNeeded(jwt)
+                .thenCompose(v -> Base62Conversions.decodeAsStage(request.getVotingId()))
+                .thenCompose(decodedVotingId -> checkIfUserIsAllowedToParticipateInVoting(decodedVotingId, jwt))
                 .thenCompose(this::checkIfVotingIsInitializedProperly)
                 .thenCompose(decodedVotingId -> checkIfUserIsAuthorizedToInitSession(decodedVotingId, jwt.getUserId()))
                 .thenCompose(votingId -> commissionDbOperations.createSession(votingId, jwt.getUserId()))
                 .thenApply(this::toInitResponse);
+    }
+
+    private CompletionStage<Void> collectVoterInfoIfNeeded(VerifiedJwt jwt) {
+        return commissionDbOperations.collectUserInfoIfNeeded(jwt.accessToken(), jwt.getUserId());
+    }
+
+    private CompletionStage<Long> checkIfUserIsAllowedToParticipateInVoting(Long votingId, VerifiedJwt jwt) {
+        logger.info("checkIfUserIsAllowedToParticipateInVoting(): votingId = {}, userId = {}", votingId, jwt.getUserId());
+
+        return checkVoterRole(jwt)
+                .thenCompose(v -> commissionDbOperations.doesParticipateInVoting(jwt.getUserId(), votingId))
+                .thenCompose(doesParticipate -> checkIfDoesParticipate(doesParticipate, jwt.getUserId(), votingId))
+                .thenApply(v -> votingId);
+    }
+
+    private CompletionStage<Void> checkVoterRole(VerifiedJwt jwt) {
+        return runAsync(() -> {
+            if(!jwt.hasVoterRole()) {
+                String message = String.format("User %s has not voter role!", jwt.getUserId());
+                logger.warn("checkVoterRole(): {}", message);
+                throw new ForbiddenException(message);
+            }
+        });
+    }
+
+    private CompletionStage<Void> checkIfDoesParticipate(boolean doesParticipate, String userId, Long votingId) {
+        return runAsync(() -> {
+            if(!doesParticipate) {
+                String message = String.format("User %s does not participate in voting %d!", userId, votingId);
+                logger.warn("checkIfUserIsAllowedToParticipateInVoting(): {}", message);
+                throw new ForbiddenException(message);
+            }
+        });
     }
 
     private CompletionStage<Long> checkIfUserIsAuthorizedToInitSession(Long votingId, String userId) {
@@ -49,11 +83,8 @@ public class CommissionInitSubService {
                 });
     }
 
-    private CommissionInitResponse toInitResponse(JpaCommissionSession entity) {
+    private CommissionInitResponse toInitResponse(JpaCommissionSession votingSession) {
         CommissionInitResponse initResponse = new CommissionInitResponse();
-
-        String sessionJwt = jwtCenter.create(entity.getVoting().getId(), entity.getUserId());
-        initResponse.setSessionJwt(sessionJwt);
         initResponse.setPublicKey(envelopePublicKeyPem);
 
         return initResponse;
@@ -61,14 +92,14 @@ public class CommissionInitSubService {
 
     private CompletionStage<Long> checkIfVotingIsInitializedProperly(Long votingId) {
         return commissionDbOperations.isVotingInitializedProperly(votingId).thenApply(isProperlyInitialized -> {
-           if(isProperlyInitialized) {
-               logger.info("checkIfVotingIsInitializedProperly(): Voting is initialized properly.");
-               return votingId;
-           } else {
-               String message = String.format("Voting %d is not initialized properly.", votingId);
-               logger.warn("checkIfVotingIsInitializedProperly(): {}", message);
-               throw new ForbiddenException(message);
-           }
+            if (isProperlyInitialized) {
+                logger.info("checkIfVotingIsInitializedProperly(): Voting is initialized properly.");
+                return votingId;
+            } else {
+                String message = String.format("Voting %d is not initialized properly.", votingId);
+                logger.warn("checkIfVotingIsInitializedProperly(): {}", message);
+                throw new ForbiddenException(message);
+            }
         });
     }
 }

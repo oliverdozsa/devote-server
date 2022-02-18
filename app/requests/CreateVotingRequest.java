@@ -41,9 +41,6 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
 
     private List<@Constraints.Email String> authorizationEmailOptions;
 
-    @Constraints.MinLength(2)
-    private String authorizationKeybaseOptions;
-
     @Constraints.Required
     @Valid
     private List<CreatePollRequest> polls;
@@ -129,14 +126,6 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
         this.authorizationEmailOptions = authorizationEmailOptions;
     }
 
-    public String getAuthorizationKeybaseOptions() {
-        return authorizationKeybaseOptions;
-    }
-
-    public void setAuthorizationKeybaseOptions(String authorizationKeybaseOptions) {
-        this.authorizationKeybaseOptions = authorizationKeybaseOptions;
-    }
-
     @Override
     public String validate(Config config) {
         Integer minTimeInterval = config.getInt("devote.vote.related.min.time.interval.sec");
@@ -175,8 +164,7 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
             return true;
         }
 
-        return authorization == Authorization.KEYBASE &&
-                (authorizationKeybaseOptions == null || authorizationKeybaseOptions.length() == 0);
+        return false;
     }
 
     private boolean isStartEndDateNotValid(Integer minTimeIntervalSecs) {
@@ -233,7 +221,6 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
                 ", endDate=" + endDate +
                 ", authorization=" + authorization +
                 ", authorizationEmailOptions=" + authorizationEmailOptions +
-                ", authorizationKeybaseOptions='" + authorizationKeybaseOptions + '\'' +
                 ", polls=" + polls +
                 ", visibility=" + visibility +
                 ", fundingAccountPublic='" + StringUtils.redactWithEllipsis(fundingAccountPublic, 5) + '\'' +
@@ -242,13 +229,7 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
     }
 
     public enum Authorization {
-        OPEN,
-        EMAILS,
-        DOMAIN,
-        IP,
-        COOKIE,
-        CODE,
-        KEYBASE
+        EMAILS
     }
 
     public enum Visibility {

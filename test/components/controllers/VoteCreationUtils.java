@@ -2,16 +2,17 @@ package components.controllers;
 
 import components.clients.CommissionTestClient;
 import components.clients.VotingTestClient;
+import play.libs.Json;
 import play.mvc.Result;
 import requests.CommissionInitRequest;
 import requests.CreateVotingRequest;
+import security.UserInfoCollectorForTest;
 
 import java.time.Instant;
 import java.util.Arrays;
 
 import static components.controllers.VotingRequestMaker.createValidVotingRequest;
 import static components.extractors.CommissionResponseFromResult.publicKeyOf;
-import static components.extractors.CommissionResponseFromResult.sessionJwtOf;
 import static components.extractors.GenericDataFromResult.statusOf;
 import static matchers.ResultHasHeader.hasLocationHeader;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -38,7 +39,7 @@ public class VoteCreationUtils {
     public String createValidVoting() {
         CreateVotingRequest createVotingRequest = createValidVotingRequest();
         createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
-        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("alice@mail.com", "doe@where.de", "some@one.com"));
 
         return createVoting(createVotingRequest);
     }
@@ -78,6 +79,7 @@ public class VoteCreationUtils {
         String votingId = createValidVotingWithWaitingForFullInit();
         CommissionInitRequest initRequest = new CommissionInitRequest();
         initRequest.setVotingId(votingId);
+        UserInfoCollectorForTest.setReturnValue(Json.parse("{\"sub\": \"Alice\", \"email\": \"alice@mail.com\", \"email_verified\": true}"));
 
         // When
         Result result = testClient.init(initRequest, userId);
@@ -88,7 +90,6 @@ public class VoteCreationUtils {
         InitData initData = new InitData();
         initData.votingId = votingId;
         initData.publicKey = publicKeyOf(result);
-        initData.sessionJwt = sessionJwtOf(result);
 
         return initData;
     }
@@ -100,6 +101,5 @@ public class VoteCreationUtils {
     public static class InitData {
         public String votingId;
         public String publicKey;
-        public String sessionJwt;
     }
 }

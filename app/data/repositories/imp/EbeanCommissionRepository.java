@@ -3,6 +3,7 @@ package data.repositories.imp;
 import data.entities.JpaChannelGeneratorAccount;
 import data.entities.JpaCommissionSession;
 import data.entities.JpaStoredTransaction;
+import data.entities.JpaVoter;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
 import data.repositories.CommissionRepository;
@@ -10,6 +11,7 @@ import exceptions.ForbiddenException;
 import exceptions.InternalErrorException;
 import exceptions.NotFoundException;
 import io.ebean.EbeanServer;
+import io.ebean.SqlRow;
 import play.Logger;
 
 import javax.inject.Inject;
@@ -33,11 +35,7 @@ public class EbeanCommissionRepository implements CommissionRepository {
     public Optional<JpaCommissionSession> getByVotingIdAndUserId(Long votingId, String userId) {
         logger.info("getByVotingAndUserId(): votingId = {}, userId = {}", votingId, userId);
 
-        JpaCommissionSession entity = ebeanServer.createQuery(JpaCommissionSession.class)
-                .where()
-                .eq("voting.id", votingId)
-                .eq("userId", userId)
-                .findOne();
+        JpaCommissionSession entity = find(userId, votingId);
 
         return Optional.ofNullable(entity);
     }
@@ -48,10 +46,15 @@ public class EbeanCommissionRepository implements CommissionRepository {
 
         assertEntityExists(ebeanServer, JpaVoting.class, votingId);
 
+        JpaVoter voter = findVoterWith(userId);
+        if (voter == null) {
+            throw new NotFoundException("Not found user with id: " + userId);
+        }
+
         JpaCommissionSession initSession = new JpaCommissionSession();
         JpaVoting voting = ebeanServer.find(JpaVoting.class, votingId);
         initSession.setVoting(voting);
-        initSession.setUserId(userId);
+        initSession.setVoter(voter);
 
         ebeanServer.save(initSession);
         return initSession;
@@ -169,6 +172,8 @@ public class EbeanCommissionRepository implements CommissionRepository {
 
     @Override
     public boolean isVotingInitializedProperly(Long votingId) {
+        logger.info("isVotingInitializedProperly(): votingId = {}", votingId);
+
         assertEntityExists(ebeanServer, JpaVoting.class, votingId);
         JpaVoting voting = ebeanServer.find(JpaVoting.class, votingId);
 
@@ -177,10 +182,50 @@ public class EbeanCommissionRepository implements CommissionRepository {
                 voting.getBallotAccountPublic() != null && voting.getBallotAccountPublic().length() > 0;
     }
 
+    @Override
+    public void setUserIdForEmail(String email, String userId) {
+        logger.info("setUserIdForEmail(): email = {}, userId = {}", email, userId);
+
+        JpaVoter voter = ebeanServer.createQuery(JpaVoter.class)
+                .where()
+                .eq("email", email)
+                .findOne();
+
+        if (voter == null) {
+            logger.warn("setUserIdForEmail(): not found voter for email: {}", email);
+            throw new NotFoundException("Not found voter for email: " + email);
+        }
+
+        voter.setUserId(userId);
+        ebeanServer.update(voter);
+    }
+
+    @Override
+    public JpaVoter getVoterByUserId(String userId) {
+        logger.info("getVoterByUserId(): userId = {}", userId);
+        return ebeanServer.createQuery(JpaVoter.class)
+                .where()
+                .eq("userId", userId)
+                .findOne();
+    }
+
+    @Override
+    public boolean doesParticipateInVoting(String userId, Long votingId) {
+        logger.info("doesParticipateInVoting(): userId = {}, votingId = {}", userId, votingId);
+
+        JpaVoter voter = ebeanServer.createQuery(JpaVoter.class)
+                .where()
+                .eq("userId", userId)
+                .eq("votings.id", votingId)
+                .findOne();
+
+        return voter != null;
+    }
+
     private JpaCommissionSession find(String userId, Long votingId) {
         return ebeanServer.createQuery(JpaCommissionSession.class)
                 .where()
-                .eq("userId", userId)
+                .eq("voter.userId", userId)
                 .eq("voting.id", votingId)
                 .findOne();
     }
@@ -209,5 +254,12 @@ public class EbeanCommissionRepository implements CommissionRepository {
 
     private static String toSignatureFootPrint(String signature) {
         return redact(signature, 255);
+    }
+
+    private JpaVoter findVoterWith(String userId) {
+        return ebeanServer.createQuery(JpaVoter.class)
+                .where()
+                .eq("userId", userId)
+                .findOne();
     }
 }

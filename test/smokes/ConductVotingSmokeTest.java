@@ -75,7 +75,7 @@ public class ConductVotingSmokeTest {
 
     @Test
     public void testVotingOnNetworks() throws InterruptedException {
-        for(String network: supportedNetworks) {
+        for (String network : supportedNetworks) {
             testVotingOnNetwork(network);
         }
     }
@@ -89,12 +89,12 @@ public class ConductVotingSmokeTest {
 
     private void testVotingOnNetwork(String networkName) throws InterruptedException {
         // Given
-        InitData votingInitData = initVotingFor("Bob", networkName);
+        InitData votingInitData = initVotingFor("Alice", networkName);
         Thread.sleep(45 * 1000); // So that some channel accounts are present.
 
         String message = createMessage(votingInitData.votingId, generateVoterPublic(networkName));
 
-        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", message, votingInitData.votingId);
         assertThat(statusOf(result.http), equalTo(OK));
         assertThat(envelopeSignatureOf(result.http), notNullValue());
         assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
@@ -134,7 +134,6 @@ public class ConductVotingSmokeTest {
         InitData initData = new InitData();
         initData.votingId = votingId;
         initData.publicKey = publicKeyOf(result);
-        initData.sessionJwt = sessionJwtOf(result);
 
         return initData;
     }
@@ -171,7 +170,7 @@ public class ConductVotingSmokeTest {
     }
 
     private String generateVoterPublic(String network) {
-        if(network.equals("stellar")) {
+        if (network.equals("stellar")) {
             return KeyPair.random().getAccountId();
         }
 
@@ -181,6 +180,5 @@ public class ConductVotingSmokeTest {
     private static class InitData {
         public String votingId;
         public String publicKey;
-        public String sessionJwt;
     }
 }

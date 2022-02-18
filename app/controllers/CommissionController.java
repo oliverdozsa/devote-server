@@ -62,7 +62,7 @@ public class CommissionController extends Controller {
         }
     }
 
-    public CompletionStage<Result> signEnvelope(Http.Request request) {
+    public CompletionStage<Result> signEnvelope(String votingId, Http.Request request) {
         logger.info("signEnvelope()");
 
         Form<CommissionSignEnvelopeRequest> signEnvelopeRequestForm = formFactory.form(CommissionSignEnvelopeRequest.class)
@@ -76,7 +76,7 @@ public class CommissionController extends Controller {
         } else {
             VerifiedJwt jwt = SecurityUtils.getFromRequest(request);
 
-            return commissionService.signEnvelope(signEnvelopeRequestForm.get(), jwt)
+            return commissionService.signEnvelope(signEnvelopeRequestForm.get(), jwt, votingId)
                     .thenApply(this::toResult)
                     .exceptionally(mapExceptionWithUnpack);
         }
@@ -109,9 +109,11 @@ public class CommissionController extends Controller {
                 .exceptionally(mapExceptionWithUnpack);
     }
 
-    public CompletionStage<Result> getEnvelopeSignature(String votingId, String user) {
-        logger.info("getEnvelopeSignature(): votingId = {}, user = {}", votingId, user);
-        return commissionService.signatureOfEnvelope(votingId, user)
+    public CompletionStage<Result> getEnvelopeSignature(String votingId, Http.Request request) {
+        VerifiedJwt jwt = SecurityUtils.getFromRequest(request);
+
+        logger.info("getEnvelopeSignature(): votingId = {}, user = {}", votingId, jwt.getUserId());
+        return commissionService.signatureOfEnvelope(votingId, jwt.getUserId())
                 .thenApply(this::toResult)
                 .exceptionally(mapExceptionWithUnpack);
     }
@@ -124,8 +126,7 @@ public class CommissionController extends Controller {
     }
 
     private Result toResult(CommissionInitResponse initResponse) {
-        Result result = ok(Json.toJson(initResponse));
-        return result.withHeader("SESSION-TOKEN", initResponse.getSessionJwt());
+        return ok(Json.toJson(initResponse));
     }
 
     private Result toResult(CommissionSignEnvelopeResponse signEnvelopeResponse) {

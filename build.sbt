@@ -19,6 +19,7 @@ libraryDependencies ++= Seq(evolutions, jdbc)
 libraryDependencies += "org.bouncycastle" % "bcprov-jdk15on" % "1.68"
 libraryDependencies += "org.bouncycastle" % "bcpkix-jdk15on" % "1.68"
 libraryDependencies += "com.auth0" % "java-jwt" % "3.8.2"
+libraryDependencies += "com.auth0" % "jwks-rsa" % "0.20.0"
 libraryDependencies ++= Seq(javaWs)
 libraryDependencies += "io.seruco.encoding" % "base62" % "0.1.3"
 libraryDependencies += "com.github.stellar" % "java-stellar-sdk" % "0.24.0"

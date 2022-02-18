@@ -47,10 +47,9 @@ public class CommissionService {
             @Named("envelope") AsymmetricCipherKeyPair envelopeKeyPair,
             CommissionDbOperations commissionDbOperations,
             VotingDbOperations votingDbOperations,
-            CommissionBlockchainOperations commissionBlockchainOperations,
-            JwtCenter jwtCenter
+            CommissionBlockchainOperations commissionBlockchainOperations
     ) {
-        initSubService = new CommissionInitSubService(publicKeyToPemString(envelopeKeyPair), jwtCenter, commissionDbOperations);
+        initSubService = new CommissionInitSubService(publicKeyToPemString(envelopeKeyPair), commissionDbOperations);
         signEnvelopeSubService = new CommissionSignEnvelopeSubService(envelopeKeyPair, commissionDbOperations);
         createAccountSubService = new CommissionCreateAccountSubService(commissionDbOperations, votingDbOperations, commissionBlockchainOperations, envelopeKeyPair);
         storedDataSubService = new CommissionStoredDataSubService(commissionDbOperations);
@@ -62,9 +61,9 @@ public class CommissionService {
         return initSubService.init(request, jwt);
     }
 
-    public CompletionStage<CommissionSignEnvelopeResponse> signEnvelope(CommissionSignEnvelopeRequest request, VerifiedJwt jwt) {
-        logger.info("signEnvelope(): user: {}, voting: {}", jwt.getUserId(), jwt.getVotingId());
-        return signEnvelopeSubService.signEnvelope(request, jwt);
+    public CompletionStage<CommissionSignEnvelopeResponse> signEnvelope(CommissionSignEnvelopeRequest request, VerifiedJwt jwt, String votingId) {
+        logger.info("signEnvelope(): user: {}, voting: {}", jwt.getUserId(), votingId);
+        return signEnvelopeSubService.signEnvelope(request, jwt, votingId);
     }
 
     public CompletionStage<CommissionAccountCreationResponse> createAccount(CommissionAccountCreationRequest request) {

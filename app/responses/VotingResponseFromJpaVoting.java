@@ -1,6 +1,5 @@
 package responses;
 
-import data.entities.Authorization;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingPoll;
 import data.entities.JpaVotingPollOption;
@@ -33,7 +32,6 @@ public class VotingResponseFromJpaVoting {
         votingResponse.setEndDate(jpaVoting.getEndDate());
         setDistributionAndBallotAccountId(votingResponse, jpaVoting);
         votingResponse.setAuthorization(jpaVoting.getAuthorization().name());
-        setAuthOptionKeybase(votingResponse, jpaVoting);
         votingResponse.setVisibility(jpaVoting.getVisibility().name());
         votingResponse.setIssuerAccountId(jpaVoting.getIssuerAccountPublic());
         votingResponse.setAssetCode(jpaVoting.getAssetCode());
@@ -46,12 +44,6 @@ public class VotingResponseFromJpaVoting {
 
         String ballotAccountPublic = jpaVoting.getBallotAccountPublic();
         ipfsVoting.setBallotAccountId(ballotAccountPublic);
-    }
-
-    private static void setAuthOptionKeybase(VotingResponse ipfsVoting, JpaVoting jpaVoting) {
-        if(jpaVoting.getAuthorization() == Authorization.KEYBASE) {
-            ipfsVoting.setAuthOptionKeybase(jpaVoting.getAuthOptionKeybase().getTeamName());
-        }
     }
 
     private void setPollData(VotingResponse votingResponse, JpaVoting jpaVoting) {

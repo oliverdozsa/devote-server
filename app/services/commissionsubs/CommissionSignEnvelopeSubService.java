@@ -25,19 +25,15 @@ public class CommissionSignEnvelopeSubService {
         this.commissionDbOperations = commissionDbOperations;
     }
 
-    public CompletionStage<CommissionSignEnvelopeResponse> signEnvelope(CommissionSignEnvelopeRequest request, VerifiedJwt jwt) {
-        logger.info("signEnvelope(): user: {}, voting: {}", jwt.getUserId(), jwt.getVotingId());
-
-        if (!jwt.getVotingId().isPresent()) {
-            throw new BusinessLogicViolationException("Missing voting ID in JWT! user: " + jwt.getUserId());
-        }
+    public CompletionStage<CommissionSignEnvelopeResponse> signEnvelope(CommissionSignEnvelopeRequest request, VerifiedJwt jwt, String votingId) {
+        logger.info("signEnvelope(): user: {}, voting: {}", jwt.getUserId(), votingId);
 
         String userId = jwt.getUserId();
-        Long votingId = jwt.getVotingId().get();
+        Long votingIdDecoded = Base62Conversions.decode(votingId);
 
-        return commissionDbOperations.hasAlreadySignedAnEnvelope(userId, votingId)
-                .thenAccept(hasAlreadySigned -> forbidIfUserAlreadySignedAnEnvelope(userId, votingId, hasAlreadySigned))
-                .thenCompose(v -> createAndSaveEnvelopeSignature(request, userId, votingId))
+        return commissionDbOperations.hasAlreadySignedAnEnvelope(userId, votingIdDecoded)
+                .thenAccept(hasAlreadySigned -> forbidIfUserAlreadySignedAnEnvelope(userId, votingIdDecoded, hasAlreadySigned))
+                .thenCompose(v -> createAndSaveEnvelopeSignature(request, userId, votingIdDecoded))
                 .thenApply(this::createResponse);
     }
 

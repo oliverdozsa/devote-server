@@ -10,6 +10,7 @@ import requests.CreateVotingRequest;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -57,26 +58,11 @@ public class CreateVotingRequestTest {
     }
 
     @Test
-    public void testAuthorizationKeybaseNotValid() {
-        // Given
-        CreateVotingRequest createVotingRequest = new CreateVotingRequest();
-        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.KEYBASE);
-        createVotingRequest.setAuthorizationKeybaseOptions("");
-
-        // When
-        String errorMessage = createVotingRequest.validate(mockConfig);
-
-        // Then
-        assertThat(errorMessage, notNullValue());
-        assertThat(errorMessage, containsString("Invalid authorization!"));
-    }
-
-    @Test
     public void testStartDateNull() {
         // Given
         CreateVotingRequest createVotingRequest = new CreateVotingRequest();
-        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.KEYBASE);
-        createVotingRequest.setAuthorizationKeybaseOptions("someTeam");
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("one@one.com", "two@one.com"));
         createVotingRequest.setStartDate(null);
 
         // When
@@ -91,8 +77,8 @@ public class CreateVotingRequestTest {
     public void testStartDateWithEndDateInPast() {
         // Given
         CreateVotingRequest createVotingRequest = new CreateVotingRequest();
-        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.KEYBASE);
-        createVotingRequest.setAuthorizationKeybaseOptions("someTeam");
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("one@one.com", "two@one.com"));
         createVotingRequest.setStartDate(Instant.now());
         createVotingRequest.setStartDate(Instant.now().minus(Duration.ofDays(1)));
 

@@ -23,9 +23,13 @@ import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import play.data.format.Formatters;
 import security.JwtCenter;
+import security.jwtverification.Auth0JwtVerification;
+import security.jwtverification.JwtVerification;
 import services.CommissionService;
 import services.EnvelopKeyPairProvider;
 import services.VotingService;
+import services.commissionsubs.userinfo.Auth0UserInfoCollector;
+import services.commissionsubs.userinfo.UserInfoCollector;
 import tasks.TasksOrganizer;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
 import tasks.votingblockchaininit.VotingBlockchainInitTaskContext;
@@ -65,6 +69,10 @@ public class Module extends AbstractModule {
         bind(ChannelAccountBuilderTaskContext.class).asEagerSingleton();
         bind(VotingBlockchainInitTaskContext.class).asEagerSingleton();
         bind(TasksOrganizer.class).asEagerSingleton();
+
+        // Auth
+        bind(JwtVerification.class).to(Auth0JwtVerification.class).asEagerSingleton();
+        bind(UserInfoCollector.class).to(Auth0UserInfoCollector.class).asEagerSingleton();
 
         // Other
         bind(AsymmetricCipherKeyPair.class).annotatedWith(Names.named("envelope"))

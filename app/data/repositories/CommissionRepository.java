@@ -2,6 +2,7 @@ package data.repositories;
 
 import data.entities.JpaCommissionSession;
 import data.entities.JpaStoredTransaction;
+import data.entities.JpaVoter;
 import data.entities.JpaVotingChannelAccount;
 
 import java.util.Optional;
@@ -17,4 +18,7 @@ public interface CommissionRepository {
     JpaStoredTransaction getTransaction(String signature);
     JpaCommissionSession getCommissionSessionWithExistingEnvelopeSignature(Long votingId, String user);
     boolean isVotingInitializedProperly(Long votingId);
+    void setUserIdForEmail(String email, String userId);
+    JpaVoter getVoterByUserId(String userId);
+    boolean doesParticipateInVoting(String userId, Long votingId);
 }

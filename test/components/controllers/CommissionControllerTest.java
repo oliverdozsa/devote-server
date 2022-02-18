@@ -3,7 +3,6 @@ package components.controllers;
 import components.clients.CommissionTestClient;
 import components.clients.VotingTestClient;
 import controllers.routes;
-import crypto.AesCtrCrypto;
 import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;
 import org.junit.Before;
@@ -17,20 +16,21 @@ import play.mvc.Result;
 import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import rules.RuleChainForTests;
-import services.Base62Conversions;
+import security.UserInfoCollectorForTest;
+import security.jwtverification.JwtVerificationForTests;
+import security.jwtverification.JwtVerification;
+import services.commissionsubs.userinfo.UserInfoCollector;
 import units.ipfs.api.imp.MockIpfsApi;
 import units.ipfs.api.imp.MockIpfsProvider;
 import utils.JwtTestUtils;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
 import java.util.Date;
 
 import static asserts.DbAsserts.assertThatTransactionIsStoredFor;
 import static components.extractors.CommissionResponseFromResult.*;
 import static components.extractors.GenericDataFromResult.statusOf;
-import static components.extractors.VotingResponseFromResult.decryptionKeyOf;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
@@ -55,7 +55,9 @@ public class CommissionControllerTest {
     public CommissionControllerTest() {
         GuiceApplicationBuilder applicationBuilder = new GuiceApplicationBuilder()
                 .overrides(bind(IpfsApi.class).to(MockIpfsApi.class))
-                .overrides(bind(IPFS.class).toProvider(MockIpfsProvider.class));
+                .overrides(bind(IPFS.class).toProvider(MockIpfsProvider.class))
+                .overrides(bind(UserInfoCollector.class).to(UserInfoCollectorForTest.class))
+                .overrides((bind(JwtVerification.class).to(JwtVerificationForTests.class)));
 
         ruleChainForTests = new RuleChainForTests(applicationBuilder);
         chain = ruleChainForTests.getRuleChain();
@@ -66,6 +68,7 @@ public class CommissionControllerTest {
         testClient = new CommissionTestClient(ruleChainForTests.getApplication());
         votingTestClient = new VotingTestClient(ruleChainForTests.getApplication());
         voteCreationUtils = new VoteCreationUtils(testClient, votingTestClient);
+        UserInfoCollectorForTest.setReturnValue(Json.parse("{\"sub\": \"Alice\", \"email\": \"alice@mail.com\", \"email_verified\": true}"));
     }
 
     @Test
@@ -81,12 +84,11 @@ public class CommissionControllerTest {
         // Then
         assertThat(statusOf(result), equalTo(OK));
 
-        assertThat(sessionJwtOf(result), notNullValue());
         assertThat(publicKeyOf(result), notNullValue());
     }
 
     @Test
-    public void testInitVotingIsNotInitializedProperly() throws InterruptedException {
+    public void testInitVotingIsNotInitializedProperly() {
         // Given
         String votingId = voteCreationUtils.createValidVoting();
         CommissionInitRequest initRequest = new CommissionInitRequest();
@@ -145,11 +147,11 @@ public class CommissionControllerTest {
     @Test
     public void testSignOnEnvelope() throws InterruptedException {
         // Given
-        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Bob");
+        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
         String message = voteCreationUtils.createMessage(votingInitData.votingId, "someAccountId");
 
         // When
-        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", message, votingInitData.votingId);
 
         // Then
         assertThat(statusOf(result.http), equalTo(OK));
@@ -160,10 +162,10 @@ public class CommissionControllerTest {
     @Test
     public void testDoubleEnvelope() throws InterruptedException {
         // Given
-        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Bob");
+        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
         String message = voteCreationUtils.createMessage(votingInitData.votingId, "someAccountId");
 
-        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", message, votingInitData.votingId);
         assertThat(statusOf(result.http), equalTo(OK));
         assertThat(envelopeSignatureOf(result.http), notNullValue());
         assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
@@ -171,7 +173,7 @@ public class CommissionControllerTest {
         String newMessage = voteCreationUtils.createMessage(votingInitData.votingId, "anotherAccountId");
 
         // When
-        CommissionTestClient.SignOnEnvelopeResult newResult = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, newMessage);
+        CommissionTestClient.SignOnEnvelopeResult newResult = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", newMessage, votingInitData.votingId);
 
         // Then
         assertThat(statusOf(newResult.http), equalTo(FORBIDDEN));
@@ -202,7 +204,7 @@ public class CommissionControllerTest {
         Http.RequestBuilder httpRequest = new Http.RequestBuilder()
                 .method(POST)
                 .header(CONTENT_TYPE, Http.MimeTypes.JSON)
-                .uri(routes.CommissionController.signEnvelope().url());
+                .uri(routes.CommissionController.signEnvelope("42").url());
 
         JwtTestUtils jwtTestUtils = new JwtTestUtils(ruleChainForTests.getApplication().config());
         String jwt = jwtTestUtils.createToken("Alice");
@@ -218,11 +220,11 @@ public class CommissionControllerTest {
     @Test
     public void testAccountCreationRequest() throws InterruptedException {
         // Given
-        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Bob");
+        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
         Thread.sleep(15 * 1000); // So that some channel accounts are present.
         String message = voteCreationUtils.createMessage(votingInitData.votingId, "someAccountId");
 
-        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", message, votingInitData.votingId);
         assertThat(statusOf(result.http), equalTo(OK));
         assertThat(envelopeSignatureOf(result.http), notNullValue());
         assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
@@ -242,11 +244,11 @@ public class CommissionControllerTest {
     @Test
     public void testDoubleAccountCreationRequest() throws InterruptedException {
         // Given
-        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Bob");
+        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
         Thread.sleep(15 * 1000); // So that some channel accounts are present.
         String message = voteCreationUtils.createMessage(votingInitData.votingId, "someAccountId");
 
-        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", message, votingInitData.votingId);
         assertThat(statusOf(result.http), equalTo(OK));
         assertThat(envelopeSignatureOf(result.http), notNullValue());
         assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
@@ -270,11 +272,11 @@ public class CommissionControllerTest {
     @Test
     public void testGetAccountCreationTransaction() throws InterruptedException {
         // Given
-        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Bob");
+        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
         Thread.sleep(15 * 1000); // So that some channel accounts are present.
         String message = voteCreationUtils.createMessage(votingInitData.votingId, "someAccountId");
 
-        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", message, votingInitData.votingId);
         assertThat(statusOf(result.http), equalTo(OK));
         assertThat(envelopeSignatureOf(result.http), notNullValue());
         assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
@@ -311,10 +313,10 @@ public class CommissionControllerTest {
     @Test
     public void testGetEnvelopeSignatureForUserInVoting() throws InterruptedException {
         // Given
-        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Bob");
+        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
         String message = voteCreationUtils.createMessage(votingInitData.votingId, "someAccountId");
 
-        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, votingInitData.sessionJwt, message);
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", message, votingInitData.votingId);
         assertThat(statusOf(result.http), equalTo(OK));
         String envelopeSignatureOnSign = envelopeSignatureOf(result.http);
 
@@ -322,7 +324,7 @@ public class CommissionControllerTest {
         assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
 
         // When
-        Result getEnvelopeSignatureResult = testClient.envelopeSignatureOf(votingInitData.votingId, "Bob", votingInitData.sessionJwt);
+        Result getEnvelopeSignatureResult = testClient.envelopeSignatureOf(votingInitData.votingId, "Bob");
 
         // Then
         assertThat(statusOf(getEnvelopeSignatureResult), equalTo(OK));
@@ -335,10 +337,10 @@ public class CommissionControllerTest {
     @Test
     public void testGetEnvelopeSignatureForUserInVoting_NotSignedEnvelopeBefore() throws InterruptedException {
         // Given
-        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Bob");
+        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
 
         // When
-        Result getEnvelopeSignatureResult = testClient.envelopeSignatureOf(votingInitData.votingId, "Bob", votingInitData.sessionJwt);
+        Result getEnvelopeSignatureResult = testClient.envelopeSignatureOf(votingInitData.votingId, "Alice");
 
         // Then
         assertThat(statusOf(getEnvelopeSignatureResult), equalTo(NOT_FOUND));

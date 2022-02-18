@@ -40,8 +40,8 @@
       ]
     }
   ],
-  "authorization": "KEYBASE",
-  "authorizationKeybaseOptions": "a team",
+  "authorization": "EMAILS",
+  "authorizationEmailOptions": ["someone@email.com", "another@email.com"],
   "visibility": "PUBLIC",
   "votesCap": 126,
   "fundingAccountPublic": "some-public-key",

@@ -15,7 +15,7 @@ import javax.persistence.UniqueConstraint;
 @Table(
         name = "commission_session",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"voting_id", "user_id"})
+                @UniqueConstraint(columnNames = {"voting_id", "voter_id"})
         }
 )
 public class JpaCommissionSession {
@@ -28,8 +28,9 @@ public class JpaCommissionSession {
     @JoinColumn(name = "voting_id")
     private JpaVoting voting;
 
-    @Column(name = "user_id")
-    private String userId;
+    @ManyToOne
+    @JoinColumn(name = "voter_id")
+    private JpaVoter voter;
 
     @Column(name = "envelope_signature")
     @Lob
@@ -41,14 +42,6 @@ public class JpaCommissionSession {
 
     public void setVoting(JpaVoting voting) {
         this.voting = voting;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public Long getId() {
@@ -65,5 +58,13 @@ public class JpaCommissionSession {
 
     public void setEnvelopeSignature(String envelopeSignature) {
         this.envelopeSignature = envelopeSignature;
+    }
+
+    public JpaVoter getVoter() {
+        return voter;
+    }
+
+    public void setVoter(JpaVoter voter) {
+        this.voter = voter;
     }
 }

@@ -11,11 +11,6 @@ public class CommissionResponseFromResult {
         return initResponse.get("publicKey").asText();
     }
 
-    public static String sessionJwtOf(Result result) {
-        JsonNode initResponse = jsonOf(result);
-        return initResponse.get("sessionJwt").asText();
-    }
-
     public static String envelopeSignatureOf(Result result) {
         JsonNode signEnveloperResponse = jsonOf(result);
         return signEnveloperResponse.get("envelopeSignatureBase64").asText();
