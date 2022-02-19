@@ -9,6 +9,8 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import security.SecurityUtils;
+import security.VerifiedJwt;
 import services.VotingService;
 
 import javax.inject.Inject;
@@ -37,13 +39,15 @@ public class VotingController extends Controller {
 
         Form<CreateVotingRequest> form = formFactory.form(CreateVotingRequest.class).bindFromRequest(request);
 
-        if(form.hasErrors()) {
+        if (form.hasErrors()) {
             JsonNode errorJson = form.errorsAsJson();
             logger.warn("create(): Form has errors! error json:\n{}", errorJson.toPrettyString());
 
             return completedFuture(badRequest(errorJson));
         } else {
-            return votingService.create(form.get())
+            VerifiedJwt jwt = SecurityUtils.getFromRequest(request);
+
+            return votingService.create(form.get(), jwt)
                     .thenApply(id -> toCreatedVotingResult(request, id))
                     .exceptionally(mapExceptionWithUnpack);
         }

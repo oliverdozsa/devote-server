@@ -3,21 +3,23 @@ package services;
 import data.operations.VotingDbOperations;
 import devote.blockchain.api.ChannelGenerator;
 import devote.blockchain.operations.VotingBlockchainOperations;
-import ipfs.VotingIpfsOperations;
+import exceptions.ForbiddenException;
 import play.Logger;
 import requests.CreateVotingRequest;
 import responses.VotingResponse;
 import responses.VotingResponseFromJpaVoting;
+import security.VerifiedJwt;
 
 import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 
+import static java.util.concurrent.CompletableFuture.runAsync;
+
 
 public class VotingService {
     private final VotingDbOperations votingDbOperations;
     private final VotingBlockchainOperations votingBlockchainOperations;
-    private final VotingIpfsOperations votingIpfsOperations;
     private final VotingResponseFromJpaVoting votingResponseFromJpaVoting;
 
     private static final Logger.ALogger logger = Logger.of(VotingService.class);
@@ -25,21 +27,19 @@ public class VotingService {
     @Inject
     public VotingService(
             VotingDbOperations votingDbOperations,
-            VotingBlockchainOperations votingBlockchainOperations,
-            VotingIpfsOperations votingIpfsOperations
+            VotingBlockchainOperations votingBlockchainOperations
     ) {
         this.votingDbOperations = votingDbOperations;
         this.votingBlockchainOperations = votingBlockchainOperations;
-        this.votingIpfsOperations = votingIpfsOperations;
         votingResponseFromJpaVoting = new VotingResponseFromJpaVoting();
     }
 
-    public CompletionStage<String> create(CreateVotingRequest request) {
+    public CompletionStage<String> create(CreateVotingRequest request, VerifiedJwt jwt) {
         logger.info("create(): request = {}", request);
         CreatedVotingData createdVotingData = new CreatedVotingData();
 
-        return votingBlockchainOperations
-                .checkFundingAccountOf(request)
+        return checkIfUserIsAllowedToCreateVoting(jwt)
+                .thenCompose(v -> votingBlockchainOperations.checkFundingAccountOf(request))
                 .thenCompose(v -> votingDbOperations.initialize(request))
                 .thenAccept(createdVotingData::setId)
                 .thenApply(v -> createdVotingData.encodedId);
@@ -51,6 +51,16 @@ public class VotingService {
         return Base62Conversions.decodeAsStage(id)
                 .thenCompose(votingDbOperations::single)
                 .thenApply(votingResponseFromJpaVoting::convert);
+    }
+
+    private CompletionStage<Void> checkIfUserIsAllowedToCreateVoting(VerifiedJwt jwt) {
+        return runAsync(() -> {
+            if(!jwt.hasVoteCallerRole()) {
+                String message = String.format("User %s is not allowed to create voting.", jwt.getUserId());
+                logger.warn("checkIfUserIsAllowedToCreateVoting(): {}", message);
+                throw new ForbiddenException(message);
+            }
+        });
     }
 
     private static class CreatedVotingData {

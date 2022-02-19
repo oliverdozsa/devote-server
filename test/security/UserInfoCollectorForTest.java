@@ -3,6 +3,10 @@ package security;
 import com.fasterxml.jackson.databind.JsonNode;
 import services.commissionsubs.userinfo.UserInfoCollector;
 
+import java.util.concurrent.CompletionStage;
+
+import static java.util.concurrent.CompletableFuture.completedFuture;
+
 public class UserInfoCollectorForTest implements UserInfoCollector {
     private static JsonNode returnValue;
 
@@ -11,7 +15,7 @@ public class UserInfoCollectorForTest implements UserInfoCollector {
     }
 
     @Override
-    public JsonNode collect(String accessToken) {
-        return returnValue;
+    public CompletionStage<JsonNode> collect(String accessToken) {
+        return completedFuture(returnValue);
     }
 }

@@ -22,7 +22,7 @@ public class JwtCenter {
     public F.Either<Error, VerifiedJwt> verify(String token) {
         try{
             DecodedJWT jwt = jwtVerification.verify(token);
-            return F.Either.Right(new VerifiedJwt(jwt));
+            return F.Either.Right(new VerifiedJwt(jwt, token));
         } catch (JWTVerificationException e) {
             logger.warn("Failed to verify token!", e);
             return F.Either.Left(Error.ERR_INVALID_SIGNATURE_OR_CLAIM);

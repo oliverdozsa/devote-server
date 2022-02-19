@@ -17,7 +17,6 @@ import com.google.inject.AbstractModule;
 import formatters.FormattersProvider;
 import io.ebean.EbeanServer;
 import io.ipfs.api.IPFS;
-import ipfs.VotingIpfsOperations;
 import ipfs.api.IpfsApi;
 import ipfs.api.imp.IpfsApiImp;
 import ipfs.api.imp.IpfsProvider;
@@ -61,7 +60,6 @@ public class Module extends AbstractModule {
         bind(VotingDbOperations.class).asEagerSingleton();
         bind(CommissionDbOperations.class).asEagerSingleton();
         bind(VotingBlockchainOperations.class).asEagerSingleton();
-        bind(VotingIpfsOperations.class).asEagerSingleton();
         bind(CommissionBlockchainOperations.class).asEagerSingleton();
 
         // Services

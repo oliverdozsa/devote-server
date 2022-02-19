@@ -28,23 +28,22 @@ public class VoterDbOperations {
     }
 
     public CompletionStage<Void> collectUserInfoIfNeeded(String accessToken, String userId) {
-        return runAsync(() -> {
-            if(shouldNotCollectUserInfo(userId)) {
-                logger.info("collectUserInfo(): Already have info for user: {}", userId);
-                return;
-            }
+        CompletionStage<Void> userInfoCollectStage = userInfoCollector.collect(accessToken)
+                .thenAcceptAsync(userInfoJson -> processUserInfo(userInfoJson, userId), dbExecContext);
 
-            logger.info("collectUserInfoIfNeeded(): collecting info for userId: {}", userId);
+        CompletionStage<Void> doNothingStage = runAsync(() -> {
+        });
 
-            JsonNode userInfoJson = userInfoCollector.collect(accessToken);
-            logger.debug("collectUserInfo(): userInfoJson = {}", userInfoJson.toPrettyString());
-
-            if(tryAttachToEmail(userInfoJson)) {
-                logger.info("collectUserInfo(): successfully collected info based on email!");
-            } else {
-                logger.warn("collectUserInfo(): failed to collect user info! userId = {}", userId);
-            }
-        }, dbExecContext);
+        return supplyAsync(() -> shouldNotCollectUserInfo(userId), dbExecContext)
+                .thenCompose(shouldNotCollect -> {
+                    if (shouldNotCollect) {
+                        logger.info("collectUserInfo(): Already have info for user: {}", userId);
+                        return doNothingStage;
+                    } else {
+                        logger.info("collectUserInfoIfNeeded(): collecting info for userId: {}", userId);
+                        return userInfoCollectStage;
+                    }
+                });
     }
 
     public CompletionStage<Boolean> doesParticipateInVoting(String userId, Long votingId) {
@@ -57,12 +56,21 @@ public class VoterDbOperations {
         return voter != null;
     }
 
+    private void processUserInfo(JsonNode userInfoJson, String userId) {
+        logger.info("processUserInfo(): userInfoJson = {}", userInfoJson.toPrettyString());
+        if (tryAttachToEmail(userInfoJson)) {
+            logger.info("collectUserInfo(): successfully collected info based on email!");
+        } else {
+            logger.warn("collectUserInfo(): failed to collect user info! userId = {}", userId);
+        }
+    }
+
     private boolean tryAttachToEmail(JsonNode userInfoJson) {
         String email = userInfoJson.get("email").isNull() ? "" : userInfoJson.get("email").asText();
         String userId = userInfoJson.get("sub").asText();
         boolean isVerified = userInfoJson.get("email_verified").asBoolean();
 
-        if(email.isEmpty() || !isVerified) {
+        if (email.isEmpty() || !isVerified) {
             String emailInfo = String.format("email: %s, isVerified: %s", email, isVerified);
             logger.warn("tryAttachToEmail(): user email is not valid! {}", emailInfo);
             return false;

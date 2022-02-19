@@ -8,9 +8,11 @@ import java.util.Set;
 public class VerifiedJwt {
     private final String userId;
     private final Set<String> roles;
+    private final String accessToken;
 
-    public VerifiedJwt(DecodedJWT decodedJWT) {
+    public VerifiedJwt(DecodedJWT decodedJWT, String accessToken) {
         this.userId = decodedJWT.getSubject();
+        this.accessToken = accessToken;
 
         // TODO
         roles = new HashSet<>();

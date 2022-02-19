@@ -149,7 +149,7 @@ public class ConductVotingSmokeTest {
         createVotingRequest.setFundingAccountPublic(funding.publik);
         createVotingRequest.setFundingAccountSecret(funding.secret);
 
-        Result result = votingTestClient.createVoting(createVotingRequest);
+        Result result = votingTestClient.createVoting(createVotingRequest, "Alice");
         assertThat(statusOf(result), equalTo(CREATED));
         assertThat(result, hasLocationHeader());
 

@@ -1,4 +1,5 @@
 # Voting administration
++ jwtFilter
 POST    /voting                                     controllers.VotingController.create(request: Request)
 GET     /voting/:id                                 controllers.VotingController.single(id: String)
 

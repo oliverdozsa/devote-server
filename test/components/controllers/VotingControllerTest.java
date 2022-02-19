@@ -76,7 +76,7 @@ public class VotingControllerTest {
         createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
 
         // When
-        Result result = client.createVoting(createVotingRequest);
+        Result result = client.createVoting(createVotingRequest, "Alice");
 
         // Then
         assertThat(statusOf(result), equalTo(CREATED));
@@ -117,7 +117,7 @@ public class VotingControllerTest {
         createVotingRequest.setEndDate(Instant.now().minus(Duration.ofDays(1)));
 
         // When
-        Result result = client.createVoting(createVotingRequest);
+        Result result = client.createVoting(createVotingRequest, "Alice");
 
         // Then
         assertThat(statusOf(result), equalTo(BAD_REQUEST));
@@ -133,7 +133,7 @@ public class VotingControllerTest {
         createVotingRequest.getPolls().get(0).getOptions().get(1).setCode(1);
 
         // When
-        Result result = client.createVoting(createVotingRequest);
+        Result result = client.createVoting(createVotingRequest, "Alice");
 
         // Then
         assertThat(statusOf(result), equalTo(BAD_REQUEST));
@@ -171,7 +171,7 @@ public class VotingControllerTest {
         createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
 
         // When
-        Result result = client.createVoting(createVotingRequest);
+        Result result = client.createVoting(createVotingRequest, "Alice");
 
         // Then
         assertThat(statusOf(result), equalTo(CREATED));

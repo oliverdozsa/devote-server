@@ -63,7 +63,7 @@ public class VoteCreationUtils {
     }
 
     public String createVoting(CreateVotingRequest createVotingRequest) {
-        Result result = votingTestClient.createVoting(createVotingRequest);
+        Result result = votingTestClient.createVoting(createVotingRequest, "Alice");
         assertThat(statusOf(result), equalTo(CREATED));
         assertThat(result, hasLocationHeader());
 
