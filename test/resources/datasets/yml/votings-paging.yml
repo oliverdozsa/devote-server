@@ -1,0 +1,67 @@
+voting:
+  - id: 1
+    title: Voting#1-Alice
+    authorization: EMAILS
+    visibility: PRIVATE
+    created_by: Alice
+
+  - id: 2
+    title: Voting#2-Alice
+    authorization: EMAILS
+    visibility: PRIVATE
+    created_by: Alice
+
+  - id: 3
+    title: Voting#3-Bob
+    authorization: EMAILS
+    visibility: PRIVATE
+    created_by: Bob
+
+  - id: 4
+    title: Voting#4-Bob
+    authorization: EMAILS
+    visibility: PRIVATE
+    created_by: Bob
+
+voter:
+  - id: 1
+    user_id: Alice
+    email: alice@mail.com
+
+  - id: 2
+    user_id: Bob
+    email: bob@mail.com
+
+  - id: 3
+    user_id: Charlie
+    email: charlie@mail.com
+
+  - id: 4
+    user_id: Dennis
+    email: dennis@mail.com
+
+  - id: 5
+    user_id: Eva
+    email: eva@mail.com
+
+votings_participants:
+  - voter_id: 1
+    voting_id: 1
+
+  - voter_id: 2
+    voting_id: 1
+
+  - voter_id: 2
+    voting_id: 2
+
+  - voter_id: 3
+    voting_id: 2
+
+  - voter_id: 3
+    voting_id: 3
+
+  - voter_id: 4
+    voting_id: 3
+
+  - voter_id: 5
+    voting_id: 4
