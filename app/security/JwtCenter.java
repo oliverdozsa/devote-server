@@ -11,18 +11,20 @@ import javax.inject.Inject;
 
 public class JwtCenter {
     private final JwtVerification jwtVerification;
+    private final Config config;
 
     private static final Logger.ALogger logger = Logger.of(JwtCenter.class);
 
     @Inject
-    public JwtCenter(JwtVerification jwtVerification) {
+    public JwtCenter(JwtVerification jwtVerification, Config config) {
         this.jwtVerification = jwtVerification;
+        this.config = config;
     }
 
     public F.Either<Error, VerifiedJwt> verify(String token) {
-        try{
+        try {
             DecodedJWT jwt = jwtVerification.verify(token);
-            return F.Either.Right(new VerifiedJwt(jwt, token));
+            return F.Either.Right(new VerifiedJwt(jwt, token, config));
         } catch (JWTVerificationException e) {
             logger.warn("Failed to verify token!", e);
             return F.Either.Left(Error.ERR_INVALID_SIGNATURE_OR_CLAIM);

@@ -39,7 +39,7 @@ public class CommissionInitSubService {
     }
 
     private CompletionStage<Void> collectVoterInfoIfNeeded(VerifiedJwt jwt) {
-        return voterDbOperations.collectUserInfoIfNeeded(jwt.accessToken(), jwt.getUserId());
+        return voterDbOperations.collectUserInfoIfNeeded(jwt.getAccessToken(), jwt.getUserId());
     }
 
     private CompletionStage<Long> checkIfUserIsAllowedToParticipateInVoting(Long votingId, VerifiedJwt jwt) {

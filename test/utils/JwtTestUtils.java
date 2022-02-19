@@ -31,8 +31,11 @@ public class JwtTestUtils {
     }
 
     public String createToken(Date expiresAt, String userId) {
+        String rolesClaim = config.getString("devote.jwt.roles.claim");
+
         return prepareBuilder(expiresAt)
                 .withSubject(userId)
+                .withArrayClaim(rolesClaim, new String[]{"voter", "vote-caller"})
                 .sign(algorithm);
     }
 
@@ -42,6 +45,8 @@ public class JwtTestUtils {
 
     private JWTCreator.Builder prepareBuilder(Date expiresAt) {
         String issuer = config.getString("devote.jwt.issuer");
+
+
         return JWT.create()
                 .withIssuer(issuer)
                 .withExpiresAt(expiresAt);
