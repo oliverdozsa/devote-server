@@ -2,9 +2,11 @@ import com.google.inject.name.Names;
 import data.operations.CommissionDbOperations;
 import data.repositories.ChannelProgressRepository;
 import data.repositories.CommissionRepository;
+import data.repositories.VoterRepository;
 import data.repositories.imp.EbeanCommissionRepository;
 import data.repositories.imp.EbeanChannelProgressRepository;
 import data.repositories.imp.EbeanServerProvider;
+import data.repositories.imp.EbeanVoterRepository;
 import devote.blockchain.operations.CommissionBlockchainOperations;
 import devote.blockchain.operations.VotingBlockchainOperations;
 import data.operations.VotingDbOperations;
@@ -53,6 +55,7 @@ public class Module extends AbstractModule {
         bind(VotingRepository.class).to(EbeanVotingRepository.class).asEagerSingleton();
         bind(ChannelProgressRepository.class).to(EbeanChannelProgressRepository.class).asEagerSingleton();
         bind(CommissionRepository.class).to(EbeanCommissionRepository.class).asEagerSingleton();
+        bind(VoterRepository.class).to(EbeanVoterRepository.class).asEagerSingleton();
 
         // Operations
         bind(VotingDbOperations.class).asEagerSingleton();

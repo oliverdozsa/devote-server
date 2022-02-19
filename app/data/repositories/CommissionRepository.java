@@ -18,7 +18,4 @@ public interface CommissionRepository {
     JpaStoredTransaction getTransaction(String signature);
     JpaCommissionSession getCommissionSessionWithExistingEnvelopeSignature(Long votingId, String user);
     boolean isVotingInitializedProperly(Long votingId);
-    void setUserIdForEmail(String email, String userId);
-    JpaVoter getVoterByUserId(String userId);
-    boolean doesParticipateInVoting(String userId, Long votingId);
 }

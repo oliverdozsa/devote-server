@@ -2,6 +2,7 @@ package services.commissionsubs;
 
 import data.entities.JpaCommissionSession;
 import data.operations.CommissionDbOperations;
+import data.operations.VoterDbOperations;
 import exceptions.ForbiddenException;
 import play.Logger;
 import requests.CommissionInitRequest;
@@ -16,12 +17,14 @@ import static java.util.concurrent.CompletableFuture.runAsync;
 public class CommissionInitSubService {
     private final String envelopePublicKeyPem;
     private final CommissionDbOperations commissionDbOperations;
+    private final VoterDbOperations voterDbOperations;
 
     private static final Logger.ALogger logger = Logger.of(CommissionInitSubService.class);
 
-    public CommissionInitSubService(String envelopePublicKeyPem, CommissionDbOperations commissionDbOperations) {
+    public CommissionInitSubService(String envelopePublicKeyPem, CommissionDbOperations commissionDbOperations, VoterDbOperations voterDbOperations) {
         this.envelopePublicKeyPem = envelopePublicKeyPem;
         this.commissionDbOperations = commissionDbOperations;
+        this.voterDbOperations = voterDbOperations;
     }
 
     public CompletionStage<CommissionInitResponse> init(CommissionInitRequest request, VerifiedJwt jwt) {
@@ -36,14 +39,14 @@ public class CommissionInitSubService {
     }
 
     private CompletionStage<Void> collectVoterInfoIfNeeded(VerifiedJwt jwt) {
-        return commissionDbOperations.collectUserInfoIfNeeded(jwt.accessToken(), jwt.getUserId());
+        return voterDbOperations.collectUserInfoIfNeeded(jwt.accessToken(), jwt.getUserId());
     }
 
     private CompletionStage<Long> checkIfUserIsAllowedToParticipateInVoting(Long votingId, VerifiedJwt jwt) {
         logger.info("checkIfUserIsAllowedToParticipateInVoting(): votingId = {}, userId = {}", votingId, jwt.getUserId());
 
         return checkVoterRole(jwt)
-                .thenCompose(v -> commissionDbOperations.doesParticipateInVoting(jwt.getUserId(), votingId))
+                .thenCompose(v -> voterDbOperations.doesParticipateInVoting(jwt.getUserId(), votingId))
                 .thenCompose(doesParticipate -> checkIfDoesParticipate(doesParticipate, jwt.getUserId(), votingId))
                 .thenApply(v -> votingId);
     }
@@ -51,7 +54,7 @@ public class CommissionInitSubService {
     private CompletionStage<Void> checkVoterRole(VerifiedJwt jwt) {
         return runAsync(() -> {
             if(!jwt.hasVoterRole()) {
-                String message = String.format("User %s has not voter role!", jwt.getUserId());
+                String message = String.format("User %s has no voter role!", jwt.getUserId());
                 logger.warn("checkVoterRole(): {}", message);
                 throw new ForbiddenException(message);
             }

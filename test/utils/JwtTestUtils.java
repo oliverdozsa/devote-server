@@ -31,10 +31,8 @@ public class JwtTestUtils {
     }
 
     public String createToken(Date expiresAt, String userId) {
-        String userIdClaim = config.getString("devote.jwt.useridclaim");
-
         return prepareBuilder(expiresAt)
-                .withClaim(userIdClaim, userId)
+                .withSubject(userId)
                 .sign(algorithm);
     }
 

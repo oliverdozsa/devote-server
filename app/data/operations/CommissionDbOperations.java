@@ -1,9 +1,7 @@
 package data.operations;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import data.entities.JpaCommissionSession;
 import data.entities.JpaStoredTransaction;
-import data.entities.JpaVoter;
 import data.entities.JpaVotingChannelAccount;
 import data.repositories.CommissionRepository;
 import executioncontexts.DatabaseExecutionContext;
@@ -94,51 +92,6 @@ public class CommissionDbOperations {
     public CompletionStage<Boolean> isVotingInitializedProperly(Long votingId) {
         logger.info("isVotingInitializedProperly(): votingId = {}", votingId);
         return supplyAsync(() -> commissionRepository.isVotingInitializedProperly(votingId), dbExecContext);
-    }
-
-    public CompletionStage<Void> collectUserInfoIfNeeded(String accessToken, String userId) {
-        return runAsync(() -> {
-            if(shouldNotCollectUserInfo(userId)) {
-                logger.info("collectUserInfo(): Already have info for user: {}", userId);
-                return;
-            }
-
-            logger.info("collectUserInfoIfNeeded(): collecting info for userId: {}", userId);
-
-            JsonNode userInfoJson = userInfoCollector.collect(accessToken);
-            logger.debug("collectUserInfo(): userInfoJson = {}", userInfoJson.toPrettyString());
-
-            if(tryAttachToEmail(userInfoJson)) {
-                logger.info("collectUserInfo(): successfully collected info based on email!");
-            } else {
-                logger.warn("collectUserInfo(): failed to collect user info! userId = {}", userId);
-            }
-        }, dbExecContext);
-    }
-
-    public CompletionStage<Boolean> doesParticipateInVoting(String userId, Long votingId) {
-        logger.info("doesParticipateInVoting(): userId = {}, votingId = {}", userId, votingId);
-        return supplyAsync(() -> commissionRepository.doesParticipateInVoting(userId, votingId), dbExecContext);
-    }
-
-    private boolean shouldNotCollectUserInfo(String userId) {
-        JpaVoter voter = commissionRepository.getVoterByUserId(userId);
-        return voter != null;
-    }
-
-    private boolean tryAttachToEmail(JsonNode userInfoJson) {
-        String email = userInfoJson.get("email").isNull() ? "" : userInfoJson.get("email").asText();
-        String userId = userInfoJson.get("sub").asText();
-        boolean isVerified = userInfoJson.get("email_verified").asBoolean();
-
-        if(email.isEmpty() || !isVerified) {
-            String emailInfo = String.format("email: %s, isVerified: %s", email, isVerified);
-            logger.warn("tryAttachToEmail(): user email is not valid! {}", emailInfo);
-            return false;
-        } else {
-            commissionRepository.setUserIdForEmail(email, userId);
-            return true;
-        }
     }
 }
 

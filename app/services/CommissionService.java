@@ -4,6 +4,7 @@ import crypto.EncryptedVoting;
 import crypto.RsaKeyUtils;
 import data.entities.JpaVoting;
 import data.operations.CommissionDbOperations;
+import data.operations.VoterDbOperations;
 import data.operations.VotingDbOperations;
 import devote.blockchain.operations.CommissionBlockchainOperations;
 import exceptions.BusinessLogicViolationException;
@@ -47,9 +48,10 @@ public class CommissionService {
             @Named("envelope") AsymmetricCipherKeyPair envelopeKeyPair,
             CommissionDbOperations commissionDbOperations,
             VotingDbOperations votingDbOperations,
-            CommissionBlockchainOperations commissionBlockchainOperations
+            CommissionBlockchainOperations commissionBlockchainOperations,
+            VoterDbOperations voterDbOperations
     ) {
-        initSubService = new CommissionInitSubService(publicKeyToPemString(envelopeKeyPair), commissionDbOperations);
+        initSubService = new CommissionInitSubService(publicKeyToPemString(envelopeKeyPair), commissionDbOperations, voterDbOperations);
         signEnvelopeSubService = new CommissionSignEnvelopeSubService(envelopeKeyPair, commissionDbOperations);
         createAccountSubService = new CommissionCreateAccountSubService(commissionDbOperations, votingDbOperations, commissionBlockchainOperations, envelopeKeyPair);
         storedDataSubService = new CommissionStoredDataSubService(commissionDbOperations);

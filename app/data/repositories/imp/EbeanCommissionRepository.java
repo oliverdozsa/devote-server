@@ -7,11 +7,9 @@ import data.entities.JpaVoter;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
 import data.repositories.CommissionRepository;
-import exceptions.ForbiddenException;
 import exceptions.InternalErrorException;
 import exceptions.NotFoundException;
 import io.ebean.EbeanServer;
-import io.ebean.SqlRow;
 import play.Logger;
 
 import javax.inject.Inject;
@@ -180,46 +178,6 @@ public class EbeanCommissionRepository implements CommissionRepository {
         return voting.getDistributionAccountPublic() != null && voting.getDistributionAccountPublic().length() > 0 &&
                 voting.getIssuerAccountPublic() != null && voting.getIssuerAccountPublic().length() > 0 &&
                 voting.getBallotAccountPublic() != null && voting.getBallotAccountPublic().length() > 0;
-    }
-
-    @Override
-    public void setUserIdForEmail(String email, String userId) {
-        logger.info("setUserIdForEmail(): email = {}, userId = {}", email, userId);
-
-        JpaVoter voter = ebeanServer.createQuery(JpaVoter.class)
-                .where()
-                .eq("email", email)
-                .findOne();
-
-        if (voter == null) {
-            logger.warn("setUserIdForEmail(): not found voter for email: {}", email);
-            throw new NotFoundException("Not found voter for email: " + email);
-        }
-
-        voter.setUserId(userId);
-        ebeanServer.update(voter);
-    }
-
-    @Override
-    public JpaVoter getVoterByUserId(String userId) {
-        logger.info("getVoterByUserId(): userId = {}", userId);
-        return ebeanServer.createQuery(JpaVoter.class)
-                .where()
-                .eq("userId", userId)
-                .findOne();
-    }
-
-    @Override
-    public boolean doesParticipateInVoting(String userId, Long votingId) {
-        logger.info("doesParticipateInVoting(): userId = {}, votingId = {}", userId, votingId);
-
-        JpaVoter voter = ebeanServer.createQuery(JpaVoter.class)
-                .where()
-                .eq("userId", userId)
-                .eq("votings.id", votingId)
-                .findOne();
-
-        return voter != null;
     }
 
     private JpaCommissionSession find(String userId, Long votingId) {

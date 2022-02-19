@@ -102,7 +102,7 @@ public class JpaVoting {
     @OneToMany(mappedBy = "voting", cascade = {CascadeType.REMOVE})
     private List<JpaCommissionSession> initSessions;
 
-    @ManyToMany(mappedBy = "votings", cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
+    @ManyToMany(mappedBy = "votings", cascade = {CascadeType.PERSIST})
     private List<JpaVoter> voters;
 
     public Long getId() {

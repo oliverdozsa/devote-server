@@ -324,7 +324,7 @@ public class CommissionControllerTest {
         assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
 
         // When
-        Result getEnvelopeSignatureResult = testClient.envelopeSignatureOf(votingInitData.votingId, "Bob");
+        Result getEnvelopeSignatureResult = testClient.envelopeSignatureOf(votingInitData.votingId, "Alice");
 
         // Then
         assertThat(statusOf(getEnvelopeSignatureResult), equalTo(OK));
