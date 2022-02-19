@@ -9,7 +9,7 @@ import requests.CreateVotingRequest;
 import java.util.List;
 
 public interface VotingRepository {
-    Long initialize(CreateVotingRequest request, String assetCode);
+    Long initialize(CreateVotingRequest request, String assetCode, String userId);
     JpaVoting single(Long id);
     void channelGeneratorsCreated(Long id, List<ChannelGenerator> channelGenerators);
     void channelAccountCreated(Long id, List<Account> accounts);

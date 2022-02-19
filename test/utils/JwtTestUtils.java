@@ -4,11 +4,14 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.typesafe.config.Config;
+import play.libs.Json;
 import play.mvc.Http;
+import security.UserInfoCollectorForTest;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Locale;
 
 public class JwtTestUtils {
     private final Config config;
@@ -27,15 +30,24 @@ public class JwtTestUtils {
 
     public String createToken(int expirySeconds, String userId) {
         Date expiresAt = Date.from(Instant.now().plus(expirySeconds, ChronoUnit.SECONDS));
-        return createToken(expiresAt, userId);
+        return createToken(expiresAt, userId, new String[]{"voter", "vote-caller"});
+    }
+
+    public String createToken(String userId, String[] roles) {
+        Date expiresAt = Date.from(Instant.now().plus(5, ChronoUnit.SECONDS));
+        return createToken(expiresAt, userId, roles);
     }
 
     public String createToken(Date expiresAt, String userId) {
+        return createToken(expiresAt, userId, new String[]{"voter", "vote-caller"});
+    }
+
+    public String createToken(Date expiresAt, String userId, String[] roles) {
         String rolesClaim = config.getString("devote.jwt.roles.claim");
 
         return prepareBuilder(expiresAt)
                 .withSubject(userId)
-                .withArrayClaim(rolesClaim, new String[]{"voter", "vote-caller"})
+                .withArrayClaim(rolesClaim, roles)
                 .sign(algorithm);
     }
 

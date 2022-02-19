@@ -29,11 +29,12 @@ public class EbeanVotingRepository implements VotingRepository {
     }
 
     @Override
-    public Long initialize(CreateVotingRequest request, String assetCode) {
-        logger.info("initialize(): request = {}", request);
+    public Long initialize(CreateVotingRequest request, String assetCode, String userId) {
+        logger.info("initialize(): assetCode = {}, userId = {}, request = {}", assetCode, userId, request);
 
         JpaVoting voting = initVotingFrom(request);
         voting.setAssetCode(assetCode);
+        voting.setCreatedBy(userId);
 
         ebeanServer.save(voting);
         return voting.getId();

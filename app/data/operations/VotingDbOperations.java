@@ -28,10 +28,10 @@ public class VotingDbOperations {
         this.votingRepository = votingRepository;
     }
 
-    public CompletionStage<Long> initialize(CreateVotingRequest createVotingRequest) {
+    public CompletionStage<Long> initialize(CreateVotingRequest createVotingRequest, String userId) {
         return supplyAsync(() -> {
-            logger.info("initialize(): createVotingRequest = {}", createVotingRequest);
-            return votingRepository.initialize(createVotingRequest, generateAssetCode(createVotingRequest));
+            logger.info("initialize(): userId = {}, createVotingRequest = {}", userId, createVotingRequest);
+            return votingRepository.initialize(createVotingRequest, generateAssetCode(createVotingRequest), userId);
         }, dbExecContext);
     }
 

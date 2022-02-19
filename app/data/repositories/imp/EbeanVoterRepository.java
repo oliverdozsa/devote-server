@@ -28,12 +28,12 @@ public class EbeanVoterRepository implements VoterRepository {
                 .findOne();
 
         if (voter == null) {
-            logger.warn("setUserIdForEmail(): not found voter for email: {}", email);
-            throw new NotFoundException("Not found voter for email: " + email);
+            logger.warn("setUserIdForEmail(): not found voter for email: {}!", email);
+        } else {
+            logger.info("setUserIdForEmail(): found voter for email: {}", email);
+            voter.setUserId(userId);
+            ebeanServer.update(voter);
         }
-
-        voter.setUserId(userId);
-        ebeanServer.update(voter);
     }
 
     @Override

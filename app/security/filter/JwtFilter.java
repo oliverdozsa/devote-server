@@ -26,6 +26,7 @@ package security.filter;
 
 import akka.stream.Materializer;
 import com.typesafe.config.Config;
+import data.operations.VoterDbOperations;
 import security.JwtCenter;
 import security.VerifiedJwt;
 import play.Logger;
@@ -48,17 +49,19 @@ import static play.mvc.Results.forbidden;
 public class JwtFilter extends Filter {
     private static Logger.ALogger logger = Logger.of(JwtFilter.class);
     private static final String ERR_AUTHORIZATION_HEADER = "ERR_AUTHORIZATION_HEADER";
-    private JwtCenter jwtCenter;
+    private final JwtCenter jwtCenter;
+    private final VoterDbOperations voterDbOperations;
 
-    private String jwtFilterTag;
-    private String headerAuthorization;
-    private String bearer;
-    private String jwtOptionalFilterTag;
+    private final String jwtFilterTag;
+    private final String headerAuthorization;
+    private final String bearer;
+    private final String jwtOptionalFilterTag;
 
     @Inject
-    public JwtFilter(Materializer mat, JwtCenter jwtCenter, Config config) {
+    public JwtFilter(Materializer mat, JwtCenter jwtCenter, Config config, VoterDbOperations voterDbOperations) {
         super(mat);
         this.jwtCenter = jwtCenter;
+        this.voterDbOperations = voterDbOperations;
 
         jwtFilterTag = config.getString("devote.jwt.filtertag");
         headerAuthorization = config.getString("devote.jwt.header.authorization");
@@ -99,7 +102,10 @@ public class JwtFilter extends Filter {
             return CompletableFuture.completedFuture(forbidden(res.left.get().toString()));
         }
 
-        return nextFilter.apply(requestHeader.withAttrs(requestHeader.attrs().put(Attrs.VERIFIED_JWT, res.right.get())));
+        String accessToken = res.right.get().getAccessToken();
+        String userId = res.right.get().getUserId();
+        return voterDbOperations.collectUserInfoIfNeeded(accessToken, userId)
+                .thenCompose(v -> nextFilter.apply(requestHeader.withAttrs(requestHeader.attrs().put(Attrs.VERIFIED_JWT, res.right.get()))));
     }
 
     private boolean hasNoFilterTag(List<String> modifiers) {

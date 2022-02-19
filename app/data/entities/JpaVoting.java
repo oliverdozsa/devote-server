@@ -105,6 +105,9 @@ public class JpaVoting {
     @ManyToMany(mappedBy = "votings", cascade = {CascadeType.PERSIST})
     private List<JpaVoter> voters;
 
+    @Column(name = "created_by", nullable = false)
+    private String createdBy;
+
     public Long getId() {
         return id;
     }
@@ -303,5 +306,13 @@ public class JpaVoting {
 
     public void setVoters(List<JpaVoter> voters) {
         this.voters = voters;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 }

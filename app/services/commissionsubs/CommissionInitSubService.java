@@ -29,17 +29,12 @@ public class CommissionInitSubService {
 
     public CompletionStage<CommissionInitResponse> init(CommissionInitRequest request, VerifiedJwt jwt) {
         logger.info("init(): request = {}, userId = {}", request.toString(), jwt.getUserId());
-        return collectVoterInfoIfNeeded(jwt)
-                .thenCompose(v -> Base62Conversions.decodeAsStage(request.getVotingId()))
+        return Base62Conversions.decodeAsStage(request.getVotingId())
                 .thenCompose(decodedVotingId -> checkIfUserIsAllowedToParticipateInVoting(decodedVotingId, jwt))
                 .thenCompose(this::checkIfVotingIsInitializedProperly)
                 .thenCompose(decodedVotingId -> checkIfUserIsAuthorizedToInitSession(decodedVotingId, jwt.getUserId()))
                 .thenCompose(votingId -> commissionDbOperations.createSession(votingId, jwt.getUserId()))
                 .thenApply(this::toInitResponse);
-    }
-
-    private CompletionStage<Void> collectVoterInfoIfNeeded(VerifiedJwt jwt) {
-        return voterDbOperations.collectUserInfoIfNeeded(jwt.getAccessToken(), jwt.getUserId());
     }
 
     private CompletionStage<Long> checkIfUserIsAllowedToParticipateInVoting(Long votingId, VerifiedJwt jwt) {

@@ -187,4 +187,109 @@ public class VotingControllerTest {
         assertTrue(votingResponseJson.get("ballotAccountId").isNull());
         assertTrue(votingResponseJson.get("issuerAccountId").isNull());
     }
+
+    @Test
+    public void testSinglePrivateWithAuth_UserIsTheVoteCaller() throws InterruptedException {
+        // Given
+        CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
+        createVotingRequest.setVisibility(CreateVotingRequest.Visibility.PRIVATE);
+
+        // When
+        Result result = client.createVoting(createVotingRequest, "Alice");
+
+        // Then
+        assertThat(statusOf(result), equalTo(CREATED));
+        assertThat(result, hasLocationHeader());
+
+        String locationUrl = result.headers().get(LOCATION);
+        Result getByLocationResult = client.byLocation(locationUrl, "Alice", new String[]{"voter", "vote-caller"});
+
+        assertThat(statusOf(getByLocationResult), equalTo(OK));
+    }
+
+    @Test
+    public void testSinglePrivateWithAuth_UserIsNotParticipant() {
+        // Given
+        CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
+        createVotingRequest.setVisibility(CreateVotingRequest.Visibility.PRIVATE);
+
+        // When
+        Result result = client.createVoting(createVotingRequest, "Alice");
+
+        // Then
+        assertThat(statusOf(result), equalTo(CREATED));
+        assertThat(result, hasLocationHeader());
+
+        String locationUrl = result.headers().get(LOCATION);
+        Result getByLocationResult = client.byLocation(locationUrl, "Charlie", new String[]{"voter", "vote-caller"});
+
+        assertThat(statusOf(getByLocationResult), equalTo(FORBIDDEN));
+    }
+
+    @Test
+    public void testSinglePrivateWithAuth_UserIsParticipant() {
+        // Given
+        CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("bob@mail.com", "doe@where.de", "some@one.com"));
+        createVotingRequest.setVisibility(CreateVotingRequest.Visibility.PRIVATE);
+
+        // When
+        Result result = client.createVoting(createVotingRequest, "Alice");
+
+        // Then
+        assertThat(statusOf(result), equalTo(CREATED));
+        assertThat(result, hasLocationHeader());
+
+        String locationUrl = result.headers().get(LOCATION);
+        Result getByLocationResult = client.byLocation(locationUrl, "Bob", new String[]{"voter", "vote-caller"});
+
+        assertThat(statusOf(getByLocationResult), equalTo(OK));
+    }
+
+    @Test
+    public void testSinglePrivateWithAuth_UserHasNoProperRole() {
+        // Given
+        CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("bob@mail.com", "doe@where.de", "some@one.com"));
+        createVotingRequest.setVisibility(CreateVotingRequest.Visibility.PRIVATE);
+
+        // When
+        Result result = client.createVoting(createVotingRequest, "Alice");
+
+        // Then
+        assertThat(statusOf(result), equalTo(CREATED));
+        assertThat(result, hasLocationHeader());
+
+        String locationUrl = result.headers().get(LOCATION);
+        Result getByLocationResult = client.byLocation(locationUrl, "Bob", new String[]{"cook", "driver"});
+
+        assertThat(statusOf(getByLocationResult), equalTo(FORBIDDEN));
+    }
+
+    @Test
+    public void testSingle_Unlisted() {
+        // Given
+        CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("bob@mail.com", "doe@where.de", "some@one.com"));
+        createVotingRequest.setVisibility(CreateVotingRequest.Visibility.UNLISTED);
+
+        // When
+        Result result = client.createVoting(createVotingRequest, "Alice");
+
+        // Then
+        assertThat(statusOf(result), equalTo(CREATED));
+        assertThat(result, hasLocationHeader());
+
+        String locationUrl = result.headers().get(LOCATION);
+        Result getByLocationResult = client.byLocation(locationUrl, "Charlie", new String[]{"cook", "driver"});
+
+        assertThat(statusOf(getByLocationResult), equalTo(OK));
+    }
 }

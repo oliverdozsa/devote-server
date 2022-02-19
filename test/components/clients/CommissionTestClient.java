@@ -18,11 +18,8 @@ import static play.test.Helpers.*;
 import static utils.JwtTestUtils.addJwtTokenTo;
 
 public class CommissionTestClient extends TestClient {
-    private final JwtTestUtils jwtTestUtils;
-
     public CommissionTestClient(Application application) {
         super(application);
-        jwtTestUtils = new JwtTestUtils(application.config());
     }
 
     public Result init(CommissionInitRequest initRequest, String userId) {

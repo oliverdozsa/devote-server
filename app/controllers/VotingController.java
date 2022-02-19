@@ -9,6 +9,7 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import responses.VotingResponse;
 import security.SecurityUtils;
 import security.VerifiedJwt;
 import services.VotingService;
@@ -18,6 +19,8 @@ import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
+import static security.SecurityUtils.getFromRequest;
+import static security.SecurityUtils.hasVerifiedJwt;
 
 public class VotingController extends Controller {
     private final FormFactory formFactory;
@@ -53,10 +56,17 @@ public class VotingController extends Controller {
         }
     }
 
-    public CompletionStage<Result> single(String id) {
+    public CompletionStage<Result> single(String id, Http.Request request) {
         logger.info("single(): id = {}", id);
 
-        return votingService.single(id)
+        CompletionStage<VotingResponse> votingResponseStage;
+        if(hasVerifiedJwt(request)) {
+            votingResponseStage = votingService.single(id, getFromRequest(request));
+        } else {
+            votingResponseStage = votingService.single(id);
+        }
+
+        return votingResponseStage
                 .thenApply(v -> ok(Json.toJson(v)))
                 .exceptionally(mapExceptionWithUnpack);
     }
