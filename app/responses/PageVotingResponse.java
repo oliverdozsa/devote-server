@@ -1,6 +1,6 @@
 package responses;
 
-public class PageOfVotingResponse {
+public class PageVotingResponse {
     private String title;
     private String id;
 

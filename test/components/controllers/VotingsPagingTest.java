@@ -22,6 +22,9 @@ import services.commissionsubs.userinfo.UserInfoCollector;
 import units.ipfs.api.imp.MockIpfsApi;
 import units.ipfs.api.imp.MockIpfsProvider;
 
+import java.time.Duration;
+import java.time.Instant;
+
 import static components.extractors.GenericDataFromResult.statusOf;
 import static components.extractors.VotingPagingResponseFromResult.votingIdsOf;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -69,9 +72,12 @@ public class VotingsPagingTest {
 
     @Test
     @DataSet(value = "datasets/yml/votings-paging.yml", disableConstraints = true, cleanBefore = true)
-    public void testGetVoterVotingsPaging() {
+    public void testGetVotingsOfVoterPaging() {
         // Given
+        UserInfoCollectorForTest.setReturnValueFor("Alice");
+
         // When
+
         Result result = client.votingsOfVoter(0, 11, "Alice");
 
         // Then
@@ -81,8 +87,10 @@ public class VotingsPagingTest {
 
     @Test
     @DataSet(value = "datasets/yml/votings-paging.yml", disableConstraints = true, cleanBefore = true)
-    public void testGetVoterVotingsPaging_NoProperRole() {
+    public void testGetVotingsOfVoterPaging_NoProperRole() {
         // Given
+        UserInfoCollectorForTest.setReturnValueFor("Alice");
+
         // When
         Result result = client.votingsOfVoter(0, 11, "Alice", new String[]{});
 
@@ -94,17 +102,22 @@ public class VotingsPagingTest {
     @DataSet(value = "datasets/yml/votings-paging.yml", disableConstraints = true, cleanBefore = true)
     public void testGetVoterVotingsPaging_NotAParticipantInAnyVote() {
         // Given
+        UserInfoCollectorForTest.setReturnValueFor("Someone");
+
         // When
         Result result = client.votingsOfVoter(0, 11, "Someone");
 
         // Then
-        assertThat(statusOf(result), equalTo(FORBIDDEN));
+        assertThat(statusOf(result), equalTo(OK));
+        assertThat(votingIdsOf(result).size(), equalTo(0));
     }
 
     @Test
     @DataSet(value = "datasets/yml/votings-paging.yml", disableConstraints = true, cleanBefore = true)
     public void testVoteCallersVotePaging() {
         // Given
+        UserInfoCollectorForTest.setReturnValueFor("Bob");
+
         // When
         Result result = client.votingsOfVoteCaller(0, 11, "Bob");
 
@@ -117,6 +130,8 @@ public class VotingsPagingTest {
     @DataSet(value = "datasets/yml/votings-paging.yml", disableConstraints = true, cleanBefore = true)
     public void testVoteCallersVotePaging_NoProperRole() {
         // Given
+        UserInfoCollectorForTest.setReturnValueFor("Bob");
+
         // When
         Result result = client.votingsOfVoteCaller(0, 11, "Bob", new String[]{});
 
@@ -128,13 +143,15 @@ public class VotingsPagingTest {
     @DataSet(value = "datasets/yml/votings-paging.yml", disableConstraints = true, cleanBefore = true)
     public void testVoteCallersVotePaging_ParticipantButNotCreatedAnyVote() {
         // Given
+        UserInfoCollectorForTest.setReturnValueFor("Eva");
+
         // When
-        Result result = client.votingsOfVoteCaller(0, 11, "Dennis");
+        Result result = client.votingsOfVoteCaller(0, 11, "Eva");
 
         // Then
-        assertThat(statusOf(result), equalTo(FORBIDDEN));
+        assertThat(statusOf(result), equalTo(OK));
+        assertThat(votingIdsOf(result).size(), equalTo(0));
     }
-
 
     private void seedPublicVotingTestData() {
         for(int i = 42; i < 84; i++) {
@@ -144,6 +161,11 @@ public class VotingsPagingTest {
             jpaVoting.setVisibility(Visibility.PUBLIC);
             jpaVoting.setAuthorization(Authorization.EMAILS);
             jpaVoting.setCreatedBy("Walter");
+            jpaVoting.setNetwork("mockblockchain");
+            jpaVoting.setVotesCap(42L);
+            jpaVoting.setCreatedAt(Instant.now().minus(Duration.ofDays(1)));
+            jpaVoting.setStartDate(Instant.now().minus(Duration.ofDays(1)));
+            jpaVoting.setEndDate(Instant.now().plus(Duration.ofDays(1)));
             Ebean.save(jpaVoting);
         }
     }

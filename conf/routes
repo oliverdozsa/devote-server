@@ -5,11 +5,11 @@ POST    /voting                                     controllers.VotingController
 GET     /voting/:id                                 controllers.VotingController.single(id: String, request: Request)
 
 # Voting lists
-GET    /votings/public                              controllers.VotePagingController.publicVotings(request: Request)
+GET    /votings/public                              controllers.VotingsPagingController.publicVotings(request: Request)
 + jwtFilter
-GET    /votings/votecaller                          controllers.VotePagingController.votingsOfVoteCaller(request: Request)
+GET    /votings/votecaller                          controllers.VotingsPagingController.votingsOfVoteCaller(request: Request)
 + jwtFilter
-GET    /votings/voter                               controllers.VotePagingController.votingsOfVoter(request: Request)
+GET    /votings/voter                               controllers.VotingsPagingController.votingsOfVoter(request: Request)
 
 # Cast vote
 + jwtFilter
