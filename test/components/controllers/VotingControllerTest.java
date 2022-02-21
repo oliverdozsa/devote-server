@@ -292,4 +292,24 @@ public class VotingControllerTest {
 
         assertThat(statusOf(getByLocationResult), equalTo(OK));
     }
+
+    @Test
+    public void testCreateOnTestNet() throws InterruptedException {
+        // Given
+        CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("bob@mail.com", "doe@where.de", "some@one.com"));
+        createVotingRequest.setUseTestnet(true);
+
+        // When
+        Result result = client.createVoting(createVotingRequest, "Alice");
+
+        // Then
+        assertThat(statusOf(result), equalTo(CREATED));
+
+        // Wait for voting init & channel task
+        Thread.sleep(30 * 1000);
+
+        assertChannelGeneratorsCreatedOnTestMockBlockchainNetwork();
+    }
 }

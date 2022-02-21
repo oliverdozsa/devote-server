@@ -54,6 +54,8 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
     @Constraints.Required
     private String fundingAccountSecret;
 
+    private Boolean useTestnet;
+
     public String getNetwork() {
         return network;
     }
@@ -236,5 +238,13 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
         PUBLIC,
         UNLISTED,
         PRIVATE
+    }
+
+    public Boolean getUseTestnet() {
+        return useTestnet;
+    }
+
+    public void setUseTestnet(Boolean useTestnet) {
+        this.useTestnet = useTestnet;
     }
 }

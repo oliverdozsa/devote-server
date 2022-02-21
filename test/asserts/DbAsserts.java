@@ -102,6 +102,12 @@ public class DbAsserts {
         assertTrue("Not found stored transaction for signature: " + signature, storedTransactionOptional.isPresent());
     }
 
+    public static void assertChannelGeneratorsCreatedOnTestMockBlockchainNetwork() {
+        List<JpaChannelGeneratorAccount> channelGenerators = Ebean.createQuery(JpaChannelGeneratorAccount.class)
+                .findList();
+        channelGenerators.forEach(cg -> assertThat(cg.getAccountPublic(), startsWith("test-net")));
+    }
+
     private static List<JpaChannelAccountProgress> channelProgressesOf(Long votingId) {
         JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
         return voting.getChannelGeneratorAccounts().stream()
