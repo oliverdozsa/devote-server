@@ -17,6 +17,10 @@ import requests.CommissionAccountCreationRequest;
 import requests.CommissionInitRequest;
 import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
+import security.UserInfoCollectorForTest;
+import security.jwtverification.JwtVerification;
+import security.jwtverification.JwtVerificationForTests;
+import services.commissionsubs.userinfo.UserInfoCollector;
 import smokes.fixtures.BlockchainTestNet;
 import smokes.fixtures.StellarBlockchainTestNet;
 import units.ipfs.api.imp.MockIpfsApi;
@@ -59,7 +63,9 @@ public class ConductVotingSmokeTest {
         // TODO: parametrize for IPFS (causes network issues when running ipfs desktop)?
         GuiceApplicationBuilder applicationBuilder = new GuiceApplicationBuilder()
                 .overrides(bind(IpfsApi.class).to(MockIpfsApi.class))
-                .overrides(bind(IPFS.class).toProvider(MockIpfsProvider.class));
+                .overrides(bind(IPFS.class).toProvider(MockIpfsProvider.class))
+                .overrides(bind(UserInfoCollector.class).to(UserInfoCollectorForTest.class))
+                .overrides((bind(JwtVerification.class).to(JwtVerificationForTests.class)));
 
         ruleChainForTests = new RuleChainForTests(applicationBuilder);
         chain = ruleChainForTests.getRuleChain();
@@ -89,12 +95,12 @@ public class ConductVotingSmokeTest {
 
     private void testVotingOnNetwork(String networkName) throws InterruptedException {
         // Given
-        InitData votingInitData = initVotingFor("Alice", networkName);
+        InitData votingInitData = initVotingFor("Bob", networkName);
         Thread.sleep(45 * 1000); // So that some channel accounts are present.
 
         String message = createMessage(votingInitData.votingId, generateVoterPublic(networkName));
 
-        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", message, votingInitData.votingId);
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Bob", message, votingInitData.votingId);
         assertThat(statusOf(result.http), equalTo(OK));
         assertThat(envelopeSignatureOf(result.http), notNullValue());
         assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
@@ -124,6 +130,7 @@ public class ConductVotingSmokeTest {
         Thread.sleep(30 * 1000);
         CommissionInitRequest initRequest = new CommissionInitRequest();
         initRequest.setVotingId(votingId);
+        UserInfoCollectorForTest.setReturnValueFor(userId);
 
         // When
         Result result = testClient.init(initRequest, userId);
@@ -143,7 +150,7 @@ public class ConductVotingSmokeTest {
 
         CreateVotingRequest createVotingRequest = createValidVotingRequest();
         createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
-        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("bob@mail.com", "doe@mail.come", "some@mail.com"));
         createVotingRequest.setNetwork(network);
         createVotingRequest.setVotesCap(168L);
         createVotingRequest.setFundingAccountPublic(funding.publik);
