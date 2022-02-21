@@ -14,8 +14,15 @@ public class MockBlockchainChannelAccountOperation implements ChannelAccountOper
 
     private static int currentChannelAccountId = 0;
 
+    private boolean shouldUseTestNet = false;
+
     @Override
     public void init(BlockchainConfiguration configuration) {
+    }
+
+    @Override
+    public void useTestNet() {
+        shouldUseTestNet = true;
     }
 
     @Override
@@ -29,6 +36,11 @@ public class MockBlockchainChannelAccountOperation implements ChannelAccountOper
         for(int i = 0; i < numOfAccountsToCreate; i++) {
             currentChannelAccountId++;
             String currentChannelAccountIdAsString = Integer.toString(currentChannelAccountId);
+
+            if(shouldUseTestNet) {
+                currentChannelAccountIdAsString = "test-net-" + currentChannelAccountIdAsString;
+            }
+
             Account account = new Account(currentChannelAccountIdAsString, currentChannelAccountIdAsString);
             accounts.add(account);
         }

@@ -31,6 +31,9 @@ public class CommissionBlockchainOperations {
 
         BlockchainFactory blockchainFactory = blockchains.getFactoryByNetwork(network);
         VoterAccountOperation voterAccountOperation = blockchainFactory.createVoterAccountOperation();
+        if(data.isOnTestNetwork) {
+            voterAccountOperation.useTestNet();
+        }
 
         return supplyAsync(() -> voterAccountOperation.createTransaction(data), blockchainExecContext);
     }

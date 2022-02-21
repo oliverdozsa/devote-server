@@ -20,6 +20,7 @@ import static devote.blockchain.stellar.StellarUtils.toAssetAmount;
 
 public class StellarVoterAccountOperation implements VoterAccountOperation {
     private StellarBlockchainConfiguration configuration;
+    private StellarServerAndNetwork serverAndNetwork;
 
     private static final Logger.ALogger logger = Logger.of(StellarVoterAccountOperation.class);
     private static final String UNIT_TOKEN_AMOUNT = unitTokenAmount();
@@ -27,6 +28,12 @@ public class StellarVoterAccountOperation implements VoterAccountOperation {
     @Override
     public void init(BlockchainConfiguration configuration) {
         this.configuration = (StellarBlockchainConfiguration) configuration;
+        serverAndNetwork = StellarServerAndNetwork.create((StellarBlockchainConfiguration) configuration);
+    }
+
+    @Override
+    public void useTestNet() {
+        serverAndNetwork = StellarServerAndNetwork.createForTestNet((StellarBlockchainConfiguration) configuration);
     }
 
     @Override
@@ -47,8 +54,8 @@ public class StellarVoterAccountOperation implements VoterAccountOperation {
     }
 
     private Transaction.Builder prepareTransaction(KeyPair channel) throws IOException {
-        Server server = configuration.getServer();
-        Network network = configuration.getNetwork();
+        Server server = serverAndNetwork.getServer();
+        Network network = serverAndNetwork.getNetwork();
 
         return StellarUtils.createTransactionBuilder(server, network, channel.getAccountId());
     }

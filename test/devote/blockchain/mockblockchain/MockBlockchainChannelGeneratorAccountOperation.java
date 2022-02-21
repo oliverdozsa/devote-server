@@ -13,6 +13,7 @@ public class MockBlockchainChannelGeneratorAccountOperation implements ChannelGe
 
     private MockBlockchainConfiguration config;
     private boolean isInitCalled = false;
+    private boolean shouldUseTestNet = false;
 
     private static int currentChannelGeneratorId = 0;
 
@@ -20,6 +21,11 @@ public class MockBlockchainChannelGeneratorAccountOperation implements ChannelGe
     public void init(BlockchainConfiguration config) {
         this.config = (MockBlockchainConfiguration) config;
         isInitCalled = true;
+    }
+
+    @Override
+    public void useTestNet() {
+        shouldUseTestNet = true;
     }
 
     @Override
@@ -32,6 +38,10 @@ public class MockBlockchainChannelGeneratorAccountOperation implements ChannelGe
         for (int i = 0; i < n - 1; i++) {
             currentChannelGeneratorId++;
             String currentChannelGeneratorIdAsString = Integer.toString(currentChannelGeneratorId);
+            if(shouldUseTestNet) {
+                currentChannelGeneratorIdAsString = "test-net-" + currentChannelGeneratorIdAsString;
+            }
+
             Account account = new Account(currentChannelGeneratorIdAsString, currentChannelGeneratorIdAsString);
             ChannelGenerator channelGenerator = new ChannelGenerator(account, votesCapPerAccount);
             channelGenerators.add(channelGenerator);
@@ -39,7 +49,13 @@ public class MockBlockchainChannelGeneratorAccountOperation implements ChannelGe
 
         currentChannelGeneratorId++;
         String currentChannelGeneratorIdAsString = Integer.toString(currentChannelGeneratorId);
+
+        if(shouldUseTestNet) {
+            currentChannelGeneratorIdAsString = "test-net-" + currentChannelGeneratorIdAsString;
+        }
+
         Account account = new Account(currentChannelGeneratorIdAsString, currentChannelGeneratorIdAsString);
+
         ChannelGenerator channelGenerator = new ChannelGenerator(account, votesCapPerAccount + votesCapRemainder);
         channelGenerators.add(channelGenerator);
 

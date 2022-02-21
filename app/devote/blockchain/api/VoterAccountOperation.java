@@ -12,6 +12,7 @@ public interface VoterAccountOperation extends BlockchainOperation {
         public String assetCode;
         public long votesCap;
         public String voterAccountPublic;
+        public boolean isOnTestNetwork;
 
         @Override
         public String toString() {
@@ -22,6 +23,7 @@ public interface VoterAccountOperation extends BlockchainOperation {
                     ", assetCode='" + assetCode + '\'' +
                     ", votesCap=" + votesCap +
                     ", voterAccountPublic='" + redactWithEllipsis(voterAccountPublic, 5) + '\'' +
+                    ", isOnTestNetwork='" + isOnTestNetwork + '\'' +
                     '}';
         }
     }

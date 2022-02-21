@@ -8,4 +8,10 @@ public interface BlockchainOperation {
      * @param configuration The blockchain configuration.
      */
     void init(BlockchainConfiguration configuration);
+
+
+    /**
+     * Prepares the operation to be executed on the test network.
+     */
+    void useTestNet();
 }

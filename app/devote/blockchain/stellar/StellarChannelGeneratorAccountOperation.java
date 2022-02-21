@@ -23,6 +23,7 @@ import static devote.blockchain.stellar.StellarUtils.toAccount;
 
 public class StellarChannelGeneratorAccountOperation implements ChannelGeneratorAccountOperation {
     private StellarBlockchainConfiguration configuration;
+    private StellarServerAndNetwork serverAndNetwork;
 
     private static final Logger.ALogger logger = Logger.of(StellarChannelGeneratorAccountOperation.class);
 
@@ -30,6 +31,12 @@ public class StellarChannelGeneratorAccountOperation implements ChannelGenerator
     @Override
     public void init(BlockchainConfiguration configuration) {
         this.configuration = (StellarBlockchainConfiguration) configuration;
+        serverAndNetwork = StellarServerAndNetwork.create(this.configuration);
+    }
+
+    @Override
+    public void useTestNet() {
+        serverAndNetwork = StellarServerAndNetwork.createForTestNet(this.configuration);
     }
 
     @Override
@@ -69,8 +76,8 @@ public class StellarChannelGeneratorAccountOperation implements ChannelGenerator
     }
 
     private Transaction.Builder prepareTransaction(Account funding) throws IOException {
-        Server server = configuration.getServer();
-        Network network = configuration.getNetwork();
+        Server server = serverAndNetwork.getServer();
+        Network network = serverAndNetwork.getNetwork();
 
         return StellarUtils.createTransactionBuilder(server, network, funding.publik);
     }
@@ -100,7 +107,7 @@ public class StellarChannelGeneratorAccountOperation implements ChannelGenerator
 
         transaction.sign(funding);
 
-        Server server = configuration.getServer();
+        Server server = serverAndNetwork.getServer();
         StellarSubmitTransaction.submit(transaction, server);
     }
 

@@ -18,12 +18,20 @@ import static devote.blockchain.stellar.StellarUtils.fromAccount;
 
 public class StellarDistributionAndBallotAccountOperation implements DistributionAndBallotAccountOperation {
     private StellarBlockchainConfiguration configuration;
+    private StellarServerAndNetwork serverAndNetwork;
 
     private static final Logger.ALogger logger = Logger.of(StellarDistributionAndBallotAccountOperation.class);
 
     @Override
     public void init(BlockchainConfiguration configuration) {
         this.configuration = (StellarBlockchainConfiguration) configuration;
+        serverAndNetwork = StellarServerAndNetwork.create((StellarBlockchainConfiguration) configuration);
+
+    }
+
+    @Override
+    public void useTestNet() {
+        serverAndNetwork = StellarServerAndNetwork.createForTestNet(configuration);
     }
 
     @Override
@@ -46,8 +54,8 @@ public class StellarDistributionAndBallotAccountOperation implements Distributio
     }
 
     private Transaction.Builder prepareTransaction(KeyPair funding) throws IOException {
-        Server server = configuration.getServer();
-        Network network = configuration.getNetwork();
+        Server server = serverAndNetwork.getServer();
+        Network network = serverAndNetwork.getNetwork();
 
         return StellarUtils.createTransactionBuilder(server, network, funding.getAccountId());
     }
@@ -56,7 +64,7 @@ public class StellarDistributionAndBallotAccountOperation implements Distributio
         Transaction transaction = txBuilder.build();
         Arrays.stream(signers).forEach(transaction::sign);
 
-        Server server = configuration.getServer();
+        Server server = serverAndNetwork.getServer();
         StellarSubmitTransaction.submit(transaction, server);
     }
 }

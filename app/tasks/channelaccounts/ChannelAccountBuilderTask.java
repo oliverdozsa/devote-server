@@ -39,6 +39,9 @@ public class ChannelAccountBuilderTask implements Runnable {
     private List<Account> createChannelAccounts(JpaChannelAccountProgress channelProgress) {
         JpaChannelGeneratorAccount channelGeneratorEntity = channelProgress.getChannelGenerator();
         ChannelAccountOperation channelAccountOperation = getChannelAccountOperation(channelGeneratorEntity);
+        if(channelProgress.getChannelGenerator().getVoting().getOnTestNetwork()) {
+            channelAccountOperation.useTestNet();
+        }
 
         int numOfAccountsToCreateInOneBatch = determineNumOfAccountsToCreateInOneBatch(channelProgress, channelAccountOperation);
         logger.info("[CHANNEL-TASK-{}]: createChannelAccounts(): about to create {} channel accounts on blockchain {} for progress {}",

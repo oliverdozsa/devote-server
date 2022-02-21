@@ -77,68 +77,6 @@ public class VotingBlockchainOperationsTest {
         );
     }
 
-    @Test
-    public void testCreateChannelGeneratorAccounts() throws ExecutionException, InterruptedException {
-        // Given
-        CreateVotingRequest request = new CreateVotingRequest();
-        request.setNetwork("mocknetwork");
-        request.setVotesCap(42L);
-        request.setTitle("Some Voting");
-
-        // When
-        CompletableFuture<List<ChannelGenerator>> channelGeneratorsFuture = operations.createChannelGeneratorAccounts(request)
-                .toCompletableFuture();
-
-
-        // Then
-        List<Account> channelGeneratorAccounts = channelGeneratorsFuture.get().stream()
-                .map(channelGenerator -> channelGenerator.account)
-                .collect(Collectors.toList());
-
-        assertThat(channelGeneratorAccounts, containsInAnyOrder(
-                new Account("sA", "pA"),
-                new Account("sB", "pB"),
-                new Account("sC", "pC")
-        ));
-    }
-
-    @Test
-    public void testCreateDistributionAndBallot_VoteTitleUsedAndItsLongerThanBaseLength() throws ExecutionException, InterruptedException {
-        // Given
-        CreateVotingRequest request = new CreateVotingRequest();
-        request.setNetwork("mocknetwork");
-        request.setVotesCap(42L);
-        request.setTitle("S#ome!Vo@tingWithALongTitle");
-
-        // When
-        CompletableFuture<VotingBlockchainOperations.BallotAndDistributionResult> transactionResultFuture =
-                operations.createDistributionAndBallotAccounts(request)
-                        .toCompletableFuture();
-
-        // Then
-        VotingBlockchainOperations.BallotAndDistributionResult ballotAndDistroResult = transactionResultFuture.get();
-        assertThat(ballotAndDistroResult.assetCode, Matchers.startsWith("SOMEVOTI"));
-    }
-
-    @Test
-    public void testTokenTitle_TokenIdentifierUsed() throws ExecutionException, InterruptedException {
-        // Given
-        CreateVotingRequest request = new CreateVotingRequest();
-        request.setNetwork("mocknetwork");
-        request.setVotesCap(42L);
-        request.setTitle("S#ome!Vo@tingWithALongTitle");
-        request.setTokenIdentifier("SomeID");
-
-        // When
-        CompletableFuture<VotingBlockchainOperations.BallotAndDistributionResult> transactionResultFuture =
-                operations.createDistributionAndBallotAccounts(request)
-                        .toCompletableFuture();
-
-        // Then
-        VotingBlockchainOperations.BallotAndDistributionResult ballotAndDistroResult = transactionResultFuture.get();
-        assertThat(ballotAndDistroResult.assetCode, Matchers.startsWith("SOMEID"));
-    }
-
     public void executeRunnableOnMockExecContext() {
         doAnswer(invocation -> {
             Runnable runnable = invocation.getArgument(0);

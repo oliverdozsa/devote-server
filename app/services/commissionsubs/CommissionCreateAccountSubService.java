@@ -115,6 +115,7 @@ public class CommissionCreateAccountSubService {
         params.distribution = new Account(
                 accountCreationData.voting.getDistributionAccountSecret(), accountCreationData.voting.getDistributionAccountPublic()
         );
+        params.isOnTestNetwork = accountCreationData.voting.getOnTestNetwork() != null && accountCreationData.voting.getOnTestNetwork();
 
         return params;
     }

@@ -14,6 +14,11 @@ public class BlockchainWihMissingImplementationChannelGeneratorOperation impleme
     }
 
     @Override
+    public void useTestNet() {
+
+    }
+
+    @Override
     public List<ChannelGenerator> create(long totalVotesCap, Account funding) {
         return null;
     }

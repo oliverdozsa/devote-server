@@ -22,6 +22,7 @@ import static devote.blockchain.stellar.StellarUtils.fromAccount;
 import static devote.blockchain.stellar.StellarUtils.toAccount;
 
 public class StellarChannelAccountOperation implements ChannelAccountOperation {
+    private StellarServerAndNetwork serverAndNetwork;
     private StellarBlockchainConfiguration configuration;
 
     private static final int MAX_NUM_OF_ACCOUNTS_TO_CREATE_IN_ONE_TRANSACTION = 50;
@@ -32,6 +33,12 @@ public class StellarChannelAccountOperation implements ChannelAccountOperation {
     @Override
     public void init(BlockchainConfiguration configuration) {
         this.configuration = (StellarBlockchainConfiguration) configuration;
+        serverAndNetwork = StellarServerAndNetwork.create(this.configuration);
+    }
+
+    @Override
+    public void useTestNet() {
+        serverAndNetwork = StellarServerAndNetwork.createForTestNet(configuration);
     }
 
     @Override
@@ -59,8 +66,8 @@ public class StellarChannelAccountOperation implements ChannelAccountOperation {
     }
 
     private Transaction.Builder prepareTransaction(String channelGeneratorAccountId) throws IOException {
-        Server server = configuration.getServer();
-        Network network = configuration.getNetwork();
+        Server server = serverAndNetwork.getServer();
+        Network network = serverAndNetwork.getNetwork();
 
         return StellarUtils.createTransactionBuilder(server, network, channelGeneratorAccountId);
     }
@@ -94,7 +101,7 @@ public class StellarChannelAccountOperation implements ChannelAccountOperation {
         Transaction transaction = txBuilder.build();
         transaction.sign(channel);
 
-        Server server = configuration.getServer();
+        Server server = serverAndNetwork.getServer();
         StellarSubmitTransaction.submit(transaction, server);
     }
 }

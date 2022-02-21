@@ -77,6 +77,10 @@ public class VotingBlockchainInitTask implements Runnable {
         logger.info("[VOTING-BC-INIT-TASK-{}]: creating channel generators for voting {}", taskId, voting.getId());
 
         ChannelGeneratorAccountOperation channelGeneratorAccountOperation = getChannelGeneratorOperation(voting.getNetwork());
+        if(voting.getOnTestNetwork()) {
+            channelGeneratorAccountOperation.useTestNet();
+        }
+
         List<ChannelGenerator> channelGenerators = channelGeneratorAccountOperation.create(voting.getVotesCap(), getFundingOf(voting));
         context.votingRepository.channelGeneratorsCreated(voting.getId(), channelGenerators);
         context.channelProgressRepository.channelGeneratorsCreated(voting.getId());
@@ -91,6 +95,10 @@ public class VotingBlockchainInitTask implements Runnable {
         logger.info("[VOTING-BC-INIT-TASK-{}]: creating ballot and distribution generators for voting {}", taskId, voting.getId());
 
         DistributionAndBallotAccountOperation distributionAndBallotAccountOperation = getDistributionAndBallotOperation(voting.getNetwork());
+        if(voting.getOnTestNetwork()) {
+            distributionAndBallotAccountOperation.useTestNet();
+        }
+
         DistributionAndBallotAccountOperation.TransactionResult transactionResult =
                 distributionAndBallotAccountOperation.create(getFundingOf(voting), voting.getAssetCode(), voting.getVotesCap());
 

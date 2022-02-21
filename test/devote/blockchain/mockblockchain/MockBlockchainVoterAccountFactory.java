@@ -12,6 +12,11 @@ public class MockBlockchainVoterAccountFactory implements VoterAccountOperation 
     }
 
     @Override
+    public void useTestNet() {
+
+    }
+
+    @Override
     public String createTransaction(CreateTransactionParams params) {
         String randomTransactionString = createRandomAlphabeticString(16);
         return randomTransactionString + params.voterAccountPublic.substring(0, 5);

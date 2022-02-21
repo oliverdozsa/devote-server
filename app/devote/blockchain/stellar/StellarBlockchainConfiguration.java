@@ -10,6 +10,9 @@ import play.Logger;
 public class StellarBlockchainConfiguration implements BlockchainConfiguration {
     private Server server;
     private Network network;
+    private Server testNetServer;
+    private Network testNetwork;
+
     private Config config;
 
     private static final Logger.ALogger logger = Logger.of(StellarBlockchainConfiguration.class);
@@ -36,6 +39,16 @@ public class StellarBlockchainConfiguration implements BlockchainConfiguration {
         return network;
     }
 
+    public Server getTestNetServer() {
+        initServerAndNetworkIfNeeded();
+        return testNetServer;
+    }
+
+    public Network getTestNetwork() {
+        initServerAndNetworkIfNeeded();
+        return testNetwork;
+    }
+
     public long getNumOfVoteBuckets() {
         return config.getLong("devote.blockchain.stellar.votebuckets");
     }
@@ -43,14 +56,16 @@ public class StellarBlockchainConfiguration implements BlockchainConfiguration {
     private void initServerAndNetworkIfNeeded() {
         if (server == null) {
             String horizonUrl = config.getString("devote.blockchain.stellar.url");
-            logger.info("[STELLAR]: horizon url = {}", horizonUrl);
-            server = new Server(horizonUrl);
+            String horizonTestNetUrl = config.getString("devote.blockchain.stellar.url");
 
-            if (horizonUrl.contains("testnet")) {
-                network = Network.TESTNET;
-            } else {
-                network = Network.PUBLIC;
-            }
+            logger.info("[STELLAR]: horizon url = {}", horizonUrl);
+            logger.info("[STELLAR]: horizon testnet url = {}", horizonTestNetUrl);
+
+            server = new Server(horizonUrl);
+            testNetServer = new Server(horizonTestNetUrl);
+
+            network = Network.PUBLIC;
+            testNetwork = Network.TESTNET;
         }
     }
 }

@@ -9,8 +9,15 @@ public class MockBlockchainDistributionAndBallotAccountOperation implements Dist
     private static int currentBallotAccountId = 0;
     private static int currentIssuerAccountId = 0;
 
+    private boolean shouldUseTestNet = false;
+
     @Override
     public void init(BlockchainConfiguration configuration) {
+    }
+
+    @Override
+    public void useTestNet() {
+        shouldUseTestNet = true;
     }
 
     @Override
@@ -22,6 +29,12 @@ public class MockBlockchainDistributionAndBallotAccountOperation implements Dist
         String currentDistributionAccountIdAsString = Integer.toString(currentDistributionAccountId);
         String currentBallotAccountIdAsString = Integer.toString(currentBallotAccountId);
         String currentIssuerAccountIdAsString = Integer.toString(currentIssuerAccountId);
+
+        if(shouldUseTestNet) {
+            currentDistributionAccountIdAsString = "test-net-" + currentDistributionAccountIdAsString;
+            currentBallotAccountIdAsString = "test-net-" + currentBallotAccountIdAsString;
+            currentIssuerAccountIdAsString = "test-net-" + currentIssuerAccountIdAsString;
+        }
 
         Account distributionAccount = new Account(currentDistributionAccountIdAsString, currentDistributionAccountIdAsString);
         Account ballotAccount = new Account(currentBallotAccountIdAsString, currentBallotAccountIdAsString);

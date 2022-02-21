@@ -108,6 +108,9 @@ public class JpaVoting {
     @Column(name = "created_by", nullable = false)
     private String createdBy;
 
+    @Column(name = "is_on_test_network")
+    private Boolean isOnTestNetwork;
+
     public Long getId() {
         return id;
     }
@@ -314,5 +317,13 @@ public class JpaVoting {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public Boolean getOnTestNetwork() {
+        return isOnTestNetwork;
+    }
+
+    public void setOnTestNetwork(Boolean onTestNetwork) {
+        isOnTestNetwork = onTestNetwork;
     }
 }

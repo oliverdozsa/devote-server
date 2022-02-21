@@ -14,17 +14,24 @@ import static utils.StringUtils.redactWithEllipsis;
 
 public class StellarFundingAccountOperation implements FundingAccountOperation {
     private StellarBlockchainConfiguration configuration;
+    private StellarServerAndNetwork serverAndNetwork;
 
     private static final Logger.ALogger logger = Logger.of(StellarFundingAccountOperation.class);
 
     @Override
     public void init(BlockchainConfiguration configuration) {
         this.configuration = (StellarBlockchainConfiguration) configuration;
+        serverAndNetwork = StellarServerAndNetwork.create(this.configuration);
+    }
+
+    @Override
+    public void useTestNet() {
+        serverAndNetwork = StellarServerAndNetwork.createForTestNet(this.configuration);
     }
 
     @Override
     public boolean doesNotHaveEnoughBalanceForVotesCap(String accountPublic, long votesCap) {
-        Server server = configuration.getServer();
+        Server server = serverAndNetwork.getServer();
 
         try {
             String loggableAccount = redactWithEllipsis(accountPublic, 5);

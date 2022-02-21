@@ -155,6 +155,7 @@ public class ConductVotingSmokeTest {
         createVotingRequest.setVotesCap(168L);
         createVotingRequest.setFundingAccountPublic(funding.publik);
         createVotingRequest.setFundingAccountSecret(funding.secret);
+        createVotingRequest.setUseTestnet(true);
 
         Result result = votingTestClient.createVoting(createVotingRequest, "Alice");
         assertThat(statusOf(result), equalTo(CREATED));

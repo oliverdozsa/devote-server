@@ -65,6 +65,11 @@ public class BlockchainFactoryTest {
         }
 
         @Override
+        public void useTestNet() {
+
+        }
+
+        @Override
         public List<ChannelGenerator> create(long totalVotesCap, Account funding) {
             return null;
         }
