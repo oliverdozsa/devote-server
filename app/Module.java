@@ -1,3 +1,4 @@
+import com.auth0.jwk.JwkProvider;
 import com.google.inject.name.Names;
 import data.operations.CommissionDbOperations;
 import data.operations.PageOfVotingsDbOperations;
@@ -28,6 +29,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import play.data.format.Formatters;
 import security.JwtCenter;
 import security.jwtverification.Auth0JwtVerification;
+import security.jwtverification.JwkProviderProvider;
 import security.jwtverification.JwtVerification;
 import services.CommissionService;
 import services.EnvelopKeyPairProvider;
@@ -79,6 +81,7 @@ public class Module extends AbstractModule {
         // Auth
         bind(JwtVerification.class).to(Auth0JwtVerification.class).asEagerSingleton();
         bind(UserInfoCollector.class).to(Auth0UserInfoCollector.class).asEagerSingleton();
+        bind(JwkProvider.class).toProvider(JwkProviderProvider.class).asEagerSingleton();
 
         // Other
         bind(AsymmetricCipherKeyPair.class).annotatedWith(Names.named("envelope"))

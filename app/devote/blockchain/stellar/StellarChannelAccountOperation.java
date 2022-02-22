@@ -102,6 +102,6 @@ public class StellarChannelAccountOperation implements ChannelAccountOperation {
         transaction.sign(channel);
 
         Server server = serverAndNetwork.getServer();
-        StellarSubmitTransaction.submit(transaction, server);
+        StellarSubmitTransaction.submit("channel account", transaction, server);
     }
 }

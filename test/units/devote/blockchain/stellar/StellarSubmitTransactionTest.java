@@ -60,7 +60,7 @@ public class StellarSubmitTransactionTest {
         // When
         // Then
         BlockchainException exception =
-                assertThrows(BlockchainException.class, () -> StellarSubmitTransaction.submit(mockTransaction, mockServer));
+                assertThrows(BlockchainException.class, () -> StellarSubmitTransaction.submit("mock tx", mockTransaction, mockServer));
         assertThat(exception.getMessage(), containsString("STELLAR]: Failed to submit transaction"));
     }
 }

@@ -108,7 +108,7 @@ public class StellarChannelGeneratorAccountOperation implements ChannelGenerator
         transaction.sign(funding);
 
         Server server = serverAndNetwork.getServer();
-        StellarSubmitTransaction.submit(transaction, server);
+        StellarSubmitTransaction.submit("channel generator", transaction, server);
     }
 
     private ChannelGenerator toChannelGenerator(KeyPair keyPair, long votesCapPerAccount) {

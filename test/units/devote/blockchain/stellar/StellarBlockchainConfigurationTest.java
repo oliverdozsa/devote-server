@@ -46,8 +46,8 @@ public class StellarBlockchainConfigurationTest {
         configuration.init(mockConfig);
 
         // Then
-        assertThat(configuration.getServer(), notNullValue());
-        assertThat(configuration.getNetwork(), equalTo(Network.TESTNET));
+        assertThat(configuration.getTestNetServer(), notNullValue());
+        assertThat(configuration.getTestNetwork(), equalTo(Network.TESTNET));
     }
 
     @Test

@@ -3,7 +3,6 @@ package security.jwtverification;
 import com.auth0.jwk.Jwk;
 import com.auth0.jwk.JwkException;
 import com.auth0.jwk.JwkProvider;
-import com.auth0.jwk.UrlJwkProvider;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -18,9 +17,9 @@ public class Auth0JwtVerification implements JwtVerification {
     private final String issuer;
 
     @Inject
-    public Auth0JwtVerification(Config config) {
+    public Auth0JwtVerification(Config config, JwkProvider jwkProvider) {
+        this.jwkProvider = jwkProvider;
         issuer = config.getString("devote.auth0.jwt.issuer");
-        jwkProvider = new UrlJwkProvider(issuer);
     }
 
     @Override

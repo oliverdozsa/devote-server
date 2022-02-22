@@ -14,8 +14,8 @@ import java.util.StringJoiner;
 public class StellarSubmitTransaction {
     private static final Logger.ALogger logger = Logger.of(StellarSubmitTransaction.class);
 
-    public static void submit(Transaction transaction, Server server) throws AccountRequiresMemoException, IOException {
-        logger.info("[STELLAR]: Submitting transaction with operations: {}", collectionOperationsOf(transaction));
+    public static void submit(String name, Transaction transaction, Server server) throws AccountRequiresMemoException, IOException {
+        logger.info("[STELLAR]: Submitting {} transaction with operations: {}", name, collectionOperationsOf(transaction));
         SubmitTransactionResponse response = server.submitTransaction(transaction);
 
         if (response.isSuccess()) {

@@ -65,6 +65,6 @@ public class StellarDistributionAndBallotAccountOperation implements Distributio
         Arrays.stream(signers).forEach(transaction::sign);
 
         Server server = serverAndNetwork.getServer();
-        StellarSubmitTransaction.submit(transaction, server);
+        StellarSubmitTransaction.submit("distribution and ballot", transaction, server);
     }
 }
