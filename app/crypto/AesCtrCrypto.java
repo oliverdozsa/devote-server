@@ -10,6 +10,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Arrays;
+import java.util.Base64;
 
 // Based on:
 //   - https://medium.com/lumenauts/sending-secret-and-anonymous-memos-with-stellar-8914479e949b
@@ -83,5 +84,15 @@ public class AesCtrCrypto {
     }
 
     private AesCtrCrypto() {
+    }
+
+    public static void main(String[] args) {
+        String message = "01|01";
+        byte[] key = AesCtrCrypto.generateKey();
+        byte[] cipherBytes = AesCtrCrypto.encrypt(key, message.getBytes());
+        System.out.println(Base64.getEncoder().encodeToString(cipherBytes));
+
+        byte[] decryptedBytes = AesCtrCrypto.decrypt(key, cipherBytes);
+        System.out.println(new String(decryptedBytes));
     }
 }

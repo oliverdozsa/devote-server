@@ -312,4 +312,19 @@ public class VotingControllerTest {
 
         assertChannelGeneratorsCreatedOnTestMockBlockchainNetwork();
     }
+
+    @Test
+    public void testVotesCapTooBig() {
+        // Given
+        CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("bob@mail.com", "doe@where.de", "some@one.com"));
+        createVotingRequest.setVotesCap(221L);
+
+        // When
+        Result result = client.createVoting(createVotingRequest, "Alice");
+
+        // Then
+        assertThat(statusOf(result), equalTo(BAD_REQUEST));
+    }
 }

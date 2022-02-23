@@ -7,6 +7,7 @@ import validation.ValidatableWithConfig;
 import validation.ValidateWithConfig;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -43,6 +44,7 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
 
     @Constraints.Required
     @Valid
+    @Size(min = 1)
     private List<CreatePollRequest> polls;
 
     @Constraints.Required
@@ -144,6 +146,11 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
         if (isStartEndDateNotValid(minTimeInterval)) {
             return "The minimum difference between start and end date should be " +
                     minTimeInterval + " seconds, and voting must end in the future!";
+        }
+
+        long maxVotesCap = config.getLong("devote.max.votes.cap");
+        if(votesCap > maxVotesCap) {
+            return "Requested votes cap (" + maxVotesCap + ") is greater, than the maximum allowed (" + maxVotesCap + ")";
         }
 
         return null;

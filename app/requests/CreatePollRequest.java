@@ -15,7 +15,7 @@ public class CreatePollRequest implements Constraints.Validatable<String> {
 
     @Constraints.Required
     @Valid
-    @Size(min = 2)
+    @Size(min = 2, max = 99)
     private List<CreatePollOptionRequest> options;
 
     public String getQuestion() {
