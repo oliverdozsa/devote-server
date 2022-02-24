@@ -85,3 +85,54 @@ components:
           maxLength: 8
           required: false
           example: COLOR01
+        encryptedUntil:
+          description: If the voting to be encrypted, the date until it should be.
+          type: string
+          format: date-time
+          required: false
+          example: 2021-02-24T18:45:28Z
+        startDate:
+          description: The start date of the voting
+          type: string
+          format: date-time
+          required: true
+          example: 2021-02-24T18:45:28Z
+        endDate:
+          description: The end date of the voting
+          type: string
+          format: date-time
+          required: true
+          example: 2021-02-24T18:45:28Z
+        authorization:
+          description: Determines the authorization method for voters  (currently only emails is supported).
+          type: string
+          enum: [EMAILS]
+          required: false
+          example: EMAILS
+        authorizationEmailOptions:
+          description: List of email addresses who will be participants of the voting
+          type: array
+          items: 
+            type: string
+            format: email
+          required: false
+          example: 
+            - alice@mail.com
+            - bob@mail.com
+        polls:
+          description: List of polls (currently one poll is supported)
+          type: array:
+          items:
+            $ref: '#/components/schemas/Poll'
+
+    Poll:
+      type: object
+      properties:
+        question:
+          description: The question of the poll.
+          type: string
+          minLength: 2
+          required: true
+
+
+
