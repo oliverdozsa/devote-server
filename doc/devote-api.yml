@@ -1,0 +1,87 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: devote
+  license:
+    name: MIT
+    url: 'https://opensource.org/licenses/MIT'
+  description: |
+    # DeVote
+    This is the API doc of https://github.com/oliverdozsa/devote.
+paths:
+  '/voting':
+    post:
+      summary: Creates a new voting
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVoting'
+      
+  '/voting/{id}':
+    get:
+      summary: Gets a single voting by its ID
+  '/votings/public':
+    get:
+      summary: Gets public votings
+  '/votings/votecaller':
+    get:
+      summary: Gets votings created by logged in user
+  '/votings/voter':
+    get:
+      summary: Gets votings where logged in user is a voter (participant)
+  '/castvote/init':
+    post:
+      summary: Starts a voting session
+      requestBody:
+  '/castvote/{votingId}/signEnvelope':
+    post:
+      summary: Signs the envelope of the voter
+      requestBody:
+  '/castvote/createAccount':
+    post:
+      summary: Provides the anonymous voter the vote token by creating an account on the blockchain
+      requestBody:
+  '/castvote/txOfSignature/{signature}':
+    get:
+      summary: Gets the transaction string for the given signature (if an account was created before)
+  '/castvote/envlSignature/{votingId}':
+    get:
+      summary: Gets the envelope signature of logged in user for the given voting id (if signed an enveloper before)
+  '/encryptoptioncode/{votingId}/{optionCode}':
+    get:
+      summary: Encrypts an option code for the given voting
+
+components:
+  schemas:
+    CreateVoting:
+      type: object
+      properties:
+        network:
+          description: Identifier of the blockchain network (should be lowercase)
+          type: string
+          minLength: 2
+          required: true
+          example: stellar
+        votesCap:
+          description: Number of total voters allowed.
+          type: integer
+          format: int64
+          minimum: 2
+          required: true
+          example: 42
+        title:
+          description: Title of the voting
+          type: string
+          minLength: 2
+          required: true
+          example: General voting about favorite colors
+        tokenIdentifier:
+          description: Identifer of the (vote) token to be created on the blockchain
+          type: string
+          pattern: '[0-9a-z]+'
+          minLength: 2
+          maxLength: 8
+          required: false
+          example: COLOR01

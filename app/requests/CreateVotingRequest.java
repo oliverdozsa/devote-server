@@ -15,6 +15,7 @@ import java.util.List;
 @ValidateWithConfig
 public class CreateVotingRequest implements ValidatableWithConfig<String> {
     @Constraints.Required
+    @Constraints.MinLength(2)
     private String network;
 
     @Constraints.Required
