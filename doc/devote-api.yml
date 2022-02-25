@@ -12,16 +12,47 @@ paths:
   '/voting':
     post:
       summary: Creates a new voting
+      security:
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateVoting'
-      
+              $ref: '#/components/schemas/CreateVotingRequest'
+      responses:
+        '204':
+          description: Successfully created voting.
+          headers:
+            Location:
+              description: The location at which the newly created voting is available.
+              type: string
+        '400':
+          description: The request is not valid.
+        '403':
+          description: User is not allowed to create the voting (has no vote-caller role).
+
   '/voting/{id}':
     get:
       summary: Gets a single voting by its ID
+      description: PUBLIC and UNLISTED votes are available without authentication. PRIVATE 
+        votes are only available to participants and the creator of the voting.
+      security:
+        - bearerAuth: [ ]
+        - none: [ ]
+      parameters:
+        - name: id
+          description: Id of the voting
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Data about the voting.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleVotingResponse'
   '/votings/public':
     get:
       summary: Gets public votings
@@ -54,8 +85,13 @@ paths:
       summary: Encrypts an option code for the given voting
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
-    CreateVoting:
+    CreateVotingRequest:
       type: object
       properties:
         network:
@@ -121,11 +157,35 @@ components:
             - bob@mail.com
         polls:
           description: List of polls (currently one poll is supported)
-          type: array:
+          type: array
           items:
-            $ref: '#/components/schemas/Poll'
+            $ref: '#/components/schemas/CreatePollRequest'
+          minItems: 1
+          maxItems: 1
+          required: true
+        visibility:
+          description: Visibility of the poll. UNLISTED is available to anyone who knows the id. PRIVATE is only available to participants and the vote-caller (creator).
+          type: string
+          enum: [PUBLIC, UNLISTED, PRIVATE]
+          required: true
+          example: PUBLIC
+        fundingAccountPublic:
+          description: The public key of the funding account.
+          type: string
+          required: true
+          example: XYZV
+        fundingAccountSecret:
+          description: The secret (private) key of the funding account.
+          type: string
+          required: true
+          example: CDFG
+        useTestnet:
+          description: Whether conduct the voting on the testnet of the chosen network.
+          type: boolean
+          required: false
+          example: false
 
-    Poll:
+    CreatePollRequest:
       type: object
       properties:
         question:
@@ -133,6 +193,48 @@ components:
           type: string
           minLength: 2
           required: true
+          example: What is your favorite color?
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreatePollOptionRequest'
+          minItems: 2
+          maxItems: 99
+          required: true
+          example:
+            - name: blue
+              code: 1
+            - name: red
+              code: 2
+
+    CreatePollOptionRequest:
+      type: object
+      properties:
+        name:
+          description: An option of the poll.
+          type: string
+          minLength: 2
+          required: true
+          example: blue
+        code:
+          description: The code for the option
+          type: integer
+          minimum: 1
+          required: true
+          example: 1
+
+    SingleVotingResponse:
+      type: object
+      properties:
+        id:
+          description: Unique identifier of the vote
+          type: string
+          example: abcdef
+        network:
+          description: Identifier of the blockchain network
+          type: string
+          example: stellar
+
 
 
 

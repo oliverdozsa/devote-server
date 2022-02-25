@@ -8,6 +8,7 @@ import devote.blockchain.api.ChannelGenerator;
 import devote.blockchain.api.ChannelGeneratorAccountOperation;
 import devote.blockchain.api.DistributionAndBallotAccountOperation;
 import devote.blockchain.api.FundingAccountOperation;
+import exceptions.BusinessLogicViolationException;
 import executioncontexts.BlockchainExecutionContext;
 import play.Logger;
 import requests.CreateVotingRequest;
@@ -56,7 +57,7 @@ public class VotingBlockchainOperations {
                 String message = String.format("%s does not have enough balance for votes cap %d", loggableAccount, votesCap);
 
                 logger.warn("checkFundingAccountOf(): {}", message);
-                throw new BlockchainException(message);
+                throw new BusinessLogicViolationException(message);
             } else {
                 logger.info("checkFundingAccountOf(): Account {} has enough balance for the voting.", loggableAccount);
             }

@@ -4,6 +4,7 @@ import data.entities.JpaVoting;
 import data.entities.JpaVotingPoll;
 import data.entities.JpaVotingPollOption;
 import play.Logger;
+import services.Base62Conversions;
 
 import java.time.Instant;
 import java.util.List;
@@ -22,7 +23,7 @@ public class VotingResponseFromJpaVoting {
     }
 
     private void setBasicData(VotingResponse votingResponse, JpaVoting jpaVoting) {
-        votingResponse.setId(jpaVoting.getId());
+        votingResponse.setId(Base62Conversions.encode(jpaVoting.getId()));
         votingResponse.setTitle(jpaVoting.getTitle());
         votingResponse.setNetwork(jpaVoting.getNetwork());
         votingResponse.setVotesCap(jpaVoting.getVotesCap());
