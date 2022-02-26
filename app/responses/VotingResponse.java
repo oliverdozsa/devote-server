@@ -19,7 +19,6 @@ public class VotingResponse {
     private String issuerAccountId;
     private String assetCode;
     private String authorization;
-    private String authOptionKeybase;
     private String visibility;
 
     public String getId() {
@@ -116,14 +115,6 @@ public class VotingResponse {
 
     public void setAuthorization(String authorization) {
         this.authorization = authorization;
-    }
-
-    public String getAuthOptionKeybase() {
-        return authOptionKeybase;
-    }
-
-    public void setAuthOptionKeybase(String authOptionKeybase) {
-        this.authOptionKeybase = authOptionKeybase;
     }
 
     public String getVisibility() {

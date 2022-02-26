@@ -53,33 +53,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SingleVotingResponse'
+
   '/votings/public':
     get:
       summary: Gets public votings
+
   '/votings/votecaller':
     get:
       summary: Gets votings created by logged in user
+
   '/votings/voter':
     get:
       summary: Gets votings where logged in user is a voter (participant)
+
   '/castvote/init':
     post:
       summary: Starts a voting session
       requestBody:
+
   '/castvote/{votingId}/signEnvelope':
     post:
       summary: Signs the envelope of the voter
       requestBody:
+
   '/castvote/createAccount':
     post:
       summary: Provides the anonymous voter the vote token by creating an account on the blockchain
       requestBody:
+
   '/castvote/txOfSignature/{signature}':
     get:
       summary: Gets the transaction string for the given signature (if an account was created before)
+
   '/castvote/envlSignature/{votingId}':
     get:
       summary: Gets the envelope signature of logged in user for the given voting id (if signed an enveloper before)
+
   '/encryptoptioncode/{votingId}/{optionCode}':
     get:
       summary: Encrypts an option code for the given voting
@@ -234,6 +243,91 @@ components:
           description: Identifier of the blockchain network
           type: string
           example: stellar
+        title:
+          description: The title of the voting
+          type: string
+          example: Voting about colors
+        votesCap:
+          description: Number of total voters allowed.
+          type: integer
+          format: int64
+          example: 42
+        polls:
+          description: List of polls (currently one poll is supported)
+          type: array
+          items:
+            $ref: '#/components/schemas/PollResponse'
+        createdAt:
+          description: Creation time of the voting
+          type: string
+          format: date-time
+          required: false
+          example: 2021-02-24T18:45:28Z
+        encryptedUntil:
+          description: If the voting to be encrypted, the date until it should be.
+          type: string
+          format: date-time
+          required: false
+          example: 2021-02-24T18:45:28Z
+        decryptionKey:
+          description: Used to encrypt decrypted voting result. Available only, if voting encryption was requested, and
+            the encrypted until date is expired.
+          type: string
+          example: pkpkpkrefwceonwon
+        startDate:
+          description: The start date of the voting
+          type: string
+          format: date-time
+          example: 2021-02-24T18:45:28Z
+        endDate:
+          description: The end date of the voting
+          type: string
+          format: date-time
+          example: 2021-02-24T18:45:28Z
+        distributionAccountId:
+          description: Id (public key) of the distribution account
+          type: string
+          example: xerewrfijije
+        ballotAccountId:
+          description: Id (public key) of the ballot account
+          type: string
+          example: ejnfeunnrb
+        issuerAccountId:
+          description: Id (public key) of the issuer account
+          type: string
+          example: ejnfeunnrb
+        assetCode:
+          description: Name of the vote token.
+          type: string
+          example: COLOR01
+        authorization:
+          description: Determines the authorization method for voters  (currently only emails is supported).
+          type: string
+          enum: [ EMAILS ]
+          example: EMAILS
+        visibility:
+          description: Visibility of the poll. UNLISTED is available to anyone who knows the id. PRIVATE is only available to participants and the vote-caller (creator).
+          type: string
+          enum: [ PUBLIC, UNLISTED, PRIVATE ]
+          example: PUBLIC
+
+    PollResponse:
+      type: object
+      properties:
+        question:
+          description: The question of the poll.
+          type: string
+          example: What is your favorite color?
+        pollOptions:
+          description: Options of the poll
+          type: array
+            items:
+              $ref: '#/components/schemas/PollOptionResponse'
+
+    PollOptionResponse:
+      type: object
+      properties:
+
 
 
 
