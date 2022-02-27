@@ -57,23 +57,77 @@ paths:
   '/votings/public':
     get:
       summary: Gets public votings
+      parameters:
+        - $ref: "#/parameters/limitParam"
+        - $ref: "#/parameters/offsetParam"
+      responses:
+        '200':
+          description: A page of public votings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VotingPageResponse'
 
   '/votings/votecaller':
     get:
       summary: Gets votings created by logged in user
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: "#/parameters/limitParam"
+        - $ref: "#/parameters/offsetParam"
+      responses:
+        '200':
+          description: A page of votings created by the logged in user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VotingPageResponse'
+        '403':
+          description: If user has not vote-caller role.
 
   '/votings/voter':
     get:
       summary: Gets votings where logged in user is a voter (participant)
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: "#/parameters/limitParam"
+        - $ref: "#/parameters/offsetParam"
+      responses:
+        '200':
+          description: A page of votings where the logged in user is participant.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VotingPageResponse'
+        '403':
+          description: If user has not voter role.
 
   '/castvote/init':
     post:
       summary: Starts a voting session
+      security:
+        - bearerAuth: [ ]
       requestBody:
+        required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CastVoteInitRequest'
+      responses:
+        '200':
+          description: Public RSA key of commission used for creating an envelope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CastVoteInitResponse'
 
   '/castvote/{votingId}/signEnvelope':
     post:
       summary: Signs the envelope of the voter
+      security:
+        - bearerAuth: [ ]
       requestBody:
 
   '/castvote/createAccount':
@@ -291,7 +345,7 @@ components:
         ballotAccountId:
           description: Id (public key) of the ballot account
           type: string
-          example: ejnfeunnrb
+          example: iuhiuhiuhd
         issuerAccountId:
           description: Id (public key) of the issuer account
           type: string
@@ -321,14 +375,89 @@ components:
         pollOptions:
           description: Options of the poll
           type: array
-            items:
-              $ref: '#/components/schemas/PollOptionResponse'
+          minItems: 2
+          maxItems: 99
+          items:
+            $ref: '#/components/schemas/PollOptionResponse'
+          example:
+            - name: blue
+              code: 1
+            - name: red
+              code: 2
 
     PollOptionResponse:
       type: object
       properties:
+        name:
+          description: Name of the poll option
+          type: string
+          example: blue
+        code:
+          description: Code of the poll option
+          type: integer
+          example: 1
+
+    VotingPageResponse:
+      type: object
+      properties:
+        totalCount:
+          description: Total count of results
+          type: integer
+          format: int64
+          example: 4284
+        items:
+          description: Items of results
+          type: array
+          items:
+            $ref: '#/components/schemas/VotingPageItem'
+
+    VotingPageItem:
+      type: object
+      properties:
+        title:
+          description: The title of the voting.
+          type: string
+          example: Voting about colors.
+        id:
+          description: The id of the voting.
+          type: string
+          example: fsfesef
+
+    CastVoteInitRequest:
+      type: object
+      properties:
+        votingId:
+          description: The id of the voting.
+          type: string
+          required: true
+          example: oijooijoijom
+
+    CastVoteInitResponse:
+      type: object
+      properties:
+        publicKey:
+          description: Public RSA key of commission used to create a voter envelope
+          type: string
+          example: iurhhrih
 
 
-
-
-
+parameters:
+  limitParam:
+    name: limit
+    description: Maximum how many results should be in one page
+    in: query
+    type: integer
+    format: int32
+    minimum: 5
+    maximum: 50
+    required: false
+    example: 25
+  offsetParam:
+    name: offset
+    description: From where to start obtaining results
+    in: query
+    type: integer
+    format: int32
+    minimum: 0
+    required: false
+    example: 50
