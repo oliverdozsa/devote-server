@@ -77,6 +77,10 @@ public class EbeanCommissionRepository implements CommissionRepository {
                 userId, votingId, redactWithEllipsis(signature, 5));
         JpaCommissionSession commissionSession = find(userId, votingId);
 
+        if (commissionSession == null) {
+            throw new NotFoundException("Not found session for user: " + userId + " in voting: " + votingId);
+        }
+
         commissionSession.setEnvelopeSignature(signature);
         ebeanServer.update(commissionSession);
     }

@@ -1,7 +1,5 @@
 package responses;
 
-import static utils.StringUtils.redactWithEllipsis;
-
 public class CommissionSignEnvelopeResponse {
     private String envelopeSignatureBase64;
 

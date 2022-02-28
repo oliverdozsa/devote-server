@@ -111,33 +111,97 @@ paths:
         - bearerAuth: [ ]
       requestBody:
         required: true
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CastVoteInitRequest'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CastVoteInitRequest'
       responses:
         '200':
-          description: Public RSA key of commission used for creating an envelope
+          description: Public RSA key used for creating an envelope in the voting
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CastVoteInitResponse'
+        '403':
+          description: If user is not a participant of the voting. If user already initialized a session for this voting.
+            If voting is not initalized properly. In this case, the request can be retried at a later time.
+        '404':
+          description: If voting or user is not found.
 
   '/castvote/{votingId}/signEnvelope':
     post:
       summary: Signs the envelope of the voter
       security:
         - bearerAuth: [ ]
+      parameters:
+        - name: id
+          description: Id of the voting
+          in: path
+          type: string
+          required: true
       requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CastVoteSignEnvelopeRequest'
+      responses:
+        '200':
+          description: The signature for the envelope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CastVoteSignEnvelopeResponse'
+        '403':
+          description: If user already signed an envelope with this voting. In this case /castvote/envlSignature/{votingId}
+            can be used to obtain the signature for the voting for user.
+        '404':
+          description: If session is not found for user in voting.
 
   '/castvote/createAccount':
     post:
       summary: Provides the anonymous voter the vote token by creating an account on the blockchain
       requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CastVoteCreateAccountRequest'
+      responses:
+        '200':
+          description: The transaction string to be submitted by the user (client) to the blockchain in order
+            to get the vote token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CastVoteCreateAccountResponse'
+        '403':
+          description: If a create account request with the given signature was sent previously. In this case
+            /castvote/txOfSignature/{signature} can be used to obtain the transaction string (signature is revealedSignatureBase64
+            of request).
+        '404':
+          description: If voting is not found.
+
 
   '/castvote/txOfSignature/{signature}':
     get:
       summary: Gets the transaction string for the given signature (if an account was created before)
+      parameters:
+        - name: signature
+          description: Signature (in base64) of revealed message. See /castvote/createAccount.
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: The transaction string. See /castvote/createAccount.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionOfSignatureResponse'
+        '404':
+          description: If signature was not found (= account creation was not requested previously).
+
 
   '/castvote/envlSignature/{votingId}':
     get:
@@ -440,6 +504,54 @@ components:
           type: string
           example: iurhhrih
 
+    CastVoteSignEnvelopeRequest:
+      type: object
+      properties:
+        envelopeBase64:
+          description: The envelope as base64 string
+          type: string
+          required: true
+          example: fefwef
+
+    CastVoteSignEnvelopeResponse:
+      type: object
+      properties:
+        envelopeSignatureBase64:
+          description: The envelope signature as base64 string
+          type: string
+          required: true
+          example: wefwefwe
+
+    CastVoteCreateAccountRequest:
+      type: object
+      properties:
+        message:
+          description: The message in the format <voting ID>|<voter public key>
+          type: string
+          pattern: '.+|.+'
+          required: true
+          example: wwdd|grwegerg
+        revealedSignatureBase64:
+          description: The revealed signature for message as base64 string.
+          type: string
+          required: true
+          example: efwrcett
+
+    CastVoteCreateAccountResponse:
+      type: object
+      properties:
+        transaction:
+          description: The transaction string.
+          type: string
+          example: fwefwerwtf
+
+    TransactionOfSignatureResponse:
+      type: object
+      properties:
+        transaction:
+          description: The transaction string.
+          type: string
+          example: fwefwerwtf
 
 parameters:
   limitParam:
