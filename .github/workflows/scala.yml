@@ -19,4 +19,4 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
     - name: Run tests
-      run: sbt testOnly components.* units.*
+      run: sbt "testOnly components.* units.*"
