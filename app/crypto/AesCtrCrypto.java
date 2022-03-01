@@ -85,14 +85,4 @@ public class AesCtrCrypto {
 
     private AesCtrCrypto() {
     }
-
-    public static void main(String[] args) {
-        String message = "01|01";
-        byte[] key = AesCtrCrypto.generateKey();
-        byte[] cipherBytes = AesCtrCrypto.encrypt(key, message.getBytes());
-        System.out.println(Base64.getEncoder().encodeToString(cipherBytes));
-
-        byte[] decryptedBytes = AesCtrCrypto.decrypt(key, cipherBytes);
-        System.out.println(new String(decryptedBytes));
-    }
 }

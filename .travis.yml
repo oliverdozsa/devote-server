@@ -1,0 +1,21 @@
+env:
+  global:
+    - CC_TEST_REPORTER_ID=TODO
+language: scala
+scala:
+  - 2.13.3
+jdk:
+  - openjdk8
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+script:
+  - sbt clean jacoco testOnly components.* units.*
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot/scala-$TRAVIS_SCALA_VERSION
+after_success:
+  - sbt jacocoReport
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
