@@ -1,5 +1,7 @@
 package crypto;
 
+import services.Base62Conversions;
+
 import java.util.Base64;
 
 public class EncryptedVoting {
@@ -16,5 +18,12 @@ public class EncryptedVoting {
     }
 
     private EncryptedVoting() {
+    }
+
+    public static void main(String[] args) {
+        String key = generateKey();
+        String encryptedCode = encryptOptionCode(key, 42);
+        System.out.println(encryptedCode);
+        System.out.println(Base62Conversions.encode(4242L));
     }
 }

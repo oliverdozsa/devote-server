@@ -206,10 +206,49 @@ paths:
   '/castvote/envlSignature/{votingId}':
     get:
       summary: Gets the envelope signature of logged in user for the given voting id (if signed an enveloper before)
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: votingId
+          description: Id of the voting
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: The envelope signature.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeSignatureResponse'
+        '404':
+          description: If session is not found for voting id, and logged in user.
 
   '/encryptoptioncode/{votingId}/{optionCode}':
     get:
       summary: Encrypts an option code for the given voting
+      parameters:
+        - name: votingId
+          description: Id of the voting.
+          in: path
+          type: string
+          required: true
+        - name: optionCode
+          description: A valid option code (> 1 and < 100)
+          in: path
+          type: integer
+          required: true
+      responses:
+        '200':
+          description: An encrypted option code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EncryptedOptionCodeResponse'
+        '404':
+          description: If voting not found.
+        '400':
+          description: If voting is not encrypted. If option code is not valid.
 
 components:
   securitySchemes:
@@ -356,7 +395,7 @@ components:
         id:
           description: Unique identifier of the vote
           type: string
-          example: abcdef
+          example: 16Q
         network:
           description: Identifier of the blockchain network
           type: string
@@ -485,7 +524,7 @@ components:
         id:
           description: The id of the voting.
           type: string
-          example: fsfesef
+          example: 16Q
 
     CastVoteInitRequest:
       type: object
@@ -494,7 +533,7 @@ components:
           description: The id of the voting.
           type: string
           required: true
-          example: oijooijoijom
+          example: 16Q
 
     CastVoteInitResponse:
       type: object
@@ -502,7 +541,7 @@ components:
         publicKey:
           description: Public RSA key of commission used to create a voter envelope
           type: string
-          example: iurhhrih
+          example: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJp1As0YE/htIKiv+RsY9Cc49rnVzSEXadToV7iAk0a7D36WNt4DGc/ycSGzXCnTaxxyq3Pdc1SsEf9BcLD/eXsCAwEAAQ==
 
     CastVoteSignEnvelopeRequest:
       type: object
@@ -511,7 +550,7 @@ components:
           description: The envelope as base64 string
           type: string
           required: true
-          example: fefwef
+          example: 5k/NAyfng1x9HMf0SAuQtg==
 
     CastVoteSignEnvelopeResponse:
       type: object
@@ -520,7 +559,7 @@ components:
           description: The envelope signature as base64 string
           type: string
           required: true
-          example: wefwefwe
+          example: V6M+Rh41R3nzl6J5u7n93w==
 
     CastVoteCreateAccountRequest:
       type: object
@@ -535,7 +574,7 @@ components:
           description: The revealed signature for message as base64 string.
           type: string
           required: true
-          example: efwrcett
+          example: A62/sIed2GKy4yvKjKGVvQ==
 
     CastVoteCreateAccountResponse:
       type: object
@@ -543,7 +582,7 @@ components:
         transaction:
           description: The transaction string.
           type: string
-          example: fwefwerwtf
+          example: h0W50Y0bgFjrK4m1lrVcAQ
 
     TransactionOfSignatureResponse:
       type: object
@@ -551,7 +590,23 @@ components:
         transaction:
           description: The transaction string.
           type: string
-          example: fwefwerwtf
+          example: LowzxtM5HoM1J2ECir3B6w
+
+    EnvelopeSignatureResponse:
+      type: object
+      properties:
+        envelopeSignatureBase64:
+          description: The envelope signature as base64 string.
+          type: string
+          example: DS/N/1x88A8nrQQxZdBgaw==
+
+    EncryptedOptionCodeResponse:
+      type: object
+      properties:
+        result:
+          description: An encrypted option code.
+          type: string
+          example: LP8yzUHJ4UQSYw==
 
 parameters:
   limitParam:

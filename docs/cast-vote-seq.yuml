@@ -1,0 +1,13 @@
+// {type:sequence}
+[Authenticated;Voter]initSession(voteId, authenticationData)>[DeVote;Commission]
+[DeVote;Commission]sessionInfo(rsaPublicKey).>[Authenticated;Voter]
+[Authenticated;Voter]createNewAccount>[Authenticated;Voter]
+[Authenticated;Voter]createConcealedMessage(voteId, newAccount.public, blindingParams)>[Authenticated;Voter]
+[Authenticated;Voter]signEnvelope(concealedMessage)>[DeVote;Commission]
+[DeVote;Commission]signatureOnConcealedMessage.>[Authenticated;Voter]
+[Authenticated;Voter]createRevealedSignatureOfAccountCreationRequest(signatureOnConcealedMessage)>[Authenticated;Voter]
+[Anonymous;Voter]requestAccountCreation(newKeyPair.public, voteId, revealedSignatureOfAccountRequest)>[DeVote;Commission]
+[DeVote;Commission]accountCreationTransaction.>[Anonymous;Voter]
+[Anonymous;Voter]
+[DeVote;Commission]
+

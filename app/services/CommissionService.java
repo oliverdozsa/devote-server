@@ -96,8 +96,8 @@ public class CommissionService {
 
     private static CompletionStage<Void> checkIfOptionCodeIsValid(Integer optionCode) {
         return runAsync(() -> {
-            if (optionCode < 1 || optionCode > 999) {
-                String message = "Option code must be > 0 and < 1000, but it was " + optionCode;
+            if (optionCode < 1 || optionCode > 99) {
+                String message = "Option code must be > 0 and < 100, but it was " + optionCode;
                 logger.warn("checkIfOptionCodeIsValid()" + message);
                 throw new BusinessLogicViolationException(message);
             }
@@ -106,7 +106,7 @@ public class CommissionService {
 
     private static String getEncryptionKeyFrom(JpaVoting voting) {
         if (voting.getEncryptionKey() == null || voting.getEncryptionKey().length() == 0) {
-            String message = String.format("Encrpytion of option code has been requested, but voting %d is not encrypted!", voting.getId());
+            String message = String.format("Encryption of option code has been requested, but voting %d is not encrypted!", voting.getId());
             logger.warn("getEncryptionKeyFrom()" + message);
             throw new BusinessLogicViolationException(message);
         }

@@ -2,13 +2,13 @@
 
 
 [User]createVotingRequest()>[DeVote]
-[DeVote]createIssuerAccounts()>[Blockchain]
-[DeVote]createChannelAccounts(issuers)>[Blockchain]
+[DeVote]createIssuerAccount()>[Blockchain]
+[DeVote]createChannelAccounts(issuer)>[Blockchain]
 [DeVote]createVoteToken()>[DeVote]
 [note: https://developers.stellar.org/docs/issuing-assets/]
-[DeVote]createDistributionAndBallotAccounts(issuers, token)>[Blockchain]
+[DeVote]createDistributionAndBallotAccounts(issuer, token)>[Blockchain]
 [note: only in case encryption is required]
-[DeVote]createEncryptionAndDecryptionKeys()>[DeVote]
+[DeVote]createEncryptionAndDecryptionKey()>[DeVote]
 [DeVote]saveVoting()>[Database]
 [DeVote]saveAuthorizationOptions()>[Database]
 [DeVote]saveChannelAccounts()>[Database]
