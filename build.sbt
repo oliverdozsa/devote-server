@@ -39,4 +39,8 @@ jacocoExcludes ++= Seq("controllers.javascript*")
 jacocoExcludes ++= Seq("router.*")
 jacocoExcludes ++= Seq("data.entities.*")
 
+jacocoReportSettings := JacocoReportSettings()
+  .withTitle("DeVote coverage")
+  .withFormats(JacocoReportFormats.HTML, JacocoReportFormats.XML)
+
 
