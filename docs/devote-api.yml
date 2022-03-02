@@ -7,7 +7,7 @@ info:
     url: 'https://opensource.org/licenses/MIT'
   description: |
     # DeVote
-    This is the API doc of https://github.com/oliverdozsa/devote.
+    This is the API doc of DeVote
 paths:
   '/voting':
     post:
