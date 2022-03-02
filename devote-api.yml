@@ -1,0 +1,630 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: devote
+  license:
+    name: MIT
+    url: 'https://opensource.org/licenses/MIT'
+  description: |
+    # DeVote
+    This is the API doc of DeVote
+paths:
+  '/voting':
+    post:
+      summary: Creates a new voting
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVotingRequest'
+      responses:
+        '204':
+          description: Successfully created voting.
+          headers:
+            Location:
+              description: The location at which the newly created voting is available.
+              type: string
+        '400':
+          description: The request is not valid.
+        '403':
+          description: User is not allowed to create the voting (has no vote-caller role).
+
+  '/voting/{id}':
+    get:
+      summary: Gets a single voting by its ID
+      description: PUBLIC and UNLISTED votes are available without authentication. PRIVATE 
+        votes are only available to participants and the creator of the voting.
+      security:
+        - bearerAuth: [ ]
+        - none: [ ]
+      parameters:
+        - name: id
+          description: Id of the voting
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Data about the voting.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleVotingResponse'
+
+  '/votings/public':
+    get:
+      summary: Gets public votings
+      parameters:
+        - $ref: "#/parameters/limitParam"
+        - $ref: "#/parameters/offsetParam"
+      responses:
+        '200':
+          description: A page of public votings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VotingPageResponse'
+
+  '/votings/votecaller':
+    get:
+      summary: Gets votings created by logged in user
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: "#/parameters/limitParam"
+        - $ref: "#/parameters/offsetParam"
+      responses:
+        '200':
+          description: A page of votings created by the logged in user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VotingPageResponse'
+        '403':
+          description: If user has not vote-caller role.
+
+  '/votings/voter':
+    get:
+      summary: Gets votings where logged in user is a voter (participant)
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: "#/parameters/limitParam"
+        - $ref: "#/parameters/offsetParam"
+      responses:
+        '200':
+          description: A page of votings where the logged in user is participant.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VotingPageResponse'
+        '403':
+          description: If user has not voter role.
+
+  '/castvote/init':
+    post:
+      summary: Starts a voting session
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CastVoteInitRequest'
+      responses:
+        '200':
+          description: Public RSA key used for creating an envelope in the voting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CastVoteInitResponse'
+        '403':
+          description: If user is not a participant of the voting. If user already initialized a session for this voting.
+            If voting is not initalized properly. In this case, the request can be retried at a later time.
+        '404':
+          description: If voting or user is not found.
+
+  '/castvote/{votingId}/signEnvelope':
+    post:
+      summary: Signs the envelope of the voter
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          description: Id of the voting
+          in: path
+          type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CastVoteSignEnvelopeRequest'
+      responses:
+        '200':
+          description: The signature for the envelope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CastVoteSignEnvelopeResponse'
+        '403':
+          description: If user already signed an envelope with this voting. In this case /castvote/envlSignature/{votingId}
+            can be used to obtain the signature for the voting for user.
+        '404':
+          description: If session is not found for user in voting.
+
+  '/castvote/createAccount':
+    post:
+      summary: Provides the anonymous voter the vote token by creating an account on the blockchain
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CastVoteCreateAccountRequest'
+      responses:
+        '200':
+          description: The transaction string to be submitted by the user (client) to the blockchain in order
+            to get the vote token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CastVoteCreateAccountResponse'
+        '403':
+          description: If a create account request with the given signature was sent previously. In this case
+            /castvote/txOfSignature/{signature} can be used to obtain the transaction string (signature is revealedSignatureBase64
+            of request).
+        '404':
+          description: If voting is not found.
+
+
+  '/castvote/txOfSignature/{signature}':
+    get:
+      summary: Gets the transaction string for the given signature (if an account was created before)
+      parameters:
+        - name: signature
+          description: Signature (in base64) of revealed message. See /castvote/createAccount.
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: The transaction string. See /castvote/createAccount.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionOfSignatureResponse'
+        '404':
+          description: If signature was not found (= account creation was not requested previously).
+
+
+  '/castvote/envlSignature/{votingId}':
+    get:
+      summary: Gets the envelope signature of logged in user for the given voting id (if signed an enveloper before)
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: votingId
+          description: Id of the voting
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: The envelope signature.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeSignatureResponse'
+        '404':
+          description: If session is not found for voting id, and logged in user.
+
+  '/encryptoptioncode/{votingId}/{optionCode}':
+    get:
+      summary: Encrypts an option code for the given voting
+      parameters:
+        - name: votingId
+          description: Id of the voting.
+          in: path
+          type: string
+          required: true
+        - name: optionCode
+          description: A valid option code (> 1 and < 100)
+          in: path
+          type: integer
+          required: true
+      responses:
+        '200':
+          description: An encrypted option code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EncryptedOptionCodeResponse'
+        '404':
+          description: If voting not found.
+        '400':
+          description: If voting is not encrypted. If option code is not valid.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    CreateVotingRequest:
+      type: object
+      properties:
+        network:
+          description: Identifier of the blockchain network (should be lowercase)
+          type: string
+          minLength: 2
+          required: true
+          example: stellar
+        votesCap:
+          description: Number of total voters allowed.
+          type: integer
+          format: int64
+          minimum: 2
+          required: true
+          example: 42
+        title:
+          description: Title of the voting
+          type: string
+          minLength: 2
+          required: true
+          example: General voting about favorite colors
+        tokenIdentifier:
+          description: Identifer of the (vote) token to be created on the blockchain
+          type: string
+          pattern: '[0-9a-z]+'
+          minLength: 2
+          maxLength: 8
+          required: false
+          example: COLOR01
+        encryptedUntil:
+          description: If the voting to be encrypted, the date until it should be.
+          type: string
+          format: date-time
+          required: false
+          example: 2021-02-24T18:45:28Z
+        startDate:
+          description: The start date of the voting
+          type: string
+          format: date-time
+          required: true
+          example: 2021-02-24T18:45:28Z
+        endDate:
+          description: The end date of the voting
+          type: string
+          format: date-time
+          required: true
+          example: 2021-02-24T18:45:28Z
+        authorization:
+          description: Determines the authorization method for voters  (currently only emails is supported).
+          type: string
+          enum: [EMAILS]
+          required: false
+          example: EMAILS
+        authorizationEmailOptions:
+          description: List of email addresses who will be participants of the voting
+          type: array
+          items: 
+            type: string
+            format: email
+          required: false
+          example: 
+            - alice@mail.com
+            - bob@mail.com
+        polls:
+          description: List of polls (currently one poll is supported)
+          type: array
+          items:
+            $ref: '#/components/schemas/CreatePollRequest'
+          minItems: 1
+          maxItems: 1
+          required: true
+        visibility:
+          description: Visibility of the poll. UNLISTED is available to anyone who knows the id. PRIVATE is only available to participants and the vote-caller (creator).
+          type: string
+          enum: [PUBLIC, UNLISTED, PRIVATE]
+          required: true
+          example: PUBLIC
+        fundingAccountPublic:
+          description: The public key of the funding account.
+          type: string
+          required: true
+          example: XYZV
+        fundingAccountSecret:
+          description: The secret (private) key of the funding account.
+          type: string
+          required: true
+          example: CDFG
+        useTestnet:
+          description: Whether conduct the voting on the testnet of the chosen network.
+          type: boolean
+          required: false
+          example: false
+
+    CreatePollRequest:
+      type: object
+      properties:
+        question:
+          description: The question of the poll.
+          type: string
+          minLength: 2
+          required: true
+          example: What is your favorite color?
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreatePollOptionRequest'
+          minItems: 2
+          maxItems: 99
+          required: true
+          example:
+            - name: blue
+              code: 1
+            - name: red
+              code: 2
+
+    CreatePollOptionRequest:
+      type: object
+      properties:
+        name:
+          description: An option of the poll.
+          type: string
+          minLength: 2
+          required: true
+          example: blue
+        code:
+          description: The code for the option
+          type: integer
+          minimum: 1
+          required: true
+          example: 1
+
+    SingleVotingResponse:
+      type: object
+      properties:
+        id:
+          description: Unique identifier of the vote
+          type: string
+          example: 16Q
+        network:
+          description: Identifier of the blockchain network
+          type: string
+          example: stellar
+        title:
+          description: The title of the voting
+          type: string
+          example: Voting about colors
+        votesCap:
+          description: Number of total voters allowed.
+          type: integer
+          format: int64
+          example: 42
+        polls:
+          description: List of polls (currently one poll is supported)
+          type: array
+          items:
+            $ref: '#/components/schemas/PollResponse'
+        createdAt:
+          description: Creation time of the voting
+          type: string
+          format: date-time
+          required: false
+          example: 2021-02-24T18:45:28Z
+        encryptedUntil:
+          description: If the voting to be encrypted, the date until it should be.
+          type: string
+          format: date-time
+          required: false
+          example: 2021-02-24T18:45:28Z
+        decryptionKey:
+          description: Used to encrypt decrypted voting result. Available only, if voting encryption was requested, and
+            the encrypted until date is expired.
+          type: string
+          example: pkpkpkrefwceonwon
+        startDate:
+          description: The start date of the voting
+          type: string
+          format: date-time
+          example: 2021-02-24T18:45:28Z
+        endDate:
+          description: The end date of the voting
+          type: string
+          format: date-time
+          example: 2021-02-24T18:45:28Z
+        distributionAccountId:
+          description: Id (public key) of the distribution account
+          type: string
+          example: xerewrfijije
+        ballotAccountId:
+          description: Id (public key) of the ballot account
+          type: string
+          example: iuhiuhiuhd
+        issuerAccountId:
+          description: Id (public key) of the issuer account
+          type: string
+          example: ejnfeunnrb
+        assetCode:
+          description: Name of the vote token.
+          type: string
+          example: COLOR01
+        authorization:
+          description: Determines the authorization method for voters  (currently only emails is supported).
+          type: string
+          enum: [ EMAILS ]
+          example: EMAILS
+        visibility:
+          description: Visibility of the poll. UNLISTED is available to anyone who knows the id. PRIVATE is only available to participants and the vote-caller (creator).
+          type: string
+          enum: [ PUBLIC, UNLISTED, PRIVATE ]
+          example: PUBLIC
+
+    PollResponse:
+      type: object
+      properties:
+        question:
+          description: The question of the poll.
+          type: string
+          example: What is your favorite color?
+        pollOptions:
+          description: Options of the poll
+          type: array
+          minItems: 2
+          maxItems: 99
+          items:
+            $ref: '#/components/schemas/PollOptionResponse'
+          example:
+            - name: blue
+              code: 1
+            - name: red
+              code: 2
+
+    PollOptionResponse:
+      type: object
+      properties:
+        name:
+          description: Name of the poll option
+          type: string
+          example: blue
+        code:
+          description: Code of the poll option
+          type: integer
+          example: 1
+
+    VotingPageResponse:
+      type: object
+      properties:
+        totalCount:
+          description: Total count of results
+          type: integer
+          format: int64
+          example: 4284
+        items:
+          description: Items of results
+          type: array
+          items:
+            $ref: '#/components/schemas/VotingPageItem'
+
+    VotingPageItem:
+      type: object
+      properties:
+        title:
+          description: The title of the voting.
+          type: string
+          example: Voting about colors.
+        id:
+          description: The id of the voting.
+          type: string
+          example: 16Q
+
+    CastVoteInitRequest:
+      type: object
+      properties:
+        votingId:
+          description: The id of the voting.
+          type: string
+          required: true
+          example: 16Q
+
+    CastVoteInitResponse:
+      type: object
+      properties:
+        publicKey:
+          description: Public RSA key of commission used to create a voter envelope
+          type: string
+          example: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJp1As0YE/htIKiv+RsY9Cc49rnVzSEXadToV7iAk0a7D36WNt4DGc/ycSGzXCnTaxxyq3Pdc1SsEf9BcLD/eXsCAwEAAQ==
+
+    CastVoteSignEnvelopeRequest:
+      type: object
+      properties:
+        envelopeBase64:
+          description: The envelope as base64 string
+          type: string
+          required: true
+          example: 5k/NAyfng1x9HMf0SAuQtg==
+
+    CastVoteSignEnvelopeResponse:
+      type: object
+      properties:
+        envelopeSignatureBase64:
+          description: The envelope signature as base64 string
+          type: string
+          required: true
+          example: V6M+Rh41R3nzl6J5u7n93w==
+
+    CastVoteCreateAccountRequest:
+      type: object
+      properties:
+        message:
+          description: The message in the format <voting ID>|<voter public key>
+          type: string
+          pattern: '.+|.+'
+          required: true
+          example: wwdd|grwegerg
+        revealedSignatureBase64:
+          description: The revealed signature for message as base64 string.
+          type: string
+          required: true
+          example: A62/sIed2GKy4yvKjKGVvQ==
+
+    CastVoteCreateAccountResponse:
+      type: object
+      properties:
+        transaction:
+          description: The transaction string.
+          type: string
+          example: h0W50Y0bgFjrK4m1lrVcAQ
+
+    TransactionOfSignatureResponse:
+      type: object
+      properties:
+        transaction:
+          description: The transaction string.
+          type: string
+          example: LowzxtM5HoM1J2ECir3B6w
+
+    EnvelopeSignatureResponse:
+      type: object
+      properties:
+        envelopeSignatureBase64:
+          description: The envelope signature as base64 string.
+          type: string
+          example: DS/N/1x88A8nrQQxZdBgaw==
+
+    EncryptedOptionCodeResponse:
+      type: object
+      properties:
+        result:
+          description: An encrypted option code.
+          type: string
+          example: LP8yzUHJ4UQSYw==
+
+parameters:
+  limitParam:
+    name: limit
+    description: Maximum how many results should be in one page
+    in: query
+    type: integer
+    format: int32
+    minimum: 5
+    maximum: 50
+    required: false
+    example: 25
+  offsetParam:
+    name: offset
+    description: From where to start obtaining results
+    in: query
+    type: integer
+    format: int32
+    minimum: 0
+    required: false
+    example: 50
