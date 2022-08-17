@@ -3,8 +3,6 @@ package smokes;
 import components.clients.CommissionTestClient;
 import components.clients.VotingTestClient;
 import devote.blockchain.api.Account;
-import io.ipfs.api.IPFS;
-import ipfs.api.IpfsApi;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,8 +21,6 @@ import security.jwtverification.JwtVerificationForTests;
 import services.commissionsubs.userinfo.UserInfoCollector;
 import smokes.fixtures.BlockchainTestNet;
 import smokes.fixtures.StellarBlockchainTestNet;
-import units.ipfs.api.imp.MockIpfsApi;
-import units.ipfs.api.imp.MockIpfsProvider;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -60,10 +56,7 @@ public class ConductVotingSmokeTest {
     private static Map<String, BlockchainTestNet> testNets = new HashMap<>();
 
     public ConductVotingSmokeTest() {
-        // TODO: parametrize for IPFS (causes network issues when running ipfs desktop)?
         GuiceApplicationBuilder applicationBuilder = new GuiceApplicationBuilder()
-                .overrides(bind(IpfsApi.class).to(MockIpfsApi.class))
-                .overrides(bind(IPFS.class).toProvider(MockIpfsProvider.class))
                 .overrides(bind(UserInfoCollector.class).to(UserInfoCollectorForTest.class))
                 .overrides((bind(JwtVerification.class).to(JwtVerificationForTests.class)));
 
