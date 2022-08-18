@@ -85,14 +85,14 @@ public class JpaVoting {
     @Column(name = "issuer_account_public")
     private String issuerAccountPublic;
 
-    @Column(name = "authorization", nullable = false)
+    @Column(name = "auth_type", nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
     private Authorization authorization;
 
     @OneToMany(mappedBy = "voting", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     private List<JpaVotingPoll> polls;
 
-    @Column(name = "visibility", nullable = false)
+    @Column(name = "visibility", nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
     private Visibility visibility;
 
