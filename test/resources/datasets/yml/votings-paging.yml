@@ -1,7 +1,7 @@
 voting:
   - id: 1
     title: Voting#1-Alice
-    authorization: EMAILS
+    auth_type: EMAILS
     visibility: PRIVATE
     created_by: Alice
     network: mockblockchain
@@ -12,7 +12,7 @@ voting:
 
   - id: 2
     title: Voting#2-Alice
-    authorization: EMAILS
+    auth_type: EMAILS
     visibility: PRIVATE
     created_by: Alice
     network: mockblockchain
@@ -23,7 +23,7 @@ voting:
 
   - id: 3
     title: Voting#3-Bob
-    authorization: EMAILS
+    auth_type: EMAILS
     visibility: PRIVATE
     created_by: Bob
     network: mockblockchain
@@ -34,7 +34,7 @@ voting:
 
   - id: 4
     title: Voting#4-Bob
-    authorization: EMAILS
+    auth_type: EMAILS
     visibility: PRIVATE
     created_by: Bob
     network: mockblockchain
