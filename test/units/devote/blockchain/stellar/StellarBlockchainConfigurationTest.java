@@ -26,6 +26,7 @@ public class StellarBlockchainConfigurationTest {
     public void testGetNonTestServer() {
         // Given
         when(mockConfig.getString("devote.blockchain.stellar.url")).thenReturn("https://mock-horizon.stellar.org");
+        when(mockConfig.getString("devote.blockchain.stellar.testnet.url")).thenReturn("https://mock-test-horizon.stellar.org");
 
         // When
         StellarBlockchainConfiguration configuration = new StellarBlockchainConfiguration();
@@ -40,6 +41,7 @@ public class StellarBlockchainConfigurationTest {
     public void testGetTestServer() {
         // Given
         when(mockConfig.getString("devote.blockchain.stellar.url")).thenReturn("https://mock-horizon-testnet.stellar.org");
+        when(mockConfig.getString("devote.blockchain.stellar.testnet.url")).thenReturn("https://mock-test-horizon.stellar.org");
 
         // When
         StellarBlockchainConfiguration configuration = new StellarBlockchainConfiguration();

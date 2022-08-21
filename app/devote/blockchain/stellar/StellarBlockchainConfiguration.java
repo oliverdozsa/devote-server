@@ -56,7 +56,7 @@ public class StellarBlockchainConfiguration implements BlockchainConfiguration {
     private void initServerAndNetworkIfNeeded() {
         if (server == null) {
             String horizonUrl = config.getString("devote.blockchain.stellar.url");
-            String horizonTestNetUrl = config.getString("devote.blockchain.stellar.url");
+            String horizonTestNetUrl = config.getString("devote.blockchain.stellar.testnet.url");
 
             logger.info("[STELLAR]: horizon url = {}", horizonUrl);
             logger.info("[STELLAR]: horizon testnet url = {}", horizonTestNetUrl);
