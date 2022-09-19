@@ -37,6 +37,7 @@ import static matchers.ResultHasHeader.hasLocationHeader;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertTrue;
 import static play.inject.Bindings.bind;
 import static play.mvc.Http.HeaderNames.LOCATION;
@@ -186,6 +187,12 @@ public class VotingControllerTest {
         assertTrue(votingResponseJson.get("distributionAccountId").isNull());
         assertTrue(votingResponseJson.get("ballotAccountId").isNull());
         assertTrue(votingResponseJson.get("issuerAccountId").isNull());
+
+        JsonNode polls = votingResponseJson.get("polls");
+        assertThat(polls.size(), equalTo(1));
+
+        JsonNode poll = polls.get(0);
+        assertThat(poll.get("index").asInt(), equalTo(1));
     }
 
     @Test

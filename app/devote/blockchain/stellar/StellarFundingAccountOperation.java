@@ -42,7 +42,7 @@ public class StellarFundingAccountOperation implements FundingAccountOperation {
             BigDecimal xlmBalance = findXlmBalance(accountResponse.getBalances());
             logger.info("[STELLAR]: Funding account balance: {} XLM", xlmBalance);
 
-            long minRequiredBalance = 4 * votesCap + 10 * StellarChannelGeneratorAccountOperation.calcNumOfAccountNeededBasedOn(configuration) + 50;
+            long minRequiredBalance = 4 * votesCap + 10 * StellarChannelGeneratorAccountOperation.calcNumOfAccountsNeededBasedOn(configuration) + 50;
             logger.info("[STELLAR]: The minimum required balance for funding account is: {} XLM", minRequiredBalance);
 
             return xlmBalance.compareTo(new BigDecimal(minRequiredBalance)) < 0;

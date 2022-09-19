@@ -22,6 +22,9 @@ public class JpaVotingPoll {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Column(name = "index", nullable = false)
+    private Integer index;
+
     @Column(name = "question", nullable = false)
     @Lob
     private String question;
@@ -39,6 +42,14 @@ public class JpaVotingPoll {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Integer getIndex() {
+        return index;
+    }
+
+    public void setIndex(Integer index) {
+        this.index = index;
     }
 
     public String getQuestion() {

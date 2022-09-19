@@ -3,8 +3,17 @@ package responses;
 import java.util.List;
 
 public class VotingPollResponse {
+    private Integer index;
     private String question;
     private List<VotingPollOptionResponse> pollOptions;
+
+    public Integer getIndex() {
+        return index;
+    }
+
+    public void setIndex(Integer index) {
+        this.index = index;
+    }
 
     public String getQuestion() {
         return question;

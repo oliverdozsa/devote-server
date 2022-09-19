@@ -58,6 +58,7 @@ public class VotingResponseFromJpaVoting {
         VotingPollResponse votingPollResponse = new VotingPollResponse();
 
         votingPollResponse.setQuestion(jpaVotingPoll.getQuestion());
+        votingPollResponse.setIndex(jpaVotingPoll.getIndex());
 
         List<VotingPollOptionResponse> votingPollOptionResponses = jpaVotingPoll.getOptions().stream()
                 .map(VotingResponseFromJpaVoting::toVotingPollOptionResponse)

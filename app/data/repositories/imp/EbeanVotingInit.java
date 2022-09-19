@@ -38,6 +38,8 @@ public class EbeanVotingInit {
                 .collect(Collectors.toList());
         voting.setPolls(polls);
 
+        setIndices(voting);
+
         return voting;
     }
 
@@ -91,6 +93,13 @@ public class EbeanVotingInit {
         jpaVoter.setEmail(email);
 
         return jpaVoter;
+    }
+
+    private static void setIndices(JpaVoting voting) {
+        for (int i = 0; i < voting.getPolls().size(); i++) {
+            JpaVotingPoll poll = voting.getPolls().get(i);
+            poll.setIndex(i + 1);
+        }
     }
 
     private EbeanVotingInit() {

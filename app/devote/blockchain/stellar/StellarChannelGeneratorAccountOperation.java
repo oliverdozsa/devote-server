@@ -68,10 +68,10 @@ public class StellarChannelGeneratorAccountOperation implements ChannelGenerator
 
     @Override
     public long calcNumOfAccountsNeeded(long totalVotesCap) {
-        return calcNumOfAccountNeededBasedOn(configuration);
+        return calcNumOfAccountsNeededBasedOn(configuration);
     }
 
-    public static long calcNumOfAccountNeededBasedOn(StellarBlockchainConfiguration configuration) {
+    public static long calcNumOfAccountsNeededBasedOn(StellarBlockchainConfiguration configuration) {
         return configuration.getNumOfVoteBuckets();
     }
 
