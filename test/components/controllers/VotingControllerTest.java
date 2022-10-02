@@ -5,12 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import components.clients.VotingTestClient;
 import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;
-import security.UserInfoCollectorForTest;
-import security.jwtverification.JwtVerification;
-import security.jwtverification.JwtVerificationForTests;
-import services.commissionsubs.userinfo.UserInfoCollector;
-import units.ipfs.api.imp.MockIpfsApi;
-import units.ipfs.api.imp.MockIpfsProvider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,7 +13,13 @@ import play.inject.guice.GuiceApplicationBuilder;
 import play.mvc.Result;
 import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
+import security.UserInfoCollectorForTest;
+import security.jwtverification.JwtVerification;
+import security.jwtverification.JwtVerificationForTests;
 import services.Base62Conversions;
+import services.commissionsubs.userinfo.UserInfoCollector;
+import units.ipfs.api.imp.MockIpfsApi;
+import units.ipfs.api.imp.MockIpfsProvider;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -37,7 +37,6 @@ import static matchers.ResultHasHeader.hasLocationHeader;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertTrue;
 import static play.inject.Bindings.bind;
 import static play.mvc.Http.HeaderNames.LOCATION;
@@ -115,6 +114,23 @@ public class VotingControllerTest {
         createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
 
         createVotingRequest.setStartDate(Instant.now());
+        createVotingRequest.setEndDate(Instant.now().minus(Duration.ofDays(1)));
+
+        // When
+        Result result = client.createVoting(createVotingRequest, "Alice");
+
+        // Then
+        assertThat(statusOf(result), equalTo(BAD_REQUEST));
+    }
+
+    @Test
+    public void testVotingCreatedInThePast() {
+        // Given
+        CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
+
+        createVotingRequest.setStartDate(Instant.now().minus(Duration.ofDays(2)));
         createVotingRequest.setEndDate(Instant.now().minus(Duration.ofDays(1)));
 
         // When

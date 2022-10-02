@@ -184,7 +184,11 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
 
         long gapMillis = Duration.between(startDate, endDate).toMillis();
         long minTimeIntervalMillis = minTimeIntervalSecs * 1000;
-        return gapMillis < minTimeIntervalMillis;
+
+        Instant now = Instant.now();
+        boolean doesNotEndInFuture = this.endDate.isBefore(now);
+
+        return gapMillis < minTimeIntervalMillis || doesNotEndInFuture;
     }
 
     public List<CreatePollRequest> getPolls() {
