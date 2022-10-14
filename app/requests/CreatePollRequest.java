@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 public class CreatePollRequest implements Constraints.Validatable<String> {
     @Constraints.Required
     @Constraints.MinLength(2)
+    @Constraints.MaxLength(1000)
     private String question;
 
     @Constraints.Required
