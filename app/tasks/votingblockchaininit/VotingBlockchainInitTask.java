@@ -54,7 +54,8 @@ public class VotingBlockchainInitTask implements Runnable {
             List<Long> notInitializedVotingIds = notInitializedVotings.stream()
                     .map(JpaVoting::getId)
                     .collect(Collectors.toList());
-            logger.warn("[VOTING-BC-INIT-TASK-{}]: Could not find suitable voting! voting ids in sample = {}", taskId, notInitializedVotingIds);
+            logger.warn("[VOTING-BC-INIT-TASK-{}]: Could not find suitable voting for this task " +
+                    "(should be handled by other tasks)! voting ids in sample = {}", taskId, notInitializedVotingIds);
         }
 
         return null;
@@ -77,7 +78,7 @@ public class VotingBlockchainInitTask implements Runnable {
         logger.info("[VOTING-BC-INIT-TASK-{}]: creating channel generators for voting {}", taskId, voting.getId());
 
         ChannelGeneratorAccountOperation channelGeneratorAccountOperation = getChannelGeneratorOperation(voting.getNetwork());
-        if(voting.getOnTestNetwork()) {
+        if (voting.getOnTestNetwork()) {
             channelGeneratorAccountOperation.useTestNet();
         }
 
@@ -87,7 +88,7 @@ public class VotingBlockchainInitTask implements Runnable {
     }
 
     private void createDistributionAndBallotAccountsIfNeeded(JpaVoting voting) {
-        if(voting.getDistributionAccountPublic() != null && voting.getDistributionAccountPublic().length() > 0) {
+        if (voting.getDistributionAccountPublic() != null && voting.getDistributionAccountPublic().length() > 0) {
             logger.info("[VOTING-BC-INIT-TASK-{}]: ballot and distribution accounts have already been created for voting {}", taskId, voting.getId());
             return;
         }
@@ -95,7 +96,7 @@ public class VotingBlockchainInitTask implements Runnable {
         logger.info("[VOTING-BC-INIT-TASK-{}]: creating ballot and distribution generators for voting {}", taskId, voting.getId());
 
         DistributionAndBallotAccountOperation distributionAndBallotAccountOperation = getDistributionAndBallotOperation(voting.getNetwork());
-        if(voting.getOnTestNetwork()) {
+        if (voting.getOnTestNetwork()) {
             distributionAndBallotAccountOperation.useTestNet();
         }
 
