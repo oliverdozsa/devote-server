@@ -322,7 +322,7 @@ components:
             - alice@mail.com
             - bob@mail.com
         polls:
-          description: List of polls (currently one poll is supported)
+          description: List of polls.
           type: array
           items:
             $ref: '#/components/schemas/CreatePollRequest'
@@ -410,7 +410,7 @@ components:
           format: int64
           example: 42
         polls:
-          description: List of polls (currently one poll is supported)
+          description: List of polls
           type: array
           items:
             $ref: '#/components/schemas/PollResponse'
