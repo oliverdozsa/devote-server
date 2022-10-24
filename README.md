@@ -19,4 +19,4 @@ about the voter's account where the vote token should be delivered.
 6. Server sends back the transaction so that voter can obtain the vote token.
 ![cast vote](./docs/cast-vote-seq.svg)
 ## Documentation
-The API doc is available [here](https://oliverdozsa.github.io/devote).
+The API doc is available [here](https://oliverdozsa.github.io/devote-server).
