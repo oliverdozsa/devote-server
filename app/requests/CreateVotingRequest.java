@@ -27,7 +27,7 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
     @Constraints.MaxLength(1000)
     private String title;
 
-    @Constraints.Pattern("[0-9a-z]+")
+    @Constraints.Pattern("^[0-9a-z]+$")
     @Constraints.MaxLength(8)
     @Constraints.MinLength(2)
     private String tokenIdentifier;

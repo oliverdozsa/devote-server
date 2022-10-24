@@ -78,7 +78,7 @@ public class VotingResponseFromJpaVoting {
     }
 
     private static void setDecryptionKeyIfNeeded(VotingResponse votingResponse, JpaVoting jpaVoting) {
-        if(jpaVoting.getEncryptedUntil().compareTo(Instant.now()) <= 0) {
+        if(jpaVoting.getEncryptedUntil() != null && jpaVoting.getEncryptedUntil().compareTo(Instant.now()) <= 0) {
             logger.info("Encrypted until expired for voting {}, giving decryption key in response.", jpaVoting.getId());
             votingResponse.setDecryptionKey(jpaVoting.getEncryptionKey());
         }
