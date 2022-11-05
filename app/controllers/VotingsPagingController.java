@@ -9,7 +9,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 import requests.PageVotingsRequest;
 import responses.Page;
-import responses.PageVotingResponse;
+import responses.PageVotingItemResponse;
 import security.SecurityUtils;
 import security.VerifiedJwt;
 import services.VotingsPagingService;
@@ -56,7 +56,7 @@ public class VotingsPagingController {
         return preprocess(request, pagingRequest -> votingsPagingService.votingsOfVoter(pagingRequest, jwt));
     }
 
-    private CompletionStage<Result> preprocess(Http.Request request, Function<PageVotingsRequest, CompletionStage<Page<PageVotingResponse>>> onSuccess) {
+    private CompletionStage<Result> preprocess(Http.Request request, Function<PageVotingsRequest, CompletionStage<Page<PageVotingItemResponse>>> onSuccess) {
         Form<PageVotingsRequest> form = formFactory.form(PageVotingsRequest.class)
                 .bindFromRequest(request);
 
@@ -72,7 +72,7 @@ public class VotingsPagingController {
         }
     }
 
-    private Result toResult(Page<PageVotingResponse> page) {
+    private Result toResult(Page<PageVotingItemResponse> page) {
         return ok(Json.toJson(page));
     }
 }

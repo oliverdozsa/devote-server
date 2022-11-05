@@ -8,6 +8,7 @@ import data.entities.Visibility;
 import io.ebean.Ebean;
 import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,9 +27,9 @@ import java.time.Duration;
 import java.time.Instant;
 
 import static components.extractors.GenericDataFromResult.statusOf;
-import static components.extractors.VotingPagingResponseFromResult.votingIdsOf;
+import static components.extractors.VotingPagingItemResponsesFromResult.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static play.inject.Bindings.bind;
 import static play.mvc.Http.Status.FORBIDDEN;
 import static play.mvc.Http.Status.OK;
@@ -67,7 +68,17 @@ public class VotingsPagingTest {
 
         // Then
         assertThat(statusOf(result), equalTo(OK));
+
         assertThat(votingIdsOf(result).size(), equalTo(11));
+        assertThat(votingIdsOf(result), everyItem(notNullValue(String.class)));
+
+        assertThat(votingTitlesOf(result).size(), equalTo(11));
+        assertThat(votingTitlesOf(result), everyItem(notNullValue(String.class)));
+
+        assertThat(endDatesOf(result).size(), equalTo(11));
+        assertThat(endDatesOf(result), everyItem(notNullValue(String.class)));
+
+
     }
 
     @Test
@@ -83,6 +94,13 @@ public class VotingsPagingTest {
         // Then
         assertThat(statusOf(result), equalTo(OK));
         assertThat(votingIdsOf(result).size(), equalTo(2));
+        assertThat(votingIdsOf(result), everyItem(notNullValue(String.class)));
+
+        assertThat(votingTitlesOf(result).size(), equalTo(2));
+        assertThat(votingTitlesOf(result), everyItem(notNullValue(String.class)));
+
+        assertThat(endDatesOf(result).size(), equalTo(2));
+        assertThat(endDatesOf(result), everyItem(notNullValue(String.class)));
     }
 
     @Test
@@ -110,6 +128,8 @@ public class VotingsPagingTest {
         // Then
         assertThat(statusOf(result), equalTo(OK));
         assertThat(votingIdsOf(result).size(), equalTo(0));
+        assertThat(votingTitlesOf(result).size(), equalTo(0));
+        assertThat(endDatesOf(result).size(), equalTo(0));
     }
 
     @Test
@@ -124,6 +144,13 @@ public class VotingsPagingTest {
         // Then
         assertThat(statusOf(result), equalTo(OK));
         assertThat(votingIdsOf(result).size(), equalTo(2));
+        assertThat(votingIdsOf(result), everyItem(notNullValue(String.class)));
+
+        assertThat(votingTitlesOf(result).size(), equalTo(2));
+        assertThat(votingTitlesOf(result), everyItem(notNullValue(String.class)));
+
+        assertThat(endDatesOf(result).size(), equalTo(2));
+        assertThat(endDatesOf(result), everyItem(notNullValue(String.class)));
     }
 
     @Test
@@ -151,6 +178,8 @@ public class VotingsPagingTest {
         // Then
         assertThat(statusOf(result), equalTo(OK));
         assertThat(votingIdsOf(result).size(), equalTo(0));
+        assertThat(votingTitlesOf(result).size(), equalTo(0));
+        assertThat(endDatesOf(result).size(), equalTo(0));
     }
 
     private void seedPublicVotingTestData() {

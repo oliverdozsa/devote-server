@@ -6,7 +6,7 @@ import exceptions.ForbiddenException;
 import play.Logger;
 import requests.PageVotingsRequest;
 import responses.Page;
-import responses.PageVotingResponse;
+import responses.PageVotingItemResponse;
 import security.VerifiedJwt;
 
 import javax.inject.Inject;
@@ -26,14 +26,14 @@ public class VotingsPagingService {
         this.pageOfVotingsDbOperations = pageOfVotingsDbOperations;
     }
 
-    public CompletionStage<Page<PageVotingResponse>> publicVotings(PageVotingsRequest request) {
+    public CompletionStage<Page<PageVotingItemResponse>> publicVotings(PageVotingsRequest request) {
         logger.info("publicVotings(): request = {}", request);
 
         return pageOfVotingsDbOperations.pageOfPublic(getOffsetOrDefault(request), getLimitOrDefault(request))
                 .thenApply(this::toPageOfPageVotingResponse);
     }
 
-    public CompletionStage<Page<PageVotingResponse>> votingsOfVoteCaller(PageVotingsRequest request, VerifiedJwt jwt) {
+    public CompletionStage<Page<PageVotingItemResponse>> votingsOfVoteCaller(PageVotingsRequest request, VerifiedJwt jwt) {
         logger.info("votingsOfVoteCaller(): userId = {}, request = {}", jwt.getUserId(), request);
 
         int offset = getOffsetOrDefault(request);
@@ -44,7 +44,7 @@ public class VotingsPagingService {
                 .thenApply(this::toPageOfPageVotingResponse);
     }
 
-    public CompletionStage<Page<PageVotingResponse>> votingsOfVoter(PageVotingsRequest request, VerifiedJwt jwt) {
+    public CompletionStage<Page<PageVotingItemResponse>> votingsOfVoter(PageVotingsRequest request, VerifiedJwt jwt) {
         logger.info("votingsOfVoter(): userId = {}, request = {}", jwt.getUserId(), request);
 
         int offset = getOffsetOrDefault(request);
@@ -71,24 +71,25 @@ public class VotingsPagingService {
         return request.getLimit();
     }
 
-    private Page<PageVotingResponse> toPageOfPageVotingResponse(Page<JpaVoting> jpaVotingPage) {
-        List<PageVotingResponse> pageVotingResponses = jpaVotingPage.getItems().stream()
+    private Page<PageVotingItemResponse> toPageOfPageVotingResponse(Page<JpaVoting> jpaVotingPage) {
+        List<PageVotingItemResponse> pageVotingItemRespons = jpaVotingPage.getItems().stream()
                 .map(this::toPageVotingResponse)
                 .collect(Collectors.toList());
 
-        Page<PageVotingResponse> result = new Page<>();
-        result.setItems(pageVotingResponses);
+        Page<PageVotingItemResponse> result = new Page<>();
+        result.setItems(pageVotingItemRespons);
         result.setTotalCount(jpaVotingPage.getTotalCount());
 
         return result;
     }
 
-    private PageVotingResponse toPageVotingResponse(JpaVoting jpaVoting) {
-        PageVotingResponse pageVotingResponse = new PageVotingResponse();
-        pageVotingResponse.setTitle(jpaVoting.getTitle());
-        pageVotingResponse.setId(Base62Conversions.encode(jpaVoting.getId()));
+    private PageVotingItemResponse toPageVotingResponse(JpaVoting jpaVoting) {
+        PageVotingItemResponse pageVotingItemResponse = new PageVotingItemResponse();
+        pageVotingItemResponse.setTitle(jpaVoting.getTitle());
+        pageVotingItemResponse.setId(Base62Conversions.encode(jpaVoting.getId()));
+        pageVotingItemResponse.setEndDate(jpaVoting.getEndDate());
 
-        return pageVotingResponse;
+        return pageVotingItemResponse;
     }
 
     private CompletionStage<Void> checkIfUserIsAllowedToPageVotingsOfVoteCallers(VerifiedJwt jwt) {

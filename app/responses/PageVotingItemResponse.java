@@ -1,8 +1,12 @@
 package responses;
 
-public class PageVotingResponse {
+import java.time.Instant;
+
+public class PageVotingItemResponse {
     private String title;
     private String id;
+
+    private Instant endDate;
 
     public String getTitle() {
         return title;
@@ -18,5 +22,13 @@ public class PageVotingResponse {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Instant getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Instant endDate) {
+        this.endDate = endDate;
     }
 }
