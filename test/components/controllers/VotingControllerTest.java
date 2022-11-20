@@ -350,4 +350,26 @@ public class VotingControllerTest {
         // Then
         assertThat(statusOf(result), equalTo(BAD_REQUEST));
     }
+
+    @Test
+    public void testCreateTwoVotingsWithSameEmails() {
+        // Given
+        CreateVotingRequest createFirstVotingRequest = createValidVotingRequest();
+        createFirstVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createFirstVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
+
+        Result result = client.createVoting(createFirstVotingRequest, "Alice");
+        assertThat(statusOf(result), equalTo(CREATED));
+        assertThat(result, hasLocationHeader());
+
+        CreateVotingRequest createSecondVotingRequest = createValidVotingRequest();
+        createSecondVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createSecondVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
+
+        // When
+        result = client.createVoting(createSecondVotingRequest, "Alice");
+        assertThat(statusOf(result), equalTo(CREATED));
+        assertThat(result, hasLocationHeader());
+        assertVotersAreUnique();
+    }
 }

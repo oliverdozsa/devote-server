@@ -1,8 +1,6 @@
 package data.repositories.imp;
 
-import data.entities.JpaVoting;
-import data.entities.JpaVotingChannelAccount;
-import data.entities.JpaChannelGeneratorAccount;
+import data.entities.*;
 import data.repositories.VotingRepository;
 import devote.blockchain.api.ChannelGenerator;
 import devote.blockchain.api.DistributionAndBallotAccountOperation;
@@ -35,6 +33,8 @@ public class EbeanVotingRepository implements VotingRepository {
         JpaVoting voting = initVotingFrom(request);
         voting.setAssetCode(assetCode);
         voting.setCreatedBy(userId);
+
+        checkForExistingUsers(voting);
 
         ebeanServer.save(voting);
         return voting.getId();
@@ -123,5 +123,31 @@ public class EbeanVotingRepository implements VotingRepository {
         votingChannelAccount.setAccountPublic(account.publik);
         votingChannelAccount.setConsumed(false);
         return votingChannelAccount;
+    }
+
+    private void checkForExistingUsers(JpaVoting voting) {
+        if (voting.getAuthorization() == Authorization.EMAILS) {
+            this.checkForExistingUsersByEmail(voting);
+        }
+    }
+
+    private void checkForExistingUsersByEmail(JpaVoting voting) {
+        List<JpaVoter> checkedVoters = voting.getVoters().stream()
+                .map(this::replaceWithExistingIfNeededByEmail)
+                .collect(Collectors.toList());
+        voting.setVoters(checkedVoters);
+    }
+
+    private JpaVoter replaceWithExistingIfNeededByEmail(JpaVoter voter) {
+        JpaVoter existingVoter = ebeanServer.createQuery(JpaVoter.class)
+                .where()
+                .eq("email", voter.getEmail())
+                .findOne();
+
+        if (existingVoter == null) {
+            return voter;
+        } else {
+            return existingVoter;
+        }
     }
 }

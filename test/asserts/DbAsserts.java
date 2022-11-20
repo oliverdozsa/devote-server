@@ -14,8 +14,10 @@ import requests.CreatePollOptionRequest;
 import requests.CreatePollRequest;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -106,6 +108,17 @@ public class DbAsserts {
         List<JpaChannelGeneratorAccount> channelGenerators = Ebean.createQuery(JpaChannelGeneratorAccount.class)
                 .findList();
         channelGenerators.forEach(cg -> assertThat(cg.getAccountPublic(), startsWith("test-net")));
+    }
+
+    public static void assertVotersAreUnique() {
+        List<String> voterEmails = Ebean.createQuery(JpaVoter.class)
+                .findList()
+                .stream().map(JpaVoter::getEmail)
+                .collect(Collectors.toList());
+
+        Set<String> uniqueVoterEmails = new HashSet<>(voterEmails);
+
+        assertThat(voterEmails.size(), equalTo(uniqueVoterEmails.size()));
     }
 
     private static List<JpaChannelAccountProgress> channelProgressesOf(Long votingId) {
