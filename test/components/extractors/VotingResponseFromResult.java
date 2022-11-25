@@ -18,4 +18,9 @@ public class VotingResponseFromResult {
         JsonNode votingResponseJson = GenericDataFromResult.jsonOf(result);
         return votingResponseJson.get("decryptionKey").asText();
     }
+
+    public static Boolean isOnTestNetworkOf(Result result) {
+        JsonNode votingResponseJson = GenericDataFromResult.jsonOf(result);
+        return votingResponseJson.get("isOnTestNetwork").asBoolean();
+    }
 }

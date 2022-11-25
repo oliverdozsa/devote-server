@@ -31,8 +31,7 @@ import static asserts.DbAsserts.*;
 import static components.controllers.VotingRequestMaker.createValidVotingRequest;
 import static components.extractors.GenericDataFromResult.jsonOf;
 import static components.extractors.GenericDataFromResult.statusOf;
-import static components.extractors.VotingResponseFromResult.idOf;
-import static components.extractors.VotingResponseFromResult.networkOf;
+import static components.extractors.VotingResponseFromResult.*;
 import static matchers.ResultHasHeader.hasLocationHeader;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -334,6 +333,11 @@ public class VotingControllerTest {
         Thread.sleep(30 * 1000);
 
         assertChannelGeneratorsCreatedOnTestMockBlockchainNetwork();
+
+        String locationUrl = result.headers().get(LOCATION);
+
+        Result getByLocationResult = client.byLocation(locationUrl);
+        assertThat(isOnTestNetworkOf(getByLocationResult), equalTo(true));
     }
 
     @Test

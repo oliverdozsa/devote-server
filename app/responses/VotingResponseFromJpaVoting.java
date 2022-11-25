@@ -36,6 +36,7 @@ public class VotingResponseFromJpaVoting {
         votingResponse.setVisibility(jpaVoting.getVisibility().name());
         votingResponse.setIssuerAccountId(jpaVoting.getIssuerAccountPublic());
         votingResponse.setAssetCode(jpaVoting.getAssetCode());
+        votingResponse.setOnTestNetwork(jpaVoting.getOnTestNetwork());
         setDecryptionKeyIfNeeded(votingResponse, jpaVoting);
     }
 

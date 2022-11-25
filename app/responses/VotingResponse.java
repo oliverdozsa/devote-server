@@ -21,6 +21,8 @@ public class VotingResponse {
     private String authorization;
     private String visibility;
 
+    private boolean isOnTestNetwork;
+
     public String getId() {
         return id;
     }
@@ -147,5 +149,13 @@ public class VotingResponse {
 
     public void setDecryptionKey(String decryptionKey) {
         this.decryptionKey = decryptionKey;
+    }
+
+    public boolean isOnTestNetwork() {
+        return isOnTestNetwork;
+    }
+
+    public void setOnTestNetwork(boolean onTestNetwork) {
+        isOnTestNetwork = onTestNetwork;
     }
 }
