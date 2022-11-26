@@ -8,7 +8,7 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
-import requests.CommissionAccountCreationRequest;
+import requests.CommissionCreateTransactionRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
 import responses.CommissionAccountCreationResponse;
@@ -82,20 +82,20 @@ public class CommissionController extends Controller {
         }
     }
 
-    public CompletionStage<Result> createAccount(Http.Request request) {
-        logger.info("createAccount()");
+    public CompletionStage<Result> createTransaction(Http.Request request) {
+        logger.info("createTransaction()");
 
-        Form<CommissionAccountCreationRequest> accountCreationRequestForm = formFactory
-                .form(CommissionAccountCreationRequest.class).bindFromRequest(request);
+        Form<CommissionCreateTransactionRequest> createTransactionRequestForm = formFactory
+                .form(CommissionCreateTransactionRequest.class).bindFromRequest(request);
 
-        if (accountCreationRequestForm.hasErrors()) {
-            JsonNode errorJson = accountCreationRequestForm.errorsAsJson();
-            logger.warn("createAccount(): Form has errors! error json:\n{}", errorJson.toPrettyString());
+        if (createTransactionRequestForm.hasErrors()) {
+            JsonNode errorJson = createTransactionRequestForm.errorsAsJson();
+            logger.warn("createTransaction(): Form has errors! error json:\n{}", errorJson.toPrettyString());
 
             return completedFuture(badRequest(errorJson));
         } else {
-            CommissionAccountCreationRequest accountCreationRequest = accountCreationRequestForm.get();
-            return commissionService.createAccount(accountCreationRequest)
+            CommissionCreateTransactionRequest createTransactionRequest = createTransactionRequestForm.get();
+            return commissionService.createTransaction(createTransactionRequest)
                     .thenApply(this::toResult)
                     .exceptionally(mapExceptionWithUnpack);
         }

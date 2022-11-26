@@ -11,7 +11,7 @@ import org.stellar.sdk.KeyPair;
 import play.inject.guice.GuiceApplicationBuilder;
 import play.libs.ws.WSClient;
 import play.mvc.Result;
-import requests.CommissionAccountCreationRequest;
+import requests.CommissionCreateTransactionRequest;
 import requests.CommissionInitRequest;
 import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
@@ -99,12 +99,12 @@ public class ConductVotingSmokeTest {
         assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
 
         String envelopeSignatureBase64 = envelopeSignatureOf(result.http);
-        CommissionAccountCreationRequest accountCreationRequest = CommissionTestClient.createAccountCreationRequest(message, envelopeSignatureBase64, result.envelope);
+        CommissionCreateTransactionRequest accountCreationRequest = CommissionTestClient.createTransactionCreationRequest(message, envelopeSignatureBase64, result.envelope);
         Result accountCreationRequestResult = testClient.requestAccountCreation(accountCreationRequest);
 
         assertThat(statusOf(accountCreationRequestResult), equalTo(OK));
-        assertThat(accountCreationTransactionOf(accountCreationRequestResult), notNullValue());
-        assertThat(accountCreationTransactionOf(accountCreationRequestResult), not(isEmptyString()));
+        assertThat(transactionOf(accountCreationRequestResult), notNullValue());
+        assertThat(transactionOf(accountCreationRequestResult), not(isEmptyString()));
         assertThatTransactionIsStoredFor(accountCreationRequest.getRevealedSignatureBase64());
 
         // When

@@ -6,10 +6,9 @@ import play.Application;
 import play.libs.Json;
 import play.mvc.Http;
 import play.mvc.Result;
-import requests.CommissionAccountCreationRequest;
+import requests.CommissionCreateTransactionRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
-import utils.JwtTestUtils;
 
 import java.util.Base64;
 
@@ -55,25 +54,25 @@ public class CommissionTestClient extends TestClient {
         return new SignOnEnvelopeResult(httpResult, rsaEnvelope);
     }
 
-    public static CommissionAccountCreationRequest createAccountCreationRequest(String message, String envelopeSignatureBase64, RsaEnvelope rsaEnvelope) {
+    public static CommissionCreateTransactionRequest createTransactionCreationRequest(String message, String envelopeSignatureBase64, RsaEnvelope rsaEnvelope) {
         byte[] envelopeSignature = Base64.getDecoder().decode(envelopeSignatureBase64);
 
         byte[] revealedSignature = rsaEnvelope.revealedSignature(envelopeSignature);
         String revealedSignatureBase64 = Base64.getEncoder().encodeToString(revealedSignature);
 
-        CommissionAccountCreationRequest accountCreationRequest = new CommissionAccountCreationRequest();
-        accountCreationRequest.setMessage(message);
-        accountCreationRequest.setRevealedSignatureBase64(revealedSignatureBase64);
+        CommissionCreateTransactionRequest transactionCreationRequest = new CommissionCreateTransactionRequest();
+        transactionCreationRequest.setMessage(message);
+        transactionCreationRequest.setRevealedSignatureBase64(revealedSignatureBase64);
 
-        return accountCreationRequest;
+        return transactionCreationRequest;
     }
 
-    public Result requestAccountCreation(CommissionAccountCreationRequest request) {
+    public Result requestAccountCreation(CommissionCreateTransactionRequest request) {
         Http.RequestBuilder httpRequest = new Http.RequestBuilder()
                 .method(POST)
                 .bodyJson(Json.toJson(request))
                 .header(CONTENT_TYPE, Http.MimeTypes.JSON)
-                .uri(routes.CommissionController.createAccount().url());
+                .uri(routes.CommissionController.createTransaction().url());
 
         return route(application, httpRequest);
     }

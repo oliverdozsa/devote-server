@@ -2,10 +2,9 @@ package requests;
 
 import play.data.validation.Constraints;
 
-import static utils.StringUtils.redact;
 import static utils.StringUtils.redactWithEllipsis;
 
-public class CommissionAccountCreationRequest {
+public class CommissionCreateTransactionRequest {
     @Constraints.Required
     @Constraints.Pattern(".+|.+")
     private String message;

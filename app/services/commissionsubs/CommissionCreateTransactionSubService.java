@@ -11,7 +11,7 @@ import exceptions.ForbiddenException;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.engines.RSAEngine;
 import play.Logger;
-import requests.CommissionAccountCreationRequest;
+import requests.CommissionCreateTransactionRequest;
 import responses.CommissionAccountCreationResponse;
 import services.Base62Conversions;
 
@@ -23,13 +23,13 @@ import java.util.concurrent.CompletionStage;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
 
-public class CommissionCreateAccountSubService {
+public class CommissionCreateTransactionSubService {
     private final CommissionDbOperations commissionDbOperations;
     private final VotingDbOperations votingDbOperations;
     private final CommissionBlockchainOperations commissionBlockchainOperations;
     private final AsymmetricCipherKeyPair envelopeKeyPair;
 
-    public CommissionCreateAccountSubService(
+    public CommissionCreateTransactionSubService(
             CommissionDbOperations commissionDbOperations,
             VotingDbOperations votingDbOperations,
             CommissionBlockchainOperations commissionBlockchainOperations,
@@ -41,10 +41,10 @@ public class CommissionCreateAccountSubService {
         this.envelopeKeyPair = envelopeKeyPair;
     }
 
-    private static final Logger.ALogger logger = Logger.of(CommissionCreateAccountSubService.class);
+    private static final Logger.ALogger logger = Logger.of(CommissionCreateTransactionSubService.class);
 
-    public CompletionStage<CommissionAccountCreationResponse> createAccount(CommissionAccountCreationRequest request) {
-        logger.info("createAccount(): request = {}", request);
+    public CompletionStage<CommissionAccountCreationResponse> createTransaction(CommissionCreateTransactionRequest request) {
+        logger.info("createTransaction(): request = {}", request);
         ParsedMessage parsedMessage = new ParsedMessage(request.getMessage());
 
         Long votingId = Base62Conversions.decode(parsedMessage.votingId);
@@ -58,10 +58,10 @@ public class CommissionCreateAccountSubService {
                 .thenApply(v -> prepareForBlockchainOperation(accountCreationData))
                 .thenCompose(c -> commissionBlockchainOperations.createTransaction(accountCreationData.voting.getNetwork(), c))
                 .thenCompose(tx -> storeTransaction(accountCreationData.voting.getId(), request.getRevealedSignatureBase64(), tx))
-                .thenApply(CommissionCreateAccountSubService::toResponse);
+                .thenApply(CommissionCreateTransactionSubService::toResponse);
     }
 
-    private CompletionStage<Void> verifySignatureOfRequest(CommissionAccountCreationRequest request) {
+    private CompletionStage<Void> verifySignatureOfRequest(CommissionCreateTransactionRequest request) {
         return runAsync(() -> {
             RSAEngine rsaEngine = new RSAEngine();
             rsaEngine.init(false, envelopeKeyPair.getPublic());
@@ -84,7 +84,7 @@ public class CommissionCreateAccountSubService {
         });
     }
 
-    private CompletionStage<Void> checkIfAlreadyRequestedAccount(CommissionAccountCreationRequest request) {
+    private CompletionStage<Void> checkIfAlreadyRequestedAccount(CommissionCreateTransactionRequest request) {
         return commissionDbOperations.doesTransactionExistForSignature(request.getRevealedSignatureBase64())
                 .thenAccept(doesExist -> {
                     if(doesExist) {

@@ -16,7 +16,7 @@ GET    /votings/voter                               controllers.VotingsPagingCon
 POST    /castvote/init                              controllers.CommissionController.init(request: Request)
 + jwtFilter
 POST    /castvote/:votingId/signEnvelope            controllers.CommissionController.signEnvelope(votingId: String, request: Request)
-POST    /castvote/createAccount                     controllers.CommissionController.createAccount(request: Request)
+POST    /castvote/createTransaction                 controllers.CommissionController.createTransaction(request: Request)
 GET     /castvote/txOfSignature/:signature          controllers.CommissionController.transactionOfSignature(signature: String)
 + jwtFilter
 GET     /castvote/envlSignature/:votingId           controllers.CommissionController.getEnvelopeSignature(votingId: String, request: Request)

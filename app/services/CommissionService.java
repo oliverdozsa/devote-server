@@ -1,7 +1,6 @@
 package services;
 
 import crypto.EncryptedVoting;
-import crypto.RsaKeyUtils;
 import data.entities.JpaVoting;
 import data.operations.CommissionDbOperations;
 import data.operations.VoterDbOperations;
@@ -10,7 +9,7 @@ import devote.blockchain.operations.CommissionBlockchainOperations;
 import exceptions.BusinessLogicViolationException;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import play.Logger;
-import requests.CommissionAccountCreationRequest;
+import requests.CommissionCreateTransactionRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
 import responses.CommissionAccountCreationResponse;
@@ -19,9 +18,8 @@ import responses.CommissionGetEnvelopeSignatureResponse;
 import responses.CommissionInitResponse;
 import responses.CommissionSignEnvelopeResponse;
 import responses.CommissionTransactionOfSignatureResponse;
-import security.JwtCenter;
 import security.VerifiedJwt;
-import services.commissionsubs.CommissionCreateAccountSubService;
+import services.commissionsubs.CommissionCreateTransactionSubService;
 import services.commissionsubs.CommissionInitSubService;
 import services.commissionsubs.CommissionSignEnvelopeSubService;
 import services.commissionsubs.CommissionStoredDataSubService;
@@ -39,7 +37,7 @@ public class CommissionService {
 
     private final CommissionInitSubService initSubService;
     private final CommissionSignEnvelopeSubService signEnvelopeSubService;
-    private final CommissionCreateAccountSubService createAccountSubService;
+    private final CommissionCreateTransactionSubService createTransactionSubService;
     private final CommissionStoredDataSubService storedDataSubService;
     private final VotingDbOperations votingDbOperations;
 
@@ -53,7 +51,7 @@ public class CommissionService {
     ) {
         initSubService = new CommissionInitSubService(publicKeyToPemString(envelopeKeyPair), commissionDbOperations, voterDbOperations);
         signEnvelopeSubService = new CommissionSignEnvelopeSubService(envelopeKeyPair, commissionDbOperations);
-        createAccountSubService = new CommissionCreateAccountSubService(commissionDbOperations, votingDbOperations, commissionBlockchainOperations, envelopeKeyPair);
+        createTransactionSubService = new CommissionCreateTransactionSubService(commissionDbOperations, votingDbOperations, commissionBlockchainOperations, envelopeKeyPair);
         storedDataSubService = new CommissionStoredDataSubService(commissionDbOperations);
         this.votingDbOperations = votingDbOperations;
     }
@@ -68,9 +66,9 @@ public class CommissionService {
         return signEnvelopeSubService.signEnvelope(request, jwt, votingId);
     }
 
-    public CompletionStage<CommissionAccountCreationResponse> createAccount(CommissionAccountCreationRequest request) {
-        logger.info("createAccount(): request = {}", request);
-        return createAccountSubService.createAccount(request);
+    public CompletionStage<CommissionAccountCreationResponse> createTransaction(CommissionCreateTransactionRequest request) {
+        logger.info("createTransaction(): request = {}", request);
+        return createTransactionSubService.createTransaction(request);
     }
 
     public CompletionStage<CommissionTransactionOfSignatureResponse> transactionOfSignature(String signature) {

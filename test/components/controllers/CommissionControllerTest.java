@@ -13,7 +13,7 @@ import play.inject.guice.GuiceApplicationBuilder;
 import play.libs.Json;
 import play.mvc.Http;
 import play.mvc.Result;
-import requests.CommissionAccountCreationRequest;
+import requests.CommissionCreateTransactionRequest;
 import requests.CommissionInitRequest;
 import rules.RuleChainForTests;
 import security.UserInfoCollectorForTest;
@@ -218,7 +218,7 @@ public class CommissionControllerTest {
     }
 
     @Test
-    public void testAccountCreationRequest() throws InterruptedException {
+    public void testCreateTransaction() throws InterruptedException {
         // Given
         VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
         Thread.sleep(15 * 1000); // So that some channel accounts are present.
@@ -231,18 +231,18 @@ public class CommissionControllerTest {
 
         // When
         String envelopeSignatureBase64 = envelopeSignatureOf(result.http);
-        CommissionAccountCreationRequest accountCreationRequest = CommissionTestClient.createAccountCreationRequest(message, envelopeSignatureBase64, result.envelope);
-        Result accountCreationRequestResult = testClient.requestAccountCreation(accountCreationRequest);
+        CommissionCreateTransactionRequest createTransactionRequest = CommissionTestClient.createTransactionCreationRequest(message, envelopeSignatureBase64, result.envelope);
+        Result createTransactionRequestResult = testClient.requestAccountCreation(createTransactionRequest);
 
         // Then
-        assertThat(statusOf(accountCreationRequestResult), equalTo(OK));
-        assertThat(accountCreationTransactionOf(accountCreationRequestResult), notNullValue());
-        assertThat(accountCreationTransactionOf(accountCreationRequestResult), not(isEmptyString()));
-        assertThatTransactionIsStoredFor(accountCreationRequest.getRevealedSignatureBase64());
+        assertThat(statusOf(createTransactionRequestResult), equalTo(OK));
+        assertThat(transactionOf(createTransactionRequestResult), notNullValue());
+        assertThat(transactionOf(createTransactionRequestResult), not(isEmptyString()));
+        assertThatTransactionIsStoredFor(createTransactionRequest.getRevealedSignatureBase64());
     }
 
     @Test
-    public void testDoubleAccountCreationRequest() throws InterruptedException {
+    public void testDoubleCreateTransactionRequest() throws InterruptedException {
         // Given
         VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
         Thread.sleep(15 * 1000); // So that some channel accounts are present.
@@ -254,12 +254,12 @@ public class CommissionControllerTest {
         assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
 
         String envelopeSignatureBase64 = envelopeSignatureOf(result.http);
-        CommissionAccountCreationRequest accountCreationRequest = CommissionTestClient.createAccountCreationRequest(message, envelopeSignatureBase64, result.envelope);
+        CommissionCreateTransactionRequest accountCreationRequest = CommissionTestClient.createTransactionCreationRequest(message, envelopeSignatureBase64, result.envelope);
         Result accountCreationRequestResult = testClient.requestAccountCreation(accountCreationRequest);
 
         assertThat(statusOf(accountCreationRequestResult), equalTo(OK));
-        assertThat(accountCreationTransactionOf(accountCreationRequestResult), notNullValue());
-        assertThat(accountCreationTransactionOf(accountCreationRequestResult), not(isEmptyString()));
+        assertThat(transactionOf(accountCreationRequestResult), notNullValue());
+        assertThat(transactionOf(accountCreationRequestResult), not(isEmptyString()));
         assertThatTransactionIsStoredFor(accountCreationRequest.getRevealedSignatureBase64());
 
         // When
@@ -270,7 +270,7 @@ public class CommissionControllerTest {
     }
 
     @Test
-    public void testGetAccountCreationTransaction() throws InterruptedException {
+    public void testGetTransaction() throws InterruptedException {
         // Given
         VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
         Thread.sleep(15 * 1000); // So that some channel accounts are present.
@@ -282,12 +282,12 @@ public class CommissionControllerTest {
         assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
 
         String envelopeSignatureBase64 = envelopeSignatureOf(result.http);
-        CommissionAccountCreationRequest accountCreationRequest = CommissionTestClient.createAccountCreationRequest(message, envelopeSignatureBase64, result.envelope);
+        CommissionCreateTransactionRequest accountCreationRequest = CommissionTestClient.createTransactionCreationRequest(message, envelopeSignatureBase64, result.envelope);
         Result accountCreationRequestResult = testClient.requestAccountCreation(accountCreationRequest);
 
         assertThat(statusOf(accountCreationRequestResult), equalTo(OK));
-        assertThat(accountCreationTransactionOf(accountCreationRequestResult), notNullValue());
-        assertThat(accountCreationTransactionOf(accountCreationRequestResult), not(isEmptyString()));
+        assertThat(transactionOf(accountCreationRequestResult), notNullValue());
+        assertThat(transactionOf(accountCreationRequestResult), not(isEmptyString()));
         assertThatTransactionIsStoredFor(accountCreationRequest.getRevealedSignatureBase64());
 
         // When
