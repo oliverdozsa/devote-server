@@ -158,15 +158,15 @@ paths:
         '404':
           description: If session is not found for user in voting.
 
-  '/castvote/createAccount':
+  '/castvote/createTransaction':
     post:
-      summary: Provides the anonymous voter the vote token by creating an account on the blockchain
+      summary: Provides the anonymous voter the vote token (account provided by the voter)
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CastVoteCreateAccountRequest'
+              $ref: '#/components/schemas/CastVoteCreateTransactionRequest'
       responses:
         '200':
           description: The transaction string to be submitted by the user (client) to the blockchain in order
@@ -174,9 +174,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CastVoteCreateAccountResponse'
+                $ref: '#/components/schemas/CastVoteCreateTransactionResponse'
         '403':
-          description: If a create account request with the given signature was sent previously. In this case
+          description: If a create transaction request with the given signature was sent previously. In this case
             /castvote/txOfSignature/{signature} can be used to obtain the transaction string (signature is revealedSignatureBase64
             of request).
         '404':
@@ -188,13 +188,13 @@ paths:
       summary: Gets the transaction string for the given signature (if an account was created before)
       parameters:
         - name: signature
-          description: Signature (in base64) of revealed message. See /castvote/createAccount.
+          description: Signature (in base64) of revealed message. See /castvote/createTransaction.
           in: path
           type: string
           required: true
       responses:
         '200':
-          description: The transaction string. See /castvote/createAccount.
+          description: The transaction string. See /castvote/createTransaction.
           content:
             application/json:
               schema:
@@ -561,7 +561,7 @@ components:
           required: true
           example: V6M+Rh41R3nzl6J5u7n93w==
 
-    CastVoteCreateAccountRequest:
+    CastVoteCreateTransactionRequest:
       type: object
       properties:
         message:
@@ -576,7 +576,7 @@ components:
           required: true
           example: A62/sIed2GKy4yvKjKGVvQ==
 
-    CastVoteCreateAccountResponse:
+    CastVoteCreateTransactionResponse:
       type: object
       properties:
         transaction:
