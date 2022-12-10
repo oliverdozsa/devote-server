@@ -63,6 +63,11 @@ public class EbeanCommissionRepository implements CommissionRepository {
         logger.info("hasAlreadySignedAnEnvelope(): votingId = {}, userId = {}", votingId, userId);
 
         JpaCommissionSession commissionSession = find(userId, votingId);
+
+        if(commissionSession == null) {
+            throw new NotFoundException("Not found session for userId = " + userId + " and votingId = " + votingId);
+        }
+
         boolean hasAlreadySigned = commissionSession.getEnvelopeSignature() != null;
 
         logger.info("hasAlreadySignedAnEnvelope(): User {} has {} already signed an envelope in voting {}",

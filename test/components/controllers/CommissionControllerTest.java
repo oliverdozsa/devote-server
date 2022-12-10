@@ -3,6 +3,9 @@ package components.controllers;
 import components.clients.CommissionTestClient;
 import components.clients.VotingTestClient;
 import controllers.routes;
+import data.entities.JpaCommissionSession;
+import io.ebean.Ebean;
+import io.ebean.SqlUpdate;
 import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;
 import org.junit.Before;
@@ -344,5 +347,21 @@ public class CommissionControllerTest {
 
         // Then
         assertThat(statusOf(getEnvelopeSignatureResult), equalTo(NOT_FOUND));
+    }
+
+    @Test
+    public void testSignOnEnvelopeWithoutInitBefore() throws InterruptedException {
+        // Given
+        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
+        String message = voteCreationUtils.createMessage(votingInitData.votingId, "someAccountId");
+
+        Ebean.createQuery(JpaCommissionSession.class)
+                .delete();
+
+        // When
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", message, votingInitData.votingId);
+
+        // Then
+        assertThat(statusOf(result.http), equalTo(NOT_FOUND));
     }
 }
