@@ -224,31 +224,31 @@ paths:
         '404':
           description: If session is not found for voting id, and logged in user.
 
-  '/encryptoptioncode/{votingId}/{optionCode}':
+  '/encryptchoice/{votingId}/{choice}':
     get:
-      summary: Encrypts an option code for the given voting
+      summary: Encrypts a choice
       parameters:
         - name: votingId
           description: Id of the voting.
           in: path
           type: string
           required: true
-        - name: optionCode
-          description: A valid option code (> 1 and < 100)
+        - name: choice
+          description: A valid choice (4 numeric characters).
           in: path
-          type: integer
+          type: string
           required: true
       responses:
         '200':
-          description: An encrypted option code.
+          description: An encrypted choice.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EncryptedOptionCodeResponse'
+                $ref: '#/components/schemas/EncryptedChoiceResponse'
         '404':
           description: If voting not found.
         '400':
-          description: If voting is not encrypted. If option code is not valid.
+          description: If voting is not encrypted. If choice is not valid.
 
 components:
   securitySchemes:
@@ -600,11 +600,11 @@ components:
           type: string
           example: DS/N/1x88A8nrQQxZdBgaw==
 
-    EncryptedOptionCodeResponse:
+    EncryptedChoiceResponse:
       type: object
       properties:
         result:
-          description: An encrypted option code.
+          description: An encrypted choice.
           type: string
           example: LP8yzUHJ4UQSYw==
 
