@@ -249,7 +249,6 @@ paths:
           description: If voting not found.
         '400':
           description: If voting is not encrypted. If choice is not valid.
-          description: If voting is not encrypted. If choice is not valid.
 
 components:
   securitySchemes:
