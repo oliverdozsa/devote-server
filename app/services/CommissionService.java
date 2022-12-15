@@ -13,7 +13,7 @@ import requests.CommissionCreateTransactionRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
 import responses.CommissionAccountCreationResponse;
-import responses.CommissionGetAnEncryptedOptionCodeResponse;
+import responses.CommissionGetAnEncryptedChoiceResponse;
 import responses.CommissionGetEnvelopeSignatureResponse;
 import responses.CommissionInitResponse;
 import responses.CommissionSignEnvelopeResponse;
@@ -81,23 +81,21 @@ public class CommissionService {
         return storedDataSubService.signatureOfEnvelope(votingId, user);
     }
 
-    public CompletionStage<CommissionGetAnEncryptedOptionCodeResponse> encryptOptionCode(String votingId, Integer optionCode) {
+    public CompletionStage<CommissionGetAnEncryptedChoiceResponse> encryptChoice(String votingId, String choice) {
         logger.info("encryptOptionCode(): votingId = {}", Base62Conversions.decode(votingId));
-        return checkIfOptionCodeIsValid(optionCode)
+        return checkIfChoiceIsValid(choice)
                 .thenCompose(v -> Base62Conversions.decodeAsStage(votingId))
                 .thenCompose(votingDbOperations::single)
                 .thenApply(CommissionService::getEncryptionKeyFrom)
-                .thenApply(key -> EncryptedVoting.encryptOptionCode(key, optionCode))
+                .thenApply(key -> EncryptedVoting.encryptChoice(key, choice))
                 .thenApply(CommissionService::toResponse);
 
     }
 
-    private static CompletionStage<Void> checkIfOptionCodeIsValid(Integer optionCode) {
+    private static CompletionStage<Void> checkIfChoiceIsValid(String choice) {
         return runAsync(() -> {
-            if (optionCode < 1 || optionCode > 99) {
-                String message = "Option code must be > 0 and < 100, but it was " + optionCode;
-                logger.warn("checkIfOptionCodeIsValid()" + message);
-                throw new BusinessLogicViolationException(message);
+            if(choice == null || !choice.matches("^[0-9]{4}$")) {
+                throw new BusinessLogicViolationException("Choice must not be empty, and must consist of 4 numeric characters");
             }
         });
     }
@@ -112,8 +110,8 @@ public class CommissionService {
         return voting.getEncryptionKey();
     }
 
-    private static CommissionGetAnEncryptedOptionCodeResponse toResponse(String encryptedOptionCode) {
-        CommissionGetAnEncryptedOptionCodeResponse response = new CommissionGetAnEncryptedOptionCodeResponse();
+    private static CommissionGetAnEncryptedChoiceResponse toResponse(String encryptedOptionCode) {
+        CommissionGetAnEncryptedChoiceResponse response = new CommissionGetAnEncryptedChoiceResponse();
         response.setResult(encryptedOptionCode);
         return response;
     }

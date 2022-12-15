@@ -12,7 +12,7 @@ import requests.CommissionCreateTransactionRequest;
 import requests.CommissionInitRequest;
 import requests.CommissionSignEnvelopeRequest;
 import responses.CommissionAccountCreationResponse;
-import responses.CommissionGetAnEncryptedOptionCodeResponse;
+import responses.CommissionGetAnEncryptedChoiceResponse;
 import responses.CommissionGetEnvelopeSignatureResponse;
 import responses.CommissionInitResponse;
 import responses.CommissionSignEnvelopeResponse;
@@ -118,9 +118,9 @@ public class CommissionController extends Controller {
                 .exceptionally(mapExceptionWithUnpack);
     }
 
-    public CompletionStage<Result> getAnEncryptedOptionsCode(String votingId, Integer optionCode) {
+    public CompletionStage<Result> getAnEncryptedChoice(String votingId, String choice) {
         logger.info("getAnEncryptedOptionsCode(): votingId = {}", votingId);
-        return commissionService.encryptOptionCode(votingId, optionCode)
+        return commissionService.encryptChoice(votingId, choice)
                 .thenApply(this::toResult)
                 .exceptionally(mapExceptionWithUnpack);
     }
@@ -145,7 +145,7 @@ public class CommissionController extends Controller {
         return ok(Json.toJson(getEnvelopeSignatureResponse));
     }
 
-    private Result toResult(CommissionGetAnEncryptedOptionCodeResponse encryptedOptionCodeResponse) {
+    private Result toResult(CommissionGetAnEncryptedChoiceResponse encryptedOptionCodeResponse) {
         return ok(Json.toJson(encryptedOptionCodeResponse));
     }
 }

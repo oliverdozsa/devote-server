@@ -1,7 +1,5 @@
 package crypto;
 
-import services.Base62Conversions;
-
 import java.util.Base64;
 
 public class EncryptedVoting {
@@ -10,20 +8,12 @@ public class EncryptedVoting {
         return Base64.getEncoder().encodeToString(keyBytes);
     }
 
-    public static String encryptOptionCode(String encryptionKey, Integer optionCode) {
+    public static String encryptChoice(String encryptionKey, String choice) {
         byte[] keyBytes = Base64.getDecoder().decode(encryptionKey);
-        String message = Integer.toString(optionCode);
-        byte[] encryptedBytes = AesCtrCrypto.encrypt(keyBytes, message.getBytes());
+        byte[] encryptedBytes = AesCtrCrypto.encrypt(keyBytes, choice.getBytes());
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
     private EncryptedVoting() {
-    }
-
-    public static void main(String[] args) {
-        String key = generateKey();
-        String encryptedCode = encryptOptionCode(key, 42);
-        System.out.println(encryptedCode);
-        System.out.println(Base62Conversions.encode(4242L));
     }
 }

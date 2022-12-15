@@ -98,10 +98,10 @@ public class CommissionTestClient extends TestClient {
         return route(application, httpRequest);
     }
 
-    public Result encryptOptionCode(String votingId, Integer optionCode) {
+    public Result encryptChoice(String votingId, String choice) {
         Http.RequestBuilder httpRequest = new Http.RequestBuilder()
                 .method(GET)
-                .uri(routes.CommissionController.getAnEncryptedOptionsCode(votingId, optionCode).url());
+                .uri(routes.CommissionController.getAnEncryptedChoice(votingId, choice).url());
 
         return route(application, httpRequest);
     }

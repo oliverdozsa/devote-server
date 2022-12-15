@@ -22,4 +22,4 @@ GET     /castvote/txOfSignature/:signature          controllers.CommissionContro
 GET     /castvote/envlSignature/:votingId           controllers.CommissionController.getEnvelopeSignature(votingId: String, request: Request)
 
 # Other
-GET     /encryptoptioncode/:votingId/:optionCode    controllers.CommissionController.getAnEncryptedOptionsCode(votingId: String, optionCode: Integer)
+GET     /encryptchoice/:votingId/:choice            controllers.CommissionController.getAnEncryptedChoice(votingId: String, choice: String)

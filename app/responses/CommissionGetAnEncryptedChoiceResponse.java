@@ -1,6 +1,6 @@
 package responses;
 
-public class CommissionGetAnEncryptedOptionCodeResponse {
+public class CommissionGetAnEncryptedChoiceResponse {
     private String result;
 
     public String getResult() {

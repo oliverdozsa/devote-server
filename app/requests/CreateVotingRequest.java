@@ -46,7 +46,7 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
 
     @Constraints.Required
     @Valid
-    @Size(min = 1)
+    @Size(min = 1, max = 99)
     private List<CreatePollRequest> polls;
 
     @Constraints.Required

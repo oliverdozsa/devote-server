@@ -64,14 +64,14 @@ public class EncryptedVotingTest {
     }
 
     @Test
-    public void testEncryptOptionCodeForVoting() throws InterruptedException {
+    public void testEncryptChoiceForVoting() throws InterruptedException {
         // Given
         String votingId = voteCreationUtils.createValidVoting();
 
         // When
-        int anOptionCode = 42;
-        Result anEncryptedOptionResult = testClient.encryptOptionCode(votingId, anOptionCode);
-        Result anotherEncryptedOptionResult = testClient.encryptOptionCode(votingId, anOptionCode);
+        String aChoice = "0142";
+        Result anEncryptedOptionResult = testClient.encryptChoice(votingId, aChoice);
+        Result anotherEncryptedOptionResult = testClient.encryptChoice(votingId, aChoice);
 
         // Then
         assertThat(statusOf(anEncryptedOptionResult), equalTo(OK));
@@ -88,13 +88,13 @@ public class EncryptedVotingTest {
     }
 
     @Test
-    public void testEncryptOptionCodeForVoting_InvalidOptionCode() throws InterruptedException {
+    public void testEncryptChoiceForVoting_InvalidChoice() throws InterruptedException {
         // Given
         String votingId = voteCreationUtils.createValidVoting();
 
         // When
-        int anOptionCode = 4200;
-        Result anEncryptedOptionResult = testClient.encryptOptionCode(votingId, anOptionCode);
+        String anInvalidChoice = "123";
+        Result anEncryptedOptionResult = testClient.encryptChoice(votingId, anInvalidChoice);
 
         // Then
         assertThat(statusOf(anEncryptedOptionResult), equalTo(BAD_REQUEST));
@@ -102,40 +102,40 @@ public class EncryptedVotingTest {
     }
 
     @Test
-    public void testEncryptOptionCodeForVoting_VotingDoesNotExist() throws InterruptedException {
+    public void testEncryptChoiceForVoting_VotingDoesNotExist() throws InterruptedException {
         // Given
         voteCreationUtils.createValidVoting();
 
         // When
-        int anOptionCode = 42;
-        Result anEncryptedOptionResult = testClient.encryptOptionCode(Base62Conversions.encode(42L), anOptionCode);
+        String aChoice = "1234";
+        Result anEncryptedOptionResult = testClient.encryptChoice(Base62Conversions.encode(42L), aChoice);
 
         // Then
         assertThat(statusOf(anEncryptedOptionResult), equalTo(NOT_FOUND));
     }
 
     @Test
-    public void testEncryptOptionCodeForVoting_VotingIsNotEncrypted() throws InterruptedException {
+    public void testEncryptChoiceForVoting_VotingIsNotEncrypted() throws InterruptedException {
         // Given
         String votingId = voteCreationUtils.createValidNotEncryptedVoting();
 
         // When
-        int anOptionCode = 42;
-        Result anEncryptedOptionResult = testClient.encryptOptionCode(votingId, anOptionCode);
+        String aChoice = "1234";
+        Result anEncryptedOptionResult = testClient.encryptChoice(votingId, aChoice);
 
         // Then
         assertThat(statusOf(anEncryptedOptionResult), equalTo(BAD_REQUEST));
     }
 
     @Test
-    public void testEncryptOptionCodeEncryptedUntilExpires() throws InterruptedException {
+    public void testEncryptChoiceEncryptedUntilExpires() throws InterruptedException {
         // Given
         String votingId = voteCreationUtils.createValidVotingEncryptedUntil(Instant.now().plusSeconds(9));
 
         // When
-        int anOptionCode = 42;
-        Result anEncryptedOptionResult = testClient.encryptOptionCode(votingId, anOptionCode);
-        Result anotherEncryptedOptionResult = testClient.encryptOptionCode(votingId, anOptionCode);
+        String aChoice = "1234";
+        Result anEncryptedOptionResult = testClient.encryptChoice(votingId, aChoice);
+        Result anotherEncryptedOptionResult = testClient.encryptChoice(votingId, aChoice);
 
         // Wait for expiration of encrypted until.
         Thread.sleep(11 * 1000);
@@ -169,11 +169,9 @@ public class EncryptedVotingTest {
 
         String firstDecryptedString = new String(firstDecryptedBytes);
         String secondDecryptedString = new String(secondDecryptedBytes);
-        Integer firstDecryptedOption = Integer.parseInt(firstDecryptedString);
-        Integer secondDecryptedOption = Integer.parseInt(secondDecryptedString);
 
-        assertThat(firstDecryptedOption, equalTo(anOptionCode));
-        assertThat(secondDecryptedOption, equalTo(anOptionCode));
+        assertThat(firstDecryptedString, equalTo(aChoice));
+        assertThat(secondDecryptedString, equalTo(aChoice));
     }
 
     @Test
