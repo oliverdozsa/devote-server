@@ -3,14 +3,7 @@ package devote.blockchain.stellar;
 import devote.blockchain.api.BlockchainConfiguration;
 import devote.blockchain.api.BlockchainException;
 import devote.blockchain.api.VoterAccountOperation;
-import org.stellar.sdk.Asset;
-import org.stellar.sdk.ChangeTrustAsset;
-import org.stellar.sdk.ChangeTrustOperation;
-import org.stellar.sdk.KeyPair;
-import org.stellar.sdk.Network;
-import org.stellar.sdk.PaymentOperation;
-import org.stellar.sdk.Server;
-import org.stellar.sdk.Transaction;
+import org.stellar.sdk.*;
 import play.Logger;
 
 import java.io.IOException;
@@ -42,6 +35,7 @@ public class StellarVoterAccountOperation implements VoterAccountOperation {
 
         try {
             Transaction.Builder txBuilder = prepareTransaction(channel);
+            createVoterAccount(txBuilder, params);
             allowVoterToHaveVoteToken(txBuilder, params);
             sendTheTokenToVoter(txBuilder, params);
 
@@ -58,6 +52,14 @@ public class StellarVoterAccountOperation implements VoterAccountOperation {
         Network network = serverAndNetwork.getNetwork();
 
         return StellarUtils.createTransactionBuilder(server, network, channel.getAccountId());
+    }
+
+    private void createVoterAccount(Transaction.Builder txBuilder, CreateTransactionParams params) {
+        CreateAccountOperation createAccount = new CreateAccountOperation.Builder(params.voterAccountPublic, "2")
+                .setSourceAccount(params.distribution.publik)
+                .build();
+
+        txBuilder.addOperation(createAccount);
     }
 
     private void allowVoterToHaveVoteToken(Transaction.Builder txBuilder, CreateTransactionParams params) {

@@ -1,9 +1,9 @@
 package units.repositories;
 
 import data.entities.JpaChannelAccountProgress;
+import data.entities.JpaChannelGeneratorAccount;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
-import data.entities.JpaChannelGeneratorAccount;
 import data.repositories.imp.EbeanCommissionRepository;
 import exceptions.InternalErrorException;
 import io.ebean.EbeanServer;
@@ -74,6 +74,7 @@ public class EbeanCommissionRepositoryTest {
         when(mockEbeanServer.createQuery(JpaVotingChannelAccount.class)).thenReturn(mockChannelAccountQuery);
         when(mockChannelAccountQuery.where()).thenReturn(mockExpressionList);
         when(mockExpressionList.eq("isConsumed", false)).thenReturn(mockExpressionList);
+        when(mockExpressionList.eq("voting.id", 42L)).thenReturn(mockExpressionList);
         when(mockExpressionList.setMaxRows(1)).thenReturn(mockChannelAccountQuery);
         when(mockChannelAccountQuery.findOneOrEmpty()).thenReturn(mockChannelAccountOptional);
 

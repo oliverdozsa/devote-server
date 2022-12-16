@@ -96,6 +96,7 @@ public class EbeanCommissionRepository implements CommissionRepository {
         Optional<JpaVotingChannelAccount> optionalJpaVotingChannelAccount = ebeanServer.createQuery(JpaVotingChannelAccount.class)
                 .where()
                 .eq("isConsumed", false)
+                .eq("voting.id", votingId)
                 .setMaxRows(1)
                 .findOneOrEmpty();
 
