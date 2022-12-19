@@ -88,6 +88,7 @@ public class VotingsPagingService {
         pageVotingItemResponse.setTitle(jpaVoting.getTitle());
         pageVotingItemResponse.setId(Base62Conversions.encode(jpaVoting.getId()));
         pageVotingItemResponse.setEndDate(jpaVoting.getEndDate());
+        pageVotingItemResponse.setEncryptedUntil(jpaVoting.getEncryptedUntil());
 
         return pageVotingItemResponse;
     }

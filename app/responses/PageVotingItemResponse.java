@@ -7,6 +7,7 @@ public class PageVotingItemResponse {
     private String id;
 
     private Instant endDate;
+    private Instant encryptedUntil;
 
     public String getTitle() {
         return title;
@@ -30,5 +31,13 @@ public class PageVotingItemResponse {
 
     public void setEndDate(Instant endDate) {
         this.endDate = endDate;
+    }
+
+    public Instant getEncryptedUntil() {
+        return encryptedUntil;
+    }
+
+    public void setEncryptedUntil(Instant encryptedUntil) {
+        this.encryptedUntil = encryptedUntil;
     }
 }

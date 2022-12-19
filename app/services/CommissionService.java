@@ -94,7 +94,7 @@ public class CommissionService {
 
     private static CompletionStage<Void> checkIfChoiceIsValid(String choice) {
         return runAsync(() -> {
-            if(choice == null || !choice.matches("^[0-9]{4}$")) {
+            if(choice == null || !choice.matches("^([0-9]{4})+$")) {
                 throw new BusinessLogicViolationException("Choice must not be empty, and must consist of 4 numeric characters");
             }
         });
