@@ -1,12 +1,10 @@
 package ipfs.api.imp;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.typesafe.config.Config;
 import devote.blockchain.api.BlockchainException;
 import io.ipfs.api.IPFS;
 import io.ipfs.api.MerkleNode;
 import io.ipfs.cid.Cid;
-import io.ipfs.multiaddr.MultiAddress;
 import ipfs.api.IpfsApi;
 import play.libs.Json;
 

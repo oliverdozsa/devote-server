@@ -1,7 +1,6 @@
 package data.operations;
 
 import data.entities.JpaVoting;
-import data.repositories.ChannelProgressRepository;
 import data.repositories.VotingRepository;
 import executioncontexts.DatabaseExecutionContext;
 import play.Logger;

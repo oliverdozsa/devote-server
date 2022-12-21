@@ -109,12 +109,13 @@ public class VotingBlockchainInitTask implements Runnable {
     private void saveVotingToIpfs(JpaVoting voting) {
         // Ipfs voting is used for checking whether voting is initialized, or not, so we don't check
         // for existence of voting in IPFS.
+        JpaVoting freshVoting = context.votingRepository.single(voting.getId());
 
-        logger.info("[VOTING-BC-INIT-TASK-{}]: Saving voting {} to ipfs.", taskId, voting.getId());
-        IpfsVoting ipfsVoting = ipfsVotingFromJpaVoting.convert(voting);
+        logger.info("[VOTING-BC-INIT-TASK-{}]: Saving voting {} to ipfs.", taskId, freshVoting.getId());
+        IpfsVoting ipfsVoting = ipfsVotingFromJpaVoting.convert(freshVoting);
         JsonNode ipfsVotingJson = Json.toJson(ipfsVoting);
         String cid = context.ipfsApi.saveJson(ipfsVotingJson);
-        context.votingRepository.votingSavedToIpfs(voting.getId(), cid);
+        context.votingRepository.votingSavedToIpfs(freshVoting.getId(), cid);
     }
 
     private ChannelGeneratorAccountOperation getChannelGeneratorOperation(String network) {

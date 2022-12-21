@@ -24,6 +24,8 @@ import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;
 import ipfs.api.imp.IpfsApiImp;
 import ipfs.api.imp.IpfsProvider;
+import ipfs.api.imp.PinataIpfsApiImp;
+import ipfs.api.imp.Web3StorageIpfsApiImp;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import play.data.format.Formatters;
@@ -88,7 +90,7 @@ public class Module extends AbstractModule {
                 .toProvider(EnvelopKeyPairProvider.class)
                 .asEagerSingleton();
         bind(JwtCenter.class).asEagerSingleton();
-        bind(IPFS.class).toProvider(IpfsProvider.class).asEagerSingleton();
-        bind(IpfsApi.class).to(IpfsApiImp.class).asEagerSingleton();
+        bind(IPFS.class).toProvider(IpfsProvider.class);
+        bind(IpfsApi.class).to(Web3StorageIpfsApiImp.class).asEagerSingleton();
     }
 }
