@@ -43,21 +43,6 @@ public class CreateVotingRequestTest {
     }
 
     @Test
-    public void testAuthorizationEmailsNotValid() {
-        // Given
-        CreateVotingRequest createVotingRequest = new CreateVotingRequest();
-        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
-        createVotingRequest.setAuthorizationEmailOptions(new ArrayList<>());
-
-        // When
-        String errorMessage = createVotingRequest.validate(mockConfig);
-
-        // Then
-        assertThat(errorMessage, notNullValue());
-        assertThat(errorMessage, containsString("Invalid authorization!"));
-    }
-
-    @Test
     public void testStartDateNull() {
         // Given
         CreateVotingRequest createVotingRequest = new CreateVotingRequest();

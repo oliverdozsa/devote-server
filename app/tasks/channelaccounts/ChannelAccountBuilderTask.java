@@ -26,20 +26,25 @@ public class ChannelAccountBuilderTask implements Runnable {
 
     @Override
     public void run() {
-        JpaChannelAccountProgress channelProgress = getAChannelAccountProgress();
-        if (channelProgress == null) {
-            logger.info("[CHANNEL-TASK-{}]: run(): No suitable channel progress found.", taskId);
-            return;
+        try {
+            JpaChannelAccountProgress channelProgress = getAChannelAccountProgress();
+            if (channelProgress == null) {
+                logger.info("[CHANNEL-TASK-{}]: run(): No suitable channel progress found.", taskId);
+                return;
+            }
+
+            List<Account> channelAccountAccounts = createChannelAccounts(channelProgress);
+            channelAccountsCreated(channelProgress, channelAccountAccounts);
+        } catch (Exception e) {
+            logger.warn("[CHANNEL-TASK-{}]: run(): Exception during channel accounts creation (will retry).:\n{}", taskId, e);
         }
 
-        List<Account> channelAccountAccounts = createChannelAccounts(channelProgress);
-        channelAccountsCreated(channelProgress, channelAccountAccounts);
     }
 
     private List<Account> createChannelAccounts(JpaChannelAccountProgress channelProgress) {
         JpaChannelGeneratorAccount channelGeneratorEntity = channelProgress.getChannelGenerator();
         ChannelAccountOperation channelAccountOperation = getChannelAccountOperation(channelGeneratorEntity);
-        if(channelProgress.getChannelGenerator().getVoting().getOnTestNetwork()) {
+        if (channelProgress.getChannelGenerator().getVoting().getOnTestNetwork()) {
             channelAccountOperation.useTestNet();
         }
 

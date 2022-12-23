@@ -16,7 +16,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 public class RsaEnvelope {
-    private final RSAKeyParameters publicKey;
     private final RSABlindingFactorGenerator blindingFactorGenerator;
     private final RSABlindingParameters blindingParameters;
 
@@ -25,7 +24,6 @@ public class RsaEnvelope {
     }
 
     public RsaEnvelope(RSAKeyParameters publicKey) {
-        this.publicKey = publicKey;
         blindingFactorGenerator = new RSABlindingFactorGenerator();
         blindingFactorGenerator.init(publicKey);
         BigInteger blindingFactor = blindingFactorGenerator.generateBlindingFactor();

@@ -1,5 +1,6 @@
 import com.auth0.jwk.JwkProvider;
 import com.google.inject.name.Names;
+import com.typesafe.config.Config;
 import data.operations.CommissionDbOperations;
 import data.operations.PageOfVotingsDbOperations;
 import data.repositories.ChannelProgressRepository;
@@ -28,16 +29,19 @@ import ipfs.api.imp.PinataIpfsApiImp;
 import ipfs.api.imp.Web3StorageIpfsApiImp;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import play.Environment;
 import play.data.format.Formatters;
 import security.JwtCenter;
 import security.jwtverification.Auth0JwtVerification;
 import security.jwtverification.JwkProviderProvider;
 import security.jwtverification.JwtVerification;
+import security.jwtverification.JwtVerificationForScaleTesting;
 import services.CommissionService;
 import services.EnvelopKeyPairProvider;
 import services.VotingService;
 import services.commissionsubs.userinfo.Auth0UserInfoCollector;
 import services.commissionsubs.userinfo.UserInfoCollector;
+import services.commissionsubs.userinfo.UserInfoCollectorForScaleTesting;
 import tasks.TasksOrganizer;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
 import tasks.votingblockchaininit.VotingBlockchainInitTaskContext;
@@ -47,6 +51,14 @@ import java.security.Security;
 public class Module extends AbstractModule {
     static {
         Security.addProvider(new BouncyCastleProvider());
+    }
+
+    private final Environment environment;
+    private final Config config;
+
+    public Module(Environment environment, Config config) {
+        this.environment = environment;
+        this.config = config;
     }
 
     @Override
@@ -81,8 +93,14 @@ public class Module extends AbstractModule {
         bind(TasksOrganizer.class).asEagerSingleton();
 
         // Auth
-        bind(JwtVerification.class).to(Auth0JwtVerification.class).asEagerSingleton();
-        bind(UserInfoCollector.class).to(Auth0UserInfoCollector.class).asEagerSingleton();
+        if(config.getBoolean("devote.scale.test.mode")) {
+            bind(JwtVerification.class).to(JwtVerificationForScaleTesting.class).asEagerSingleton();
+            bind(UserInfoCollector.class).to(UserInfoCollectorForScaleTesting.class).asEagerSingleton();
+        } else {
+            bind(JwtVerification.class).to(Auth0JwtVerification.class).asEagerSingleton();
+            bind(UserInfoCollector.class).to(Auth0UserInfoCollector.class).asEagerSingleton();
+        }
+
         bind(JwkProvider.class).toProvider(JwkProviderProvider.class).asEagerSingleton();
 
         // Other

@@ -26,7 +26,7 @@ public class StellarBlockchainTestNet implements BlockchainTestNet {
     @Override
     public Account createAccountWithBalance(long balance) {
         KeyPair account = KeyPair.random();
-        fundAccountWithBalance(account, balance);;
+        fundAccountWithBalance(account, balance);
 
         return toAccount(account);
     }

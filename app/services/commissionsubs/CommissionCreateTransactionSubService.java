@@ -70,12 +70,18 @@ public class CommissionCreateTransactionSubService {
             byte[] revealedMessageBytes = request.getMessage().getBytes();
 
             byte[] signatureDecrypted = rsaEngine.processBlock(revealedSignatureBytes, 0, revealedSignatureBytes.length);
+
             try {
                 byte[] messageHashed = MessageDigest.getInstance("SHA-256").digest(revealedMessageBytes);
-                if(Arrays.equals(messageHashed, signatureDecrypted)) {
+                signatureDecrypted = checkIfLeadingZeroIsNeededInSignatureBytes(signatureDecrypted, revealedMessageBytes);
+
+                if (Arrays.equals(messageHashed, signatureDecrypted)) {
                     logger.info("verifySignatureOfRequest(): signature is valid for request: {}.", request.toString());
                 } else {
                     logger.warn("verifySignatureOfRequest(): Signature for message is not valid!");
+                    logger.warn("messageHashed      = {}", Arrays.toString(messageHashed));
+                    logger.warn("signatureDecrypted = {}", Arrays.toString(signatureDecrypted));
+                    logger.warn("input sig b64      = {}", request.getRevealedSignatureBase64());
                     throw new ForbiddenException("Signature for message is not valid!");
                 }
             } catch (NoSuchAlgorithmException e) {
@@ -87,7 +93,7 @@ public class CommissionCreateTransactionSubService {
     private CompletionStage<Void> checkIfAlreadyRequestedAccount(CommissionCreateTransactionRequest request) {
         return commissionDbOperations.doesTransactionExistForSignature(request.getRevealedSignatureBase64())
                 .thenAccept(doesExist -> {
-                    if(doesExist) {
+                    if (doesExist) {
                         throw new ForbiddenException("Account was requested before!");
                     }
                 });
@@ -130,6 +136,16 @@ public class CommissionCreateTransactionSubService {
         response.setTransaction(transaction);
 
         return response;
+    }
+
+    private static byte[] checkIfLeadingZeroIsNeededInSignatureBytes(byte[] signatureBytes, byte[] messageHashBytes) {
+        if (signatureBytes.length == messageHashBytes.length - 1) {
+            byte[] signatureBytesWithLeadingZero = new byte[messageHashBytes.length];
+            System.arraycopy(signatureBytes, 1, signatureBytesWithLeadingZero, 1, signatureBytes.length);
+            return signatureBytesWithLeadingZero;
+        }
+
+        return signatureBytes;
     }
 
     private static class ParsedMessage {

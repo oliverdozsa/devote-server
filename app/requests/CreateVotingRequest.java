@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 
 @ValidateWithConfig
@@ -170,11 +171,6 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
     }
 
     private boolean isAuthorizationNotValid() {
-        if (authorization == Authorization.EMAILS &&
-                (authorizationEmailOptions == null || authorizationEmailOptions.isEmpty())) {
-            return true;
-        }
-
         return false;
     }
 

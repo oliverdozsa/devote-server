@@ -22,7 +22,6 @@ libraryDependencies += "com.auth0" % "java-jwt" % "3.8.2"
 libraryDependencies += "com.auth0" % "jwks-rsa" % "0.20.0"
 libraryDependencies ++= Seq(javaWs)
 libraryDependencies += "io.seruco.encoding" % "base62" % "0.1.3"
-libraryDependencies += "com.github.stellar" % "java-stellar-sdk" % "0.24.0"
 libraryDependencies += "com.github.ipfs" % "java-ipfs-http-client" % "1.3.3"
 libraryDependencies += "com.github.stellar" % "java-stellar-sdk" % "0.31.0"
 

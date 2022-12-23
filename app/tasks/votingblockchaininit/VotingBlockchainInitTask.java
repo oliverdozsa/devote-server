@@ -32,13 +32,18 @@ public class VotingBlockchainInitTask implements Runnable {
 
     @Override
     public void run() {
-        JpaVoting voting = getANotFullyInitializedVoting();
-        if (voting == null) {
-            logger.info("[VOTING-BC-INIT-TASK-{}]: Could not find a voting to init.", taskId);
-            return;
+        try{
+            JpaVoting voting = getANotFullyInitializedVoting();
+            if (voting == null) {
+                logger.info("[VOTING-BC-INIT-TASK-{}]: Could not find a voting to init.", taskId);
+                return;
+            }
+
+            initializeOnBlockchain(voting);
+        } catch (Exception e) {
+            logger.warn("[VOTING-BC-INIT-TASK-{}]: Failed to init voting (will retry).:\n{}", taskId, e);
         }
 
-        initializeOnBlockchain(voting);
     }
 
     private JpaVoting getANotFullyInitializedVoting() {
