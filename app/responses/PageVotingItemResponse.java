@@ -9,6 +9,8 @@ public class PageVotingItemResponse {
     private Instant endDate;
     private Instant encryptedUntil;
 
+    private boolean isInitialized;
+
     public String getTitle() {
         return title;
     }
@@ -39,5 +41,13 @@ public class PageVotingItemResponse {
 
     public void setEncryptedUntil(Instant encryptedUntil) {
         this.encryptedUntil = encryptedUntil;
+    }
+
+    public boolean isInitialized() {
+        return isInitialized;
+    }
+
+    public void setInitialized(boolean initialized) {
+        isInitialized = initialized;
     }
 }
