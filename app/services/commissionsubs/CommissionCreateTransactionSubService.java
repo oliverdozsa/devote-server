@@ -73,7 +73,7 @@ public class CommissionCreateTransactionSubService {
 
             try {
                 byte[] messageHashed = MessageDigest.getInstance("SHA-256").digest(revealedMessageBytes);
-                signatureDecrypted = checkIfLeadingZeroIsNeededInSignatureBytes(signatureDecrypted, revealedMessageBytes);
+                signatureDecrypted = checkIfLeadingZerosAreNeededInSignatureBytes(signatureDecrypted, messageHashed);
 
                 if (Arrays.equals(messageHashed, signatureDecrypted)) {
                     logger.info("verifySignatureOfRequest(): signature is valid for request: {}.", request.toString());
@@ -138,11 +138,12 @@ public class CommissionCreateTransactionSubService {
         return response;
     }
 
-    private static byte[] checkIfLeadingZeroIsNeededInSignatureBytes(byte[] signatureBytes, byte[] messageHashBytes) {
-        if (signatureBytes.length == messageHashBytes.length - 1) {
-            byte[] signatureBytesWithLeadingZero = new byte[messageHashBytes.length];
-            System.arraycopy(signatureBytes, 1, signatureBytesWithLeadingZero, 1, signatureBytes.length);
-            return signatureBytesWithLeadingZero;
+    private static byte[] checkIfLeadingZerosAreNeededInSignatureBytes(byte[] signatureBytes, byte[] messageHashBytes) {
+        if (signatureBytes.length < messageHashBytes.length) {
+            int leadingZerosNeeded = messageHashBytes.length - signatureBytes.length;
+            byte[] signatureBytesWithLeadingZeros = new byte[messageHashBytes.length];
+            System.arraycopy(signatureBytes, 0, signatureBytesWithLeadingZeros, leadingZerosNeeded, signatureBytes.length);
+            return signatureBytesWithLeadingZeros;
         }
 
         return signatureBytes;
