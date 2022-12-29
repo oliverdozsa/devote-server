@@ -17,8 +17,8 @@ public class JpaVoter {
     @ManyToMany
     @JoinTable(
             name = "votings_participants",
-            joinColumns = @JoinColumn(name = "voter_id"),
-            inverseJoinColumns = @JoinColumn(name = "voting_id")
+            joinColumns = {@JoinColumn(name = "voter_id")},
+            inverseJoinColumns = {@JoinColumn(name = "voting_id")}
     )
     private List<JpaVoting> votings;
 
