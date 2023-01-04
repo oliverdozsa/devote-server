@@ -21,6 +21,7 @@ public class VotingResponse {
     private String assetCode;
     private String authorization;
     private String visibility;
+    private boolean isRefunded;
 
     private boolean isOnTestNetwork;
 
@@ -166,5 +167,13 @@ public class VotingResponse {
 
     public void setFundingAccountId(String fundingAccountId) {
         this.fundingAccountId = fundingAccountId;
+    }
+
+    public boolean isRefunded() {
+        return isRefunded;
+    }
+
+    public void setRefunded(boolean refunded) {
+        isRefunded = refunded;
     }
 }
