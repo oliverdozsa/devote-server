@@ -29,14 +29,14 @@ public class ChannelAccountBuilderTask implements Runnable {
         try {
             JpaChannelAccountProgress channelProgress = getAChannelAccountProgress();
             if (channelProgress == null) {
-                logger.info("[CHANNEL-TASK-{}]: run(): No suitable channel progress found.", taskId);
+                logger.info("[CHANNEL-TASK-{}]: No suitable channel progress found.", taskId);
                 return;
             }
 
             List<Account> channelAccountAccounts = createChannelAccounts(channelProgress);
             channelAccountsCreated(channelProgress, channelAccountAccounts);
         } catch (Exception e) {
-            logger.warn("[CHANNEL-TASK-{}]: run(): Exception during channel accounts creation (will retry).:\n{}", taskId, e);
+            logger.warn("[CHANNEL-TASK-{}]: Exception during channel accounts creation (will retry).:\n{}", taskId, e);
         }
 
     }
@@ -49,14 +49,14 @@ public class ChannelAccountBuilderTask implements Runnable {
         }
 
         int numOfAccountsToCreateInOneBatch = determineNumOfAccountsToCreateInOneBatch(channelProgress, channelAccountOperation);
-        logger.info("[CHANNEL-TASK-{}]: createChannelAccounts(): about to create {} channel accounts on blockchain {} for progress {}",
+        logger.info("[CHANNEL-TASK-{}]: about to create {} channel accounts on blockchain {} for progress {}",
                 taskId, numOfAccountsToCreateInOneBatch, channelGeneratorEntity.getVoting().getNetwork(), channelProgress.getId());
 
         Account channelAccount = new Account(channelProgress.getChannelGenerator().getAccountSecret(), channelProgress.getChannelGenerator().getAccountPublic());
         ChannelGenerator channelGenerator = new ChannelGenerator(channelAccount, channelProgress.getNumOfAccountsToCreate());
 
         List<Account> createdAccounts = channelAccountOperation.create(channelGenerator, numOfAccountsToCreateInOneBatch);
-        logger.info("[CHANNEL-TASK-{}]: createChannelAccounts(): successfully created {} channel accounts on blockchain {}",
+        logger.info("[CHANNEL-TASK-{}]: successfully created {} channel accounts on blockchain {}",
                 taskId, createdAccounts.size(), channelGeneratorEntity.getVoting().getNetwork());
 
         return createdAccounts;
@@ -90,7 +90,7 @@ public class ChannelAccountBuilderTask implements Runnable {
                     .map(JpaChannelAccountProgress::getId)
                     .collect(Collectors.toList());
 
-            logger.warn("[CHANNEL-TASK-{}]: getAChannelAccountProgress(): could not find a suitable channel progress! progress ids = {}",
+            logger.warn("[CHANNEL-TASK-{}]: could not find a suitable channel progress! progress ids = {}",
                     taskId, progressIds);
         }
 

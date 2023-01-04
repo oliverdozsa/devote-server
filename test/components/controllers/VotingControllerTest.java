@@ -84,7 +84,7 @@ public class VotingControllerTest {
         String locationUrl = result.headers().get(LOCATION);
 
         // Wait for voting init & channel task
-        Thread.sleep(30 * 1000);
+        Thread.sleep(6 * 1000);
         Result getByLocationResult = client.byLocation(locationUrl);
 
         assertThat(statusOf(getByLocationResult), equalTo(OK));
@@ -103,6 +103,7 @@ public class VotingControllerTest {
 
         assertChannelAccountsCreatedOnBlockchain(votingId);
         assertChannelProgressCompletedFor(votingId);
+        assertUserGivenFundingAccountExist(votingId);
     }
 
     @Test
@@ -330,7 +331,7 @@ public class VotingControllerTest {
         assertThat(statusOf(result), equalTo(CREATED));
 
         // Wait for voting init & channel task
-        Thread.sleep(30 * 1000);
+        Thread.sleep(3 * 1000);
 
         assertChannelGeneratorsCreatedOnTestMockBlockchainNetwork();
 

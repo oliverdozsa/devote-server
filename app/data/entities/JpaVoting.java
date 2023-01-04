@@ -63,6 +63,9 @@ public class JpaVoting {
     @Lob
     private String distributionAccountPublic;
 
+    @Column(name = "is_distribution_refunded")
+    private boolean isDistributionRefunded;
+
     @Column(name = "ballot_account_secret")
     @Lob
     private String ballotAccountSecret;
@@ -83,7 +86,16 @@ public class JpaVoting {
     private String assetCode;
 
     @Column(name = "issuer_account_public")
+    @Lob
     private String issuerAccountPublic;
+
+    @Column(name = "user_given_funding_account_public")
+    @Lob
+    private String userGivenFundingAccountPublic;
+
+    @Column(name = "user_given_funding_account_secret")
+    @Lob
+    private String userGivenFundingAccountSecret;
 
     @Column(name = "auth_type", nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
@@ -110,6 +122,9 @@ public class JpaVoting {
 
     @Column(name = "is_on_test_network")
     private Boolean isOnTestNetwork;
+
+    @Column(name = "is_internal_funding_refunded")
+    private boolean isInternalFundingRefunded;
 
     public Long getId() {
         return id;
@@ -325,5 +340,37 @@ public class JpaVoting {
 
     public void setOnTestNetwork(Boolean onTestNetwork) {
         isOnTestNetwork = onTestNetwork;
+    }
+
+    public boolean isDistributionRefunded() {
+        return isDistributionRefunded;
+    }
+
+    public void setDistributionRefunded(boolean distributionRefunded) {
+        isDistributionRefunded = distributionRefunded;
+    }
+
+    public String getUserGivenFundingAccountPublic() {
+        return userGivenFundingAccountPublic;
+    }
+
+    public void setUserGivenFundingAccountPublic(String userGivenFundingAccountPublic) {
+        this.userGivenFundingAccountPublic = userGivenFundingAccountPublic;
+    }
+
+    public String getUserGivenFundingAccountSecret() {
+        return userGivenFundingAccountSecret;
+    }
+
+    public void setUserGivenFundingAccountSecret(String userGivenFundingAccountSecret) {
+        this.userGivenFundingAccountSecret = userGivenFundingAccountSecret;
+    }
+
+    public Boolean getInternalFundingRefunded() {
+        return isInternalFundingRefunded;
+    }
+
+    public void setInternalFundingRefunded(Boolean internalFundingRefunded) {
+        isInternalFundingRefunded = internalFundingRefunded;
     }
 }

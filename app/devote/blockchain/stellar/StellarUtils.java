@@ -1,10 +1,8 @@
 package devote.blockchain.stellar;
 
 import devote.blockchain.api.Account;
-import org.stellar.sdk.KeyPair;
-import org.stellar.sdk.Network;
-import org.stellar.sdk.Server;
-import org.stellar.sdk.Transaction;
+import devote.blockchain.api.BlockchainException;
+import org.stellar.sdk.*;
 import org.stellar.sdk.responses.AccountResponse;
 import org.stellar.sdk.responses.SubmitTransactionResponse;
 
@@ -52,5 +50,21 @@ public class StellarUtils {
     }
 
     private StellarUtils() {
+    }
+
+    public static BigDecimal findXlmBalance(AccountResponse.Balance[] balances) {
+        AccountResponse.Balance xlm = null;
+        for (AccountResponse.Balance balance : balances) {
+            if (balance.getAssetType().equals("native")) {
+                xlm = balance;
+                break;
+            }
+        }
+
+        if (xlm == null) {
+            throw new BlockchainException("Could not find xlm balance!");
+        }
+
+        return new BigDecimal(xlm.getBalance());
     }
 }

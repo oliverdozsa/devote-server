@@ -10,7 +10,9 @@ import play.Logger;
 import requests.CreateVotingRequest;
 
 import javax.inject.Inject;
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static data.repositories.imp.EbeanRepositoryUtils.assertEntityExists;
@@ -107,6 +109,44 @@ public class EbeanVotingRepository implements VotingRepository {
                 .isNull("ipfsCid")
                 .setMaxRows(size)
                 .findList();
+    }
+
+    @Override
+    public Optional<JpaVoting> findANotRefundedEndedVoting() {
+        logger.info("findAnEndedVotingWithNotRefundedDistribution()");
+
+        return ebeanServer.createQuery(JpaVoting.class)
+                .where()
+                .eq("isInternalFundingRefunded", false)
+                .lt("endDate", Instant.now())
+                .setMaxRows(1)
+                .findOneOrEmpty();
+    }
+
+    @Override
+    public void distributionAccountRefunded(Long votingId) {
+        logger.info("distributionAccountRefunded(): votingId = {}", votingId);
+
+        JpaVoting voting = ebeanServer.find(JpaVoting.class, votingId);
+        voting.setDistributionRefunded(true);
+        ebeanServer.update(voting);
+    }
+
+    @Override
+    public void internalFundingAccountCreated(Long id, Account funding) {
+        JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
+        voting.setFundingAccountPublic(funding.publik);
+        voting.setFundingAccountSecret(funding.secret);
+
+        ebeanServer.update(voting);
+    }
+
+    @Override
+    public void internalFundingAccountRefunded(Long id) {
+        JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
+        voting.setInternalFundingRefunded(true);
+
+        ebeanServer.update(voting);
     }
 
     private JpaChannelGeneratorAccount fromChannelGenerator(ChannelGenerator channelGenerator) {

@@ -14,6 +14,7 @@ public class VotingResponse {
     private String decryptionKey;
     private Instant startDate;
     private Instant endDate;
+    private String fundingAccountId;
     private String distributionAccountId;
     private String ballotAccountId;
     private String issuerAccountId;
@@ -157,5 +158,13 @@ public class VotingResponse {
 
     public void setOnTestNetwork(boolean onTestNetwork) {
         isOnTestNetwork = onTestNetwork;
+    }
+
+    public String getFundingAccountId() {
+        return fundingAccountId;
+    }
+
+    public void setFundingAccountId(String fundingAccountId) {
+        this.fundingAccountId = fundingAccountId;
     }
 }

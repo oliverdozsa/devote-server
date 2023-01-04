@@ -34,6 +34,9 @@ public class JpaChannelGeneratorAccount {
     @Column(name = "votes_cap")
     private Long votesCap;
 
+    @Column(name = "is_refunded")
+    private boolean isRefunded;
+
     @OneToOne(mappedBy = "channelGenerator")
     private JpaChannelAccountProgress channelAccountProgress;
 
@@ -83,5 +86,13 @@ public class JpaChannelGeneratorAccount {
 
     public void setVotesCap(Long votesCap) {
         this.votesCap = votesCap;
+    }
+
+    public boolean isRefunded() {
+        return isRefunded;
+    }
+
+    public void setRefunded(boolean refunded) {
+        isRefunded = refunded;
     }
 }

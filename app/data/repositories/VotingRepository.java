@@ -7,6 +7,7 @@ import devote.blockchain.api.Account;
 import requests.CreateVotingRequest;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface VotingRepository {
     Long initialize(CreateVotingRequest request, String assetCode, String userId);
@@ -16,4 +17,8 @@ public interface VotingRepository {
     void distributionAndBallotAccountsCreated(Long id, DistributionAndBallotAccountOperation.TransactionResult transactionResult);
     void votingSavedToIpfs(Long id, String ipfsCid);
     List<JpaVoting> notInitializedSampleOf(int size);
+    Optional<JpaVoting> findANotRefundedEndedVoting();
+    void distributionAccountRefunded(Long id);
+    void internalFundingAccountCreated(Long id, Account funding);
+    void internalFundingAccountRefunded(Long id);
 }

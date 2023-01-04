@@ -24,6 +24,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class DbAsserts {
@@ -119,6 +120,79 @@ public class DbAsserts {
         Set<String> uniqueVoterEmails = new HashSet<>(voterEmails);
 
         assertThat(voterEmails.size(), equalTo(uniqueVoterEmails.size()));
+    }
+
+    public static void assertChannelGeneratorsAreMarkedAsRefunded(Long votingId) {
+        List<JpaChannelGeneratorAccount> channelGenerators = Ebean.find(JpaChannelGeneratorAccount.class)
+                .where()
+                .eq("voting.id", votingId)
+                .findList();
+
+        List<Boolean> channelGeneratorsRefunded = channelGenerators.stream()
+                .map(JpaChannelGeneratorAccount::isRefunded)
+                .collect(Collectors.toList());
+
+        assertThat(channelGeneratorsRefunded, everyItem(is(true)));
+    }
+
+    public static void assertChannelAccountsAreMarkedAsRefunded(Long votingId) {
+        List<JpaVotingChannelAccount> channelAccounts = Ebean.find(JpaVotingChannelAccount.class)
+                .where()
+                .eq("voting.id", votingId)
+                .findList();
+
+        List<Boolean> channelAccountsRefunded = channelAccounts.stream()
+                .map(JpaVotingChannelAccount::isRefunded)
+                .collect(Collectors.toList());
+
+        assertThat(channelAccountsRefunded, everyItem(is(true)));
+    }
+
+    public static void assertDistributionAccountIsMarkedAsRefunded(Long votingId) {
+        JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
+        assertThat(voting.isDistributionRefunded(), is(true));
+    }
+
+    public static void assertInternalFundingIsMarkedAsRefunded(Long votingId) {
+        JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
+        assertThat(voting.getInternalFundingRefunded(), is(true));
+    }
+
+    public static void assertChannelGeneratorsAreMarkedAsNotRefunded(Long votingId) {
+        List<JpaChannelGeneratorAccount> channelGenerators = Ebean.find(JpaChannelGeneratorAccount.class)
+                .where()
+                .eq("voting.id", votingId)
+                .findList();
+
+        List<Boolean> channelGeneratorsRefunded = channelGenerators.stream()
+                .map(JpaChannelGeneratorAccount::isRefunded)
+                .collect(Collectors.toList());
+
+        assertThat(channelGeneratorsRefunded, everyItem(is(false)));
+    }
+
+    public static void assertChannelAccountsAreMarkedAsNotRefunded(Long votingId) {
+        List<JpaVotingChannelAccount> channelAccounts = Ebean.find(JpaVotingChannelAccount.class)
+                .where()
+                .eq("voting.id", votingId)
+                .findList();
+
+        List<Boolean> channelAccountsConsumed = channelAccounts.stream()
+                .map(JpaVotingChannelAccount::isRefunded)
+                .collect(Collectors.toList());
+
+        assertThat(channelAccountsConsumed, everyItem(is(false)));
+    }
+
+    public static void assertDistributionAccountIsNotMarkedAsRefunded(Long votingId) {
+        JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
+        assertThat(voting.isDistributionRefunded(), is(false));
+    }
+
+    public static void assertUserGivenFundingAccountExist(Long votingId) {
+        JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
+        assertNotNull(voting.getUserGivenFundingAccountPublic());
+        assertNotNull(voting.getUserGivenFundingAccountSecret());
     }
 
     private static List<JpaChannelAccountProgress> channelProgressesOf(Long votingId) {

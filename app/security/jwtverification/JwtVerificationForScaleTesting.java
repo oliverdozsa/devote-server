@@ -13,13 +13,13 @@ public class JwtVerificationForScaleTesting implements JwtVerification{
     @Override
     public DecodedJWT verify(String token) {
         // Token is not really a jwt; it should merely be a merely an email string
-        return new MockDedocedJwt(token);
+        return new MockDecodedJwt(token);
     }
 
-    private static class MockDedocedJwt implements DecodedJWT {
+    private static class MockDecodedJwt implements DecodedJWT {
         private String email;
 
-        public MockDedocedJwt(String email) {
+        public MockDecodedJwt(String email) {
             this.email = email;
         }
 

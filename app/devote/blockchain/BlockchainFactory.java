@@ -1,13 +1,6 @@
 package devote.blockchain;
 
-import devote.blockchain.api.BlockchainConfiguration;
-import devote.blockchain.api.BlockchainException;
-import devote.blockchain.api.BlockchainOperation;
-import devote.blockchain.api.ChannelAccountOperation;
-import devote.blockchain.api.DistributionAndBallotAccountOperation;
-import devote.blockchain.api.FundingAccountOperation;
-import devote.blockchain.api.ChannelGeneratorAccountOperation;
-import devote.blockchain.api.VoterAccountOperation;
+import devote.blockchain.api.*;
 import org.reflections.Reflections;
 import play.Logger;
 
@@ -44,6 +37,10 @@ public class BlockchainFactory {
 
     public FundingAccountOperation createFundingAccountOperation() {
         return createBlockchainOperation(FundingAccountOperation.class);
+    }
+
+    public RefundBalancesOperation createRefundBalancesOperation() {
+        return createBlockchainOperation(RefundBalancesOperation.class);
     }
 
     private <T extends BlockchainOperation> T createBlockchainOperation(Class<T> blockChainOperationParentClass) {

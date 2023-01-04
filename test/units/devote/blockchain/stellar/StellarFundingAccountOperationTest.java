@@ -39,7 +39,7 @@ public class StellarFundingAccountOperationTest {
 
         when(stellarMock.server.accounts().account("someFundingAccount")).thenReturn(mockFundingAccount);
         when(mockFundingBalance.getAssetType()).thenReturn("native");
-        when(mockFundingBalance.getBalance()).thenReturn("168");
+        when(mockFundingBalance.getBalance()).thenReturn("178");
 
         when(mockFundingAccount.getBalances()).thenReturn(new AccountResponse.Balance[]{mockFundingBalance});
     }

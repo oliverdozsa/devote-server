@@ -10,6 +10,10 @@ import java.time.Instant;
 
 public class VotingRequestMaker {
     public static CreateVotingRequest createValidVotingRequest() {
+        return createValidVotingRequestEndingAt(Instant.now().plus(Duration.ofDays(1)));
+    }
+
+    public static CreateVotingRequest createValidVotingRequestEndingAt(Instant withEndDate) {
         InputStream sampleVotingIS = VotingControllerTest.class
                 .getClassLoader().getResourceAsStream("voting-request-base.json");
 
@@ -26,9 +30,8 @@ public class VotingRequestMaker {
         votingRequest.setEncryptedUntil(tomorrow);
 
         Instant startDate = Instant.now();
-        Instant endDate = Instant.now().plus(Duration.ofDays(1));
         votingRequest.setStartDate(startDate);
-        votingRequest.setEndDate(endDate);
+        votingRequest.setEndDate(withEndDate);
 
         return votingRequest;
     }

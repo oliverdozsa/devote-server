@@ -8,6 +8,7 @@ import requests.CommissionInitRequest;
 import requests.CreateVotingRequest;
 import security.UserInfoCollectorForTest;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 
@@ -32,12 +33,20 @@ public class VoteCreationUtils {
 
     public String createValidVotingWithWaitingForFullInit() throws InterruptedException {
         String votingId = createValidVoting();
-        Thread.sleep(8 * 1000);
+        Thread.sleep(3 * 1000);
         return votingId;
     }
 
     public String createValidVoting() {
         CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("alice@mail.com", "doe@where.de", "some@one.com"));
+
+        return createVoting(createVotingRequest);
+    }
+
+    public String createValidVotingEndingInSecondsFromNow(int seconds) {
+        CreateVotingRequest createVotingRequest = VotingRequestMaker.createValidVotingRequestEndingAt(Instant.now().plus(Duration.ofSeconds(seconds)));
         createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
         createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("alice@mail.com", "doe@where.de", "some@one.com"));
 

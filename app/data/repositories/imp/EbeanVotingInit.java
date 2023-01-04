@@ -23,8 +23,8 @@ public class EbeanVotingInit {
         voting.setTitle(request.getTitle());
         voting.setVotesCap(request.getVotesCap());
         voting.setCreatedAt(Instant.now());
-        voting.setFundingAccountPublic(request.getFundingAccountPublic());
-        voting.setFundingAccountSecret(request.getFundingAccountSecret());
+        voting.setUserGivenFundingAccountPublic(request.getFundingAccountPublic());
+        voting.setUserGivenFundingAccountSecret(request.getFundingAccountSecret());
         voting.setOnTestNetwork(request.getUseTestnet() != null && request.getUseTestnet());
 
         setEncryption(request, voting);
@@ -60,11 +60,13 @@ public class EbeanVotingInit {
     }
 
     private static void setAuthOptionEmails(CreateVotingRequest request, JpaVoting voting) {
-        List<JpaVoter> voters = request.getAuthorizationEmailOptions().stream()
-                .map(EbeanVotingInit::emailToVoter)
-                .collect(Collectors.toList());
+        if (request.getAuthorizationEmailOptions() != null) {
+            List<JpaVoter> voters = request.getAuthorizationEmailOptions().stream()
+                    .map(EbeanVotingInit::emailToVoter)
+                    .collect(Collectors.toList());
 
-        voting.setVoters(voters);
+            voting.setVoters(voters);
+        }
     }
 
     public static JpaVotingPoll toVotingPoll(CreatePollRequest pollRequest) {

@@ -224,7 +224,7 @@ public class CommissionControllerTest {
     public void testCreateTransaction() throws InterruptedException {
         // Given
         VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
-        Thread.sleep(15 * 1000); // So that some channel accounts are present.
+        Thread.sleep(3 * 1000); // So that some channel accounts are present.
         String message = voteCreationUtils.createMessage(votingInitData.votingId, "someAccountId");
 
         CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", message, votingInitData.votingId);
@@ -248,7 +248,7 @@ public class CommissionControllerTest {
     public void testDoubleCreateTransactionRequest() throws InterruptedException {
         // Given
         VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
-        Thread.sleep(15 * 1000); // So that some channel accounts are present.
+        Thread.sleep(3 * 1000); // So that some channel accounts are present.
         String message = voteCreationUtils.createMessage(votingInitData.votingId, "someAccountId");
 
         CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", message, votingInitData.votingId);
@@ -276,7 +276,7 @@ public class CommissionControllerTest {
     public void testGetTransaction() throws InterruptedException {
         // Given
         VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
-        Thread.sleep(15 * 1000); // So that some channel accounts are present.
+        Thread.sleep(3 * 1000); // So that some channel accounts are present.
         String message = voteCreationUtils.createMessage(votingInitData.votingId, "someAccountId");
 
         CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", message, votingInitData.votingId);

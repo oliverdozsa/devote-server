@@ -3,10 +3,7 @@ package tasks.votingblockchaininit;
 import com.fasterxml.jackson.databind.JsonNode;
 import data.entities.JpaVoting;
 import devote.blockchain.BlockchainFactory;
-import devote.blockchain.api.Account;
-import devote.blockchain.api.ChannelGenerator;
-import devote.blockchain.api.ChannelGeneratorAccountOperation;
-import devote.blockchain.api.DistributionAndBallotAccountOperation;
+import devote.blockchain.api.*;
 import ipfs.data.IpfsVoting;
 import ipfs.data.IpfsVotingFromJpaVoting;
 import play.Logger;
@@ -32,7 +29,7 @@ public class VotingBlockchainInitTask implements Runnable {
 
     @Override
     public void run() {
-        try{
+        try {
             JpaVoting voting = getANotFullyInitializedVoting();
             if (voting == null) {
                 logger.info("[VOTING-BC-INIT-TASK-{}]: Could not find a voting to init.", taskId);
@@ -67,6 +64,7 @@ public class VotingBlockchainInitTask implements Runnable {
     }
 
     private void initializeOnBlockchain(JpaVoting voting) {
+        createInternalFundingAccountIfNeeded(voting);
         createChannelGeneratorAccountsIfNeeded(voting);
         createDistributionAndBallotAccountsIfNeeded(voting);
 
@@ -74,9 +72,32 @@ public class VotingBlockchainInitTask implements Runnable {
         saveVotingToIpfs(voting);
     }
 
+    private void createInternalFundingAccountIfNeeded(JpaVoting voting) {
+        if (voting.getFundingAccountPublic() != null) {
+            logger.info("[VOTING-BC-INIT-TASK-{}]: internal funding account has already been created {}", taskId, voting.getId());
+            return;
+        }
+
+        FundingAccountOperation fundingAccountOperation = getFundingAccountOperation(voting.getNetwork());
+        if (voting.getOnTestNetwork()) {
+            fundingAccountOperation.useTestNet();
+        }
+
+        Account userGivenFunding = new Account(voting.getUserGivenFundingAccountPublic(), voting.getUserGivenFundingAccountSecret());
+        Account internalFunding = fundingAccountOperation.createAndFundInternalFrom(userGivenFunding);
+
+        context.votingRepository.internalFundingAccountCreated(voting.getId(), internalFunding);
+    }
+
     private void createChannelGeneratorAccountsIfNeeded(JpaVoting voting) {
         if (voting.getChannelGeneratorAccounts() != null && voting.getChannelGeneratorAccounts().size() > 0) {
             logger.info("[VOTING-BC-INIT-TASK-{}]: channel generators have already been created for voting {}", taskId, voting.getId());
+            return;
+        }
+
+        if (voting.getFundingAccountPublic() == null) {
+            logger.warn("[VOTING-BC-INIT-TASK-{}]: Internal funding account is not created yet for voting {}; " +
+                    "not creating channel generator accounts yet.", taskId, voting.getId());
             return;
         }
 
@@ -98,6 +119,12 @@ public class VotingBlockchainInitTask implements Runnable {
             return;
         }
 
+        if (voting.getFundingAccountPublic() == null) {
+            logger.warn("[VOTING-BC-INIT-TASK-{}]: Internal funding account is not created yet for voting {}; " +
+                    "not creating channel generator accounts yet.", taskId, voting.getId());
+            return;
+        }
+
         logger.info("[VOTING-BC-INIT-TASK-{}]: creating ballot and distribution generators for voting {}", taskId, voting.getId());
 
         DistributionAndBallotAccountOperation distributionAndBallotAccountOperation = getDistributionAndBallotOperation(voting.getNetwork());
@@ -112,6 +139,14 @@ public class VotingBlockchainInitTask implements Runnable {
     }
 
     private void saveVotingToIpfs(JpaVoting voting) {
+        if (voting.getFundingAccountPublic() == null ||
+                (voting.getChannelGeneratorAccounts() != null && voting.getChannelGeneratorAccounts().size() == 0) ||
+                voting.getDistributionAccountPublic() == null) {
+            logger.warn("[VOTING-BC-INIT-TASK-{}]: Voting is not initialized on blockchain completely {}; " +
+                    "not not saving voting to IPFS yet.", taskId, voting.getId());
+            return;
+        }
+
         // Ipfs voting is used for checking whether voting is initialized, or not, so we don't check
         // for existence of voting in IPFS.
         JpaVoting freshVoting = context.votingRepository.single(voting.getId());
@@ -121,6 +156,11 @@ public class VotingBlockchainInitTask implements Runnable {
         JsonNode ipfsVotingJson = Json.toJson(ipfsVoting);
         String cid = context.ipfsApi.saveJson(ipfsVotingJson);
         context.votingRepository.votingSavedToIpfs(freshVoting.getId(), cid);
+    }
+
+    private FundingAccountOperation getFundingAccountOperation(String network) {
+        BlockchainFactory blockchainFactory = context.blockchains.getFactoryByNetwork(network);
+        return blockchainFactory.createFundingAccountOperation();
     }
 
     private ChannelGeneratorAccountOperation getChannelGeneratorOperation(String network) {

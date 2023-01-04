@@ -29,8 +29,6 @@ public class VotingBlockchainOperations {
 
     private static final Logger.ALogger logger = Logger.of(VotingBlockchainOperations.class);
 
-    private static final int MAX_TOKEN_TITLE_BASE_LENGTH = 8;
-
     @Inject
     public VotingBlockchainOperations(
             BlockchainExecutionContext blockchainExecContext,

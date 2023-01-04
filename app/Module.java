@@ -3,20 +3,11 @@ import com.google.inject.name.Names;
 import com.typesafe.config.Config;
 import data.operations.CommissionDbOperations;
 import data.operations.PageOfVotingsDbOperations;
-import data.repositories.ChannelProgressRepository;
-import data.repositories.CommissionRepository;
-import data.repositories.PageOfVotingsRepository;
-import data.repositories.VoterRepository;
-import data.repositories.imp.EbeanCommissionRepository;
-import data.repositories.imp.EbeanChannelProgressRepository;
-import data.repositories.imp.EbeanPageOfVotingRepository;
-import data.repositories.imp.EbeanServerProvider;
-import data.repositories.imp.EbeanVoterRepository;
+import data.repositories.*;
+import data.repositories.imp.*;
 import devote.blockchain.operations.CommissionBlockchainOperations;
 import devote.blockchain.operations.VotingBlockchainOperations;
 import data.operations.VotingDbOperations;
-import data.repositories.VotingRepository;
-import data.repositories.imp.EbeanVotingRepository;
 import devote.blockchain.Blockchains;
 import com.google.inject.AbstractModule;
 import formatters.FormattersProvider;
@@ -44,6 +35,7 @@ import services.commissionsubs.userinfo.UserInfoCollector;
 import services.commissionsubs.userinfo.UserInfoCollectorForScaleTesting;
 import tasks.TasksOrganizer;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
+import tasks.refundbalances.RefundBalancesTaskContext;
 import tasks.votingblockchaininit.VotingBlockchainInitTaskContext;
 
 import java.security.Security;
@@ -75,6 +67,8 @@ public class Module extends AbstractModule {
         bind(CommissionRepository.class).to(EbeanCommissionRepository.class).asEagerSingleton();
         bind(VoterRepository.class).to(EbeanVoterRepository.class).asEagerSingleton();
         bind(PageOfVotingsRepository.class).to(EbeanPageOfVotingRepository.class).asEagerSingleton();
+        bind(ChannelAccountRepository.class).to(EbeanChannelAccountRepository.class).asEagerSingleton();
+        bind(ChannelGeneratorAccountRepository.class).to(EbeanChannelGeneratorAccountRepository.class).asEagerSingleton();
 
         // Operations
         bind(VotingDbOperations.class).asEagerSingleton();
@@ -90,6 +84,7 @@ public class Module extends AbstractModule {
         // Tasks
         bind(ChannelAccountBuilderTaskContext.class).asEagerSingleton();
         bind(VotingBlockchainInitTaskContext.class).asEagerSingleton();
+        bind(RefundBalancesTaskContext.class).asEagerSingleton();
         bind(TasksOrganizer.class).asEagerSingleton();
 
         // Auth

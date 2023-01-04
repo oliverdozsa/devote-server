@@ -12,8 +12,6 @@ import org.stellar.sdk.SetOptionsOperation;
 import org.stellar.sdk.Transaction;
 import play.Logger;
 
-import java.math.BigDecimal;
-
 import static devote.blockchain.stellar.StellarUtils.toAccount;
 import static devote.blockchain.stellar.StellarUtils.toAssetAmount;
 import static utils.StringUtils.redactWithEllipsis;

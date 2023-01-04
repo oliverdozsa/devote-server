@@ -29,6 +29,9 @@ public class JpaVotingChannelAccount {
     @Column(name = "is_consumed")
     private boolean isConsumed;
 
+    @Column(name = "is_refunded")
+    private boolean isRefunded;
+
     @ManyToOne
     @JoinColumn(name = "voting_id")
     private JpaVoting voting;
@@ -71,5 +74,13 @@ public class JpaVotingChannelAccount {
 
     public void setConsumed(boolean consumed) {
         isConsumed = consumed;
+    }
+
+    public boolean isRefunded() {
+        return isRefunded;
+    }
+
+    public void setRefunded(boolean refunded) {
+        isRefunded = refunded;
     }
 }
