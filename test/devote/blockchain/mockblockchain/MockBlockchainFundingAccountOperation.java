@@ -22,7 +22,7 @@ public class MockBlockchainFundingAccountOperation implements FundingAccountOper
     }
 
     @Override
-    public Account createAndFundInternalFrom(Account userGivenFunding) {
+    public Account createAndFundInternalFrom(Account userGivenFunding, long votesCap) {
         return new Account("internalFundingSecret", "internalFundingPublic");
     }
 }

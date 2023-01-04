@@ -83,8 +83,8 @@ public class VotingBlockchainInitTask implements Runnable {
             fundingAccountOperation.useTestNet();
         }
 
-        Account userGivenFunding = new Account(voting.getUserGivenFundingAccountPublic(), voting.getUserGivenFundingAccountSecret());
-        Account internalFunding = fundingAccountOperation.createAndFundInternalFrom(userGivenFunding);
+        Account userGivenFunding = new Account(voting.getUserGivenFundingAccountSecret(), voting.getUserGivenFundingAccountPublic());
+        Account internalFunding = fundingAccountOperation.createAndFundInternalFrom(userGivenFunding, voting.getVotesCap());
 
         context.votingRepository.internalFundingAccountCreated(voting.getId(), internalFunding);
     }

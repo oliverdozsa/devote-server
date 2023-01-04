@@ -57,17 +57,12 @@ public class StellarFundingAccountOperation implements FundingAccountOperation {
     }
 
     @Override
-    public Account createAndFundInternalFrom(Account userGivenFunding) {
+    public Account createAndFundInternalFrom(Account userGivenFunding, long votesCap) {
         KeyPair userGivenFundingKeyPair = StellarUtils.fromAccount(userGivenFunding);
 
-        Server server = serverAndNetwork.getServer();
-
         try {
-            AccountResponse accountResponse = server.accounts().account(userGivenFunding.publik);
-            BigDecimal userGivenFundingBalance = StellarUtils.findXlmBalance(accountResponse.getBalances());
-
             KeyPair internalFundingKeyPair = KeyPair.random();
-            String internalFundingStartingBalance = Long.toString(userGivenFundingBalance.longValue() - 10);
+            String internalFundingStartingBalance = Long.toString(getMinRequiredBalanceBasedOn(votesCap));
 
             logger.info("[STELLAR]: About to create internal funding account {} with balance {}",
                     redactWithEllipsis(internalFundingKeyPair.getAccountId(), 5),

@@ -106,7 +106,7 @@ public class StellarFundingAccountOperationTest {
         // Given
         // When
         Account internalFundingAccount = operation
-                .createAndFundInternalFrom(toAccount(userGivenKeyPair));
+                .createAndFundInternalFrom(toAccount(userGivenKeyPair), 42);
 
         // Then
         assertThat(internalFundingAccount, notNullValue());
