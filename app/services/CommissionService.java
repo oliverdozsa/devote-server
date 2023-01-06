@@ -7,6 +7,7 @@ import data.operations.VoterDbOperations;
 import data.operations.VotingDbOperations;
 import devote.blockchain.operations.CommissionBlockchainOperations;
 import exceptions.BusinessLogicViolationException;
+import exceptions.ForbiddenException;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import play.Logger;
 import requests.CommissionCreateTransactionRequest;
@@ -26,6 +27,7 @@ import services.commissionsubs.CommissionStoredDataSubService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.time.Instant;
 import java.util.concurrent.CompletionStage;
 
 import static crypto.RsaKeyUtils.publicKeyToPemString;
@@ -58,12 +60,16 @@ public class CommissionService {
 
     public CompletionStage<CommissionInitResponse> init(CommissionInitRequest request, VerifiedJwt jwt) {
         logger.info("init(): request = {}, userId = {}", request.toString(), jwt.getUserId());
-        return initSubService.init(request, jwt);
+
+        return checkIfVotingIsEndedOrNotStartedStaged(request.getVotingId())
+                .thenCompose(v -> initSubService.init(request, jwt));
     }
 
     public CompletionStage<CommissionSignEnvelopeResponse> signEnvelope(CommissionSignEnvelopeRequest request, VerifiedJwt jwt, String votingId) {
         logger.info("signEnvelope(): user: {}, voting: {}", jwt.getUserId(), votingId);
-        return signEnvelopeSubService.signEnvelope(request, jwt, votingId);
+
+        return checkIfVotingIsEndedOrNotStartedStaged(votingId)
+                .thenCompose(v -> signEnvelopeSubService.signEnvelope(request, jwt, votingId));
     }
 
     public CompletionStage<CommissionAccountCreationResponse> createTransaction(CommissionCreateTransactionRequest request) {
@@ -78,7 +84,9 @@ public class CommissionService {
 
     public CompletionStage<CommissionGetEnvelopeSignatureResponse> signatureOfEnvelope(String votingId, String user) {
         logger.info("signatureOfEnvelope(): votingId = {}, user = {}", votingId, user);
-        return storedDataSubService.signatureOfEnvelope(votingId, user);
+
+        return checkIfVotingIsEndedOrNotStartedStaged(votingId)
+                .thenCompose(v -> storedDataSubService.signatureOfEnvelope(votingId, user));
     }
 
     public CompletionStage<CommissionGetAnEncryptedChoiceResponse> encryptChoice(String votingId, String choice) {
@@ -86,6 +94,7 @@ public class CommissionService {
         return checkIfChoiceIsValid(choice)
                 .thenCompose(v -> Base62Conversions.decodeAsStage(votingId))
                 .thenCompose(votingDbOperations::single)
+                .thenApply(CommissionService::checkIfVotingIsEndedOrNotStarted)
                 .thenApply(CommissionService::getEncryptionKeyFrom)
                 .thenApply(key -> EncryptedVoting.encryptChoice(key, choice))
                 .thenApply(CommissionService::toResponse);
@@ -94,7 +103,7 @@ public class CommissionService {
 
     private static CompletionStage<Void> checkIfChoiceIsValid(String choice) {
         return runAsync(() -> {
-            if(choice == null || !choice.matches("^([0-9]{4})+$")) {
+            if (choice == null || !choice.matches("^([0-9]{4})+$")) {
                 throw new BusinessLogicViolationException("Choice must not be empty, and must consist of 4 numeric characters");
             }
         });
@@ -114,5 +123,24 @@ public class CommissionService {
         CommissionGetAnEncryptedChoiceResponse response = new CommissionGetAnEncryptedChoiceResponse();
         response.setResult(encryptedOptionCode);
         return response;
+    }
+
+    private CompletionStage<JpaVoting> checkIfVotingIsEndedOrNotStartedStaged(String votingId) {
+        return Base62Conversions.decodeAsStage(votingId)
+                .thenCompose(votingDbOperations::single)
+                .thenApply(CommissionService::checkIfVotingIsEndedOrNotStarted);
+    }
+
+    private static JpaVoting checkIfVotingIsEndedOrNotStarted(JpaVoting voting) {
+        Instant now = Instant.now();
+        if (voting.getEndDate().compareTo(now) < 0) {
+            throw new ForbiddenException("Voting is ended.");
+        }
+
+        if (voting.getStartDate().compareTo(now) > 0) {
+            throw new ForbiddenException("Voting hasn't started yet.");
+        }
+
+        return voting;
     }
 }

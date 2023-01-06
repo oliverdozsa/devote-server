@@ -6,6 +6,7 @@ public class PageVotingItemResponse {
     private String title;
     private String id;
 
+    private Instant startDate;
     private Instant endDate;
     private Instant encryptedUntil;
 
@@ -49,5 +50,13 @@ public class PageVotingItemResponse {
 
     public void setInitialized(boolean initialized) {
         isInitialized = initialized;
+    }
+
+    public Instant getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Instant startDate) {
+        this.startDate = startDate;
     }
 }

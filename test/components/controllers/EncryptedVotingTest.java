@@ -5,6 +5,8 @@ import components.clients.CommissionTestClient;
 import components.clients.VotingTestClient;
 import components.extractors.GenericDataFromResult;
 import crypto.AesCtrCrypto;
+import data.entities.JpaVoting;
+import io.ebean.Ebean;
 import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;
 import org.junit.Before;
@@ -22,6 +24,7 @@ import services.commissionsubs.userinfo.UserInfoCollector;
 import units.ipfs.api.imp.MockIpfsApi;
 import units.ipfs.api.imp.MockIpfsProvider;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 
@@ -185,5 +188,49 @@ public class EncryptedVotingTest {
         // Then
         JsonNode votingResultJson = GenericDataFromResult.jsonOf(votingResult);
         assertTrue(votingResultJson.get("decryptionKey").isNull());
+    }
+
+    @Test
+    public void testEncryptChoiceForVoting_VotingEnded() throws InterruptedException {
+        // Given
+        String votingId = voteCreationUtils.createValidVoting();
+
+        endVoting(votingId);
+
+        // When
+        String aChoice = "0142";
+        Result anEncryptedOptionResult = testClient.encryptChoice(votingId, aChoice);
+
+        // Then
+        assertThat(statusOf(anEncryptedOptionResult), equalTo(FORBIDDEN));
+    }
+
+    @Test
+    public void testEncryptChoiceForVoting_VotingNotStartedYet() throws InterruptedException {
+        // Given
+        String votingId = voteCreationUtils.createValidVoting();
+
+        startVotingInFuture(votingId);
+
+        // When
+        String aChoice = "0142";
+        Result anEncryptedOptionResult = testClient.encryptChoice(votingId, aChoice);
+
+        // Then
+        assertThat(statusOf(anEncryptedOptionResult), equalTo(FORBIDDEN));
+    }
+
+    private void endVoting(String votingIdEncoded) {
+        long votingId = Base62Conversions.decode(votingIdEncoded);
+        JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
+        voting.setEndDate(Instant.now().minus(Duration.ofSeconds(15)));
+        Ebean.update(voting);
+    }
+
+    private void startVotingInFuture(String votingIdEncoded) {
+        long votingId = Base62Conversions.decode(votingIdEncoded);
+        JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
+        voting.setStartDate(Instant.now().plus(Duration.ofSeconds(15)));
+        Ebean.update(voting);
     }
 }

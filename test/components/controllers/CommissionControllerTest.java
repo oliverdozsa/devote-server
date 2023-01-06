@@ -4,6 +4,8 @@ import components.clients.CommissionTestClient;
 import components.clients.VotingTestClient;
 import controllers.routes;
 import data.entities.JpaCommissionSession;
+import data.entities.JpaVoter;
+import data.entities.JpaVoting;
 import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
 import io.ipfs.api.IPFS;
@@ -22,11 +24,13 @@ import rules.RuleChainForTests;
 import security.UserInfoCollectorForTest;
 import security.jwtverification.JwtVerificationForTests;
 import security.jwtverification.JwtVerification;
+import services.Base62Conversions;
 import services.commissionsubs.userinfo.UserInfoCollector;
 import units.ipfs.api.imp.MockIpfsApi;
 import units.ipfs.api.imp.MockIpfsProvider;
 import utils.JwtTestUtils;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -363,5 +367,125 @@ public class CommissionControllerTest {
 
         // Then
         assertThat(statusOf(result.http), equalTo(NOT_FOUND));
+    }
+
+    @Test
+    public void testInit_VotingEnded() throws InterruptedException {
+        // Given
+        String votingId = voteCreationUtils.createValidVotingWithWaitingForFullInit();
+        CommissionInitRequest initRequest = new CommissionInitRequest();
+        initRequest.setVotingId(votingId);
+
+        endVoting(votingId);
+
+        // When
+        Result result = testClient.init(initRequest, "Alice");
+
+        // Then
+        assertThat(statusOf(result), equalTo(FORBIDDEN));
+    }
+
+    @Test
+    public void testSignEnvelope_VotingEnded() throws InterruptedException {
+        // Given
+        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
+        String message = voteCreationUtils.createMessage(votingInitData.votingId, "someAccountId");
+
+        endVoting(votingInitData.votingId);
+
+        // When
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", message, votingInitData.votingId);
+
+        // Then
+        assertThat(statusOf(result.http), equalTo(FORBIDDEN));
+    }
+
+    @Test
+    public void testGetEnvelopeSignature_VotingEnded() throws InterruptedException {
+        // Given
+        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
+        String message = voteCreationUtils.createMessage(votingInitData.votingId, "someAccountId");
+
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", message, votingInitData.votingId);
+        assertThat(statusOf(result.http), equalTo(OK));
+        String envelopeSignatureOnSign = envelopeSignatureOf(result.http);
+
+        assertThat(envelopeSignatureOnSign, notNullValue());
+        assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
+
+        endVoting(votingInitData.votingId);
+
+        // When
+        Result getEnvelopeSignatureResult = testClient.envelopeSignatureOf(votingInitData.votingId, "Alice");
+
+        // Then
+        assertThat(statusOf(getEnvelopeSignatureResult), equalTo(FORBIDDEN));
+    }
+
+    @Test
+    public void testInit_VotingNotStartedYet() throws InterruptedException {
+        // Given
+        String votingId = voteCreationUtils.createValidVotingWithWaitingForFullInit();
+        CommissionInitRequest initRequest = new CommissionInitRequest();
+        initRequest.setVotingId(votingId);
+
+        startVotingInFuture(votingId);
+
+        // When
+        Result result = testClient.init(initRequest, "Alice");
+
+        // Then
+        assertThat(statusOf(result), equalTo(FORBIDDEN));
+    }
+
+    @Test
+    public void testSignEnvelope_VotingNotStartedYet() throws InterruptedException {
+        // Given
+        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
+        String message = voteCreationUtils.createMessage(votingInitData.votingId, "someAccountId");
+
+        startVotingInFuture(votingInitData.votingId);
+
+        // When
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", message, votingInitData.votingId);
+
+        // Then
+        assertThat(statusOf(result.http), equalTo(FORBIDDEN));
+    }
+
+    @Test
+    public void testGetEnvelopeSignature_VotingNotStartedYet() throws InterruptedException {
+        // Given
+        VoteCreationUtils.InitData votingInitData = voteCreationUtils.initVotingFor("Alice");
+        String message = voteCreationUtils.createMessage(votingInitData.votingId, "someAccountId");
+
+        CommissionTestClient.SignOnEnvelopeResult result = testClient.signOnEnvelope(votingInitData.publicKey, "Alice", message, votingInitData.votingId);
+        assertThat(statusOf(result.http), equalTo(OK));
+        String envelopeSignatureOnSign = envelopeSignatureOf(result.http);
+
+        assertThat(envelopeSignatureOnSign, notNullValue());
+        assertThat(envelopeSignatureOf(result.http).length(), greaterThan(0));
+
+        startVotingInFuture(votingInitData.votingId);
+
+        // When
+        Result getEnvelopeSignatureResult = testClient.envelopeSignatureOf(votingInitData.votingId, "Alice");
+
+        // Then
+        assertThat(statusOf(getEnvelopeSignatureResult), equalTo(FORBIDDEN));
+    }
+
+    private void endVoting(String votingIdEncoded) {
+        long votingId = Base62Conversions.decode(votingIdEncoded);
+        JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
+        voting.setEndDate(Instant.now().minus(Duration.ofSeconds(15)));
+        Ebean.update(voting);
+    }
+
+    private void startVotingInFuture(String votingIdEncoded) {
+        long votingId = Base62Conversions.decode(votingIdEncoded);
+        JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
+        voting.setStartDate(Instant.now().plus(Duration.ofSeconds(15)));
+        Ebean.update(voting);
     }
 }
