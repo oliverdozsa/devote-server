@@ -13,11 +13,9 @@ import play.inject.guice.GuiceApplicationBuilder;
 import play.mvc.Result;
 import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
-import security.UserInfoCollectorForTest;
 import security.jwtverification.JwtVerification;
 import security.jwtverification.JwtVerificationForTests;
 import services.Base62Conversions;
-import services.commissionsubs.userinfo.UserInfoCollector;
 import units.ipfs.api.imp.MockIpfsApi;
 import units.ipfs.api.imp.MockIpfsProvider;
 
@@ -54,7 +52,6 @@ public class VotingControllerTest {
         GuiceApplicationBuilder applicationBuilder = new GuiceApplicationBuilder()
                 .overrides(bind(IpfsApi.class).to(MockIpfsApi.class))
                 .overrides(bind(IPFS.class).toProvider(MockIpfsProvider.class))
-                .overrides(bind(UserInfoCollector.class).to(UserInfoCollectorForTest.class))
                 .overrides((bind(JwtVerification.class).to(JwtVerificationForTests.class)));
 
         ruleChainForTests = new RuleChainForTests(applicationBuilder);
@@ -75,7 +72,7 @@ public class VotingControllerTest {
         createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
 
         // When
-        Result result = client.createVoting(createVotingRequest, "Alice");
+        Result result = client.createVoting(createVotingRequest, "Alice", "alice@mail.com");
 
         // Then
         assertThat(statusOf(result), equalTo(CREATED));
@@ -117,7 +114,7 @@ public class VotingControllerTest {
         createVotingRequest.setEndDate(Instant.now().minus(Duration.ofDays(1)));
 
         // When
-        Result result = client.createVoting(createVotingRequest, "Alice");
+        Result result = client.createVoting(createVotingRequest, "Alice", "alice@mail.com");
 
         // Then
         assertThat(statusOf(result), equalTo(BAD_REQUEST));
@@ -134,7 +131,7 @@ public class VotingControllerTest {
         createVotingRequest.setEndDate(Instant.now().minus(Duration.ofDays(1)));
 
         // When
-        Result result = client.createVoting(createVotingRequest, "Alice");
+        Result result = client.createVoting(createVotingRequest, "Alice", "alice@mail.com");
 
         // Then
         assertThat(statusOf(result), equalTo(BAD_REQUEST));
@@ -150,7 +147,7 @@ public class VotingControllerTest {
         createVotingRequest.getPolls().get(0).getOptions().get(1).setCode(1);
 
         // When
-        Result result = client.createVoting(createVotingRequest, "Alice");
+        Result result = client.createVoting(createVotingRequest, "Alice", "alice@mail.com");
 
         // Then
         assertThat(statusOf(result), equalTo(BAD_REQUEST));
@@ -188,7 +185,38 @@ public class VotingControllerTest {
         createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
 
         // When
-        Result result = client.createVoting(createVotingRequest, "Alice");
+        Result result = client.createVoting(createVotingRequest, "Alice", "alice@mail.com");
+
+        // Then
+        assertThat(statusOf(result), equalTo(CREATED));
+        assertThat(result, hasLocationHeader());
+
+        String locationUrl = result.headers().get(LOCATION);
+        Result getByLocationResult = client.byLocation(locationUrl);
+
+        assertThat(statusOf(getByLocationResult), equalTo(OK));
+
+        JsonNode votingResponseJson = jsonOf(getByLocationResult);
+        assertTrue(votingResponseJson.get("distributionAccountId").isNull());
+        assertTrue(votingResponseJson.get("ballotAccountId").isNull());
+        assertTrue(votingResponseJson.get("issuerAccountId").isNull());
+
+        JsonNode polls = votingResponseJson.get("polls");
+        assertThat(polls.size(), equalTo(1));
+
+        JsonNode poll = polls.get(0);
+        assertThat(poll.get("index").asInt(), equalTo(1));
+    }
+
+    @Test
+    public void testCreateThenGetImmediately_UserIdOnly() {
+        // Given
+        CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
+
+        // When
+        Result result = client.createVoting(createVotingRequest, "Alice", "");
 
         // Then
         assertThat(statusOf(result), equalTo(CREATED));
@@ -220,14 +248,14 @@ public class VotingControllerTest {
         createVotingRequest.setVisibility(CreateVotingRequest.Visibility.PRIVATE);
 
         // When
-        Result result = client.createVoting(createVotingRequest, "Alice");
+        Result result = client.createVoting(createVotingRequest, "Alice", "alice@mail.com");
 
         // Then
         assertThat(statusOf(result), equalTo(CREATED));
         assertThat(result, hasLocationHeader());
 
         String locationUrl = result.headers().get(LOCATION);
-        Result getByLocationResult = client.byLocation(locationUrl, "Alice", new String[]{"voter", "vote-caller"});
+        Result getByLocationResult = client.byLocation(locationUrl, "Alice", new String[]{"voter", "vote-caller"}, "alice@mail.com");
 
         assertThat(statusOf(getByLocationResult), equalTo(OK));
     }
@@ -241,14 +269,14 @@ public class VotingControllerTest {
         createVotingRequest.setVisibility(CreateVotingRequest.Visibility.PRIVATE);
 
         // When
-        Result result = client.createVoting(createVotingRequest, "Alice");
+        Result result = client.createVoting(createVotingRequest, "Alice", "alice@mail.com");
 
         // Then
         assertThat(statusOf(result), equalTo(CREATED));
         assertThat(result, hasLocationHeader());
 
         String locationUrl = result.headers().get(LOCATION);
-        Result getByLocationResult = client.byLocation(locationUrl, "Charlie", new String[]{"voter", "vote-caller"});
+        Result getByLocationResult = client.byLocation(locationUrl, "Charlie", new String[]{"voter", "vote-caller"}, "charlie@mail.com");
 
         assertThat(statusOf(getByLocationResult), equalTo(FORBIDDEN));
     }
@@ -262,14 +290,14 @@ public class VotingControllerTest {
         createVotingRequest.setVisibility(CreateVotingRequest.Visibility.PRIVATE);
 
         // When
-        Result result = client.createVoting(createVotingRequest, "Alice");
+        Result result = client.createVoting(createVotingRequest, "Alice", "alice@mail.com");
 
         // Then
         assertThat(statusOf(result), equalTo(CREATED));
         assertThat(result, hasLocationHeader());
 
         String locationUrl = result.headers().get(LOCATION);
-        Result getByLocationResult = client.byLocation(locationUrl, "Bob", new String[]{"voter", "vote-caller"});
+        Result getByLocationResult = client.byLocation(locationUrl, "Bob", new String[]{"voter", "vote-caller"}, "bob@mail.com");
 
         assertThat(statusOf(getByLocationResult), equalTo(OK));
     }
@@ -283,14 +311,14 @@ public class VotingControllerTest {
         createVotingRequest.setVisibility(CreateVotingRequest.Visibility.PRIVATE);
 
         // When
-        Result result = client.createVoting(createVotingRequest, "Alice");
+        Result result = client.createVoting(createVotingRequest, "Alice", "alice@mail.com");
 
         // Then
         assertThat(statusOf(result), equalTo(CREATED));
         assertThat(result, hasLocationHeader());
 
         String locationUrl = result.headers().get(LOCATION);
-        Result getByLocationResult = client.byLocation(locationUrl, "Bob", new String[]{"cook", "driver"});
+        Result getByLocationResult = client.byLocation(locationUrl, "Bob", new String[]{"cook", "driver"}, "bob@mail.com");
 
         assertThat(statusOf(getByLocationResult), equalTo(FORBIDDEN));
     }
@@ -304,14 +332,14 @@ public class VotingControllerTest {
         createVotingRequest.setVisibility(CreateVotingRequest.Visibility.UNLISTED);
 
         // When
-        Result result = client.createVoting(createVotingRequest, "Alice");
+        Result result = client.createVoting(createVotingRequest, "Alice", "alice@mail.com");
 
         // Then
         assertThat(statusOf(result), equalTo(CREATED));
         assertThat(result, hasLocationHeader());
 
         String locationUrl = result.headers().get(LOCATION);
-        Result getByLocationResult = client.byLocation(locationUrl, "Charlie", new String[]{"cook", "driver"});
+        Result getByLocationResult = client.byLocation(locationUrl, "Charlie", new String[]{"cook", "driver"}, "charlie@mail.com");
 
         assertThat(statusOf(getByLocationResult), equalTo(OK));
     }
@@ -325,7 +353,7 @@ public class VotingControllerTest {
         createVotingRequest.setUseTestnet(true);
 
         // When
-        Result result = client.createVoting(createVotingRequest, "Alice");
+        Result result = client.createVoting(createVotingRequest, "Alice", "alice@mail.com");
 
         // Then
         assertThat(statusOf(result), equalTo(CREATED));
@@ -350,7 +378,7 @@ public class VotingControllerTest {
         createVotingRequest.setVotesCap(221L);
 
         // When
-        Result result = client.createVoting(createVotingRequest, "Alice");
+        Result result = client.createVoting(createVotingRequest, "Alice", "alice@mail.com");
 
         // Then
         assertThat(statusOf(result), equalTo(BAD_REQUEST));
@@ -363,7 +391,7 @@ public class VotingControllerTest {
         createFirstVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
         createFirstVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
 
-        Result result = client.createVoting(createFirstVotingRequest, "Alice");
+        Result result = client.createVoting(createFirstVotingRequest, "Alice", "alice@mail.com");
         assertThat(statusOf(result), equalTo(CREATED));
         assertThat(result, hasLocationHeader());
 
@@ -372,7 +400,7 @@ public class VotingControllerTest {
         createSecondVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
 
         // When
-        result = client.createVoting(createSecondVotingRequest, "Alice");
+        result = client.createVoting(createSecondVotingRequest, "Alice", "alice@mail.com");
         assertThat(statusOf(result), equalTo(CREATED));
         assertThat(result, hasLocationHeader());
         assertVotersAreUnique();

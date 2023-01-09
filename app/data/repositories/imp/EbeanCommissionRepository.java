@@ -193,7 +193,7 @@ public class EbeanCommissionRepository implements CommissionRepository {
     private JpaCommissionSession find(String userId, Long votingId) {
         return ebeanServer.createQuery(JpaCommissionSession.class)
                 .where()
-                .eq("voter.userId", userId)
+                .eq("voter.voterIds.id", userId)
                 .eq("voting.id", votingId)
                 .findOne();
     }
@@ -227,7 +227,7 @@ public class EbeanCommissionRepository implements CommissionRepository {
     private JpaVoter findVoterWith(String userId) {
         return ebeanServer.createQuery(JpaVoter.class)
                 .where()
-                .eq("userId", userId)
+                .eq("voterIds.id", userId)
                 .findOne();
     }
 }

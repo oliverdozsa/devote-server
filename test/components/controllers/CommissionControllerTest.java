@@ -4,10 +4,8 @@ import components.clients.CommissionTestClient;
 import components.clients.VotingTestClient;
 import controllers.routes;
 import data.entities.JpaCommissionSession;
-import data.entities.JpaVoter;
 import data.entities.JpaVoting;
 import io.ebean.Ebean;
-import io.ebean.SqlUpdate;
 import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;
 import org.junit.Before;
@@ -21,11 +19,9 @@ import play.mvc.Result;
 import requests.CommissionCreateTransactionRequest;
 import requests.CommissionInitRequest;
 import rules.RuleChainForTests;
-import security.UserInfoCollectorForTest;
 import security.jwtverification.JwtVerificationForTests;
 import security.jwtverification.JwtVerification;
 import services.Base62Conversions;
-import services.commissionsubs.userinfo.UserInfoCollector;
 import units.ipfs.api.imp.MockIpfsApi;
 import units.ipfs.api.imp.MockIpfsProvider;
 import utils.JwtTestUtils;
@@ -63,7 +59,6 @@ public class CommissionControllerTest {
         GuiceApplicationBuilder applicationBuilder = new GuiceApplicationBuilder()
                 .overrides(bind(IpfsApi.class).to(MockIpfsApi.class))
                 .overrides(bind(IPFS.class).toProvider(MockIpfsProvider.class))
-                .overrides(bind(UserInfoCollector.class).to(UserInfoCollectorForTest.class))
                 .overrides((bind(JwtVerification.class).to(JwtVerificationForTests.class)));
 
         ruleChainForTests = new RuleChainForTests(applicationBuilder);
@@ -75,7 +70,6 @@ public class CommissionControllerTest {
         testClient = new CommissionTestClient(ruleChainForTests.getApplication());
         votingTestClient = new VotingTestClient(ruleChainForTests.getApplication());
         voteCreationUtils = new VoteCreationUtils(testClient, votingTestClient);
-        UserInfoCollectorForTest.setReturnValue(Json.parse("{\"sub\": \"Alice\", \"email\": \"alice@mail.com\", \"email_verified\": true}"));
     }
 
     @Test
@@ -141,7 +135,7 @@ public class CommissionControllerTest {
 
         JwtTestUtils jwtTestUtils = new JwtTestUtils(ruleChainForTests.getApplication().config());
         Date expiresAt = Date.from(Instant.now().minus(5, ChronoUnit.SECONDS));
-        String jwt = jwtTestUtils.createToken(expiresAt, "Some user");
+        String jwt = jwtTestUtils.createToken(expiresAt, "Some user", "some@mail.com");
         addJwtTokenTo(httpRequest, jwt);
 
         // When
@@ -195,7 +189,7 @@ public class CommissionControllerTest {
                 .uri(routes.CommissionController.init().url());
 
         JwtTestUtils jwtTestUtils = new JwtTestUtils(ruleChainForTests.getApplication().config());
-        String jwt = jwtTestUtils.createToken("Alice");
+        String jwt = jwtTestUtils.createToken("Alice", "alice@mail.com");
         addJwtTokenTo(httpRequest, jwt);
 
         // When
@@ -214,7 +208,7 @@ public class CommissionControllerTest {
                 .uri(routes.CommissionController.signEnvelope("42").url());
 
         JwtTestUtils jwtTestUtils = new JwtTestUtils(ruleChainForTests.getApplication().config());
-        String jwt = jwtTestUtils.createToken("Alice");
+        String jwt = jwtTestUtils.createToken("Alice", "alice@mail.com");
         addJwtTokenTo(httpRequest, jwt);
 
         // When

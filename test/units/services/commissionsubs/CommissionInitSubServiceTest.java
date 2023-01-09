@@ -42,10 +42,9 @@ public class CommissionInitSubServiceTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
-        when(mockVerifiedJwt.getAccessToken()).thenReturn("someAccessToken");
         when(mockVerifiedJwt.getUserId()).thenReturn("Alice");
         when(mockVerifiedJwt.hasVoterRole()).thenReturn(true);
-        when(mockVoterDbOperations.collectUserInfoIfNeeded(anyString(), anyString())).thenReturn(doNothing());
+        when(mockVoterDbOperations.userAuthenticated(anyString(), anyString())).thenReturn(doNothing());
 
         initSubService = new CommissionInitSubService("somePublicKey", mockCommissionDbOperations, mockVoterDbOperations);
     }

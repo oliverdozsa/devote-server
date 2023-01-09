@@ -27,7 +27,7 @@ public class VotingsPagingTestClient extends TestClient {
     public Result votingsOfVoteCaller(int offset, int limit, String userId) {
         Http.RequestBuilder httpRequest = votingsOfVoteCallerBase(offset, limit);
 
-        String jwt = jwtTestUtils.createToken(userId);
+        String jwt = jwtTestUtils.createToken(userId, userId + "@mail.com");
         addJwtTokenTo(httpRequest, jwt);
 
         return route(application, httpRequest);
@@ -36,7 +36,7 @@ public class VotingsPagingTestClient extends TestClient {
     public Result votingsOfVoteCaller(int offset, int limit, String userId, String[] roles) {
         Http.RequestBuilder httpRequest = votingsOfVoteCallerBase(offset, limit);
 
-        String jwt = jwtTestUtils.createToken(userId, roles);
+        String jwt = jwtTestUtils.createToken(userId, roles, userId + "@mail.com");
         addJwtTokenTo(httpRequest, jwt);
 
         return route(application, httpRequest);
@@ -45,7 +45,7 @@ public class VotingsPagingTestClient extends TestClient {
     public Result votingsOfVoter(int offset, int limit, String userId) {
         Http.RequestBuilder httpRequest = votingsOfVoterBase(offset, limit);
 
-        String jwt = jwtTestUtils.createToken(userId);
+        String jwt = jwtTestUtils.createToken(userId, userId + "@mail.com");
         addJwtTokenTo(httpRequest, jwt);
 
         return route(application, httpRequest);
@@ -54,7 +54,7 @@ public class VotingsPagingTestClient extends TestClient {
     public Result votingsOfVoter(int offset, int limit, String userId, String[] roles) {
         Http.RequestBuilder httpRequest = votingsOfVoterBase(offset, limit);
 
-        String jwt = jwtTestUtils.createToken(userId, roles);
+        String jwt = jwtTestUtils.createToken(userId, roles, userId + "@mail.com");
         addJwtTokenTo(httpRequest, jwt);
 
         return route(application, httpRequest);

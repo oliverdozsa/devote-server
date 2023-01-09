@@ -6,8 +6,6 @@ import play.Application;
 import play.libs.Json;
 import play.mvc.Http;
 import play.mvc.Result;
-import security.UserInfoCollectorForTest;
-import utils.JwtTestUtils;
 
 import static play.mvc.Http.HeaderNames.CONTENT_TYPE;
 import static play.test.Helpers.*;
@@ -18,15 +16,14 @@ public class VotingTestClient extends TestClient {
         super(application);
     }
 
-    public Result createVoting(CreateVotingRequest votingRequest, String userId) {
-        UserInfoCollectorForTest.setReturnValueFor(userId);
+    public Result createVoting(CreateVotingRequest votingRequest, String userId, String email) {
         Http.RequestBuilder httpRequest = new Http.RequestBuilder()
                 .method(POST)
                 .bodyJson(Json.toJson(votingRequest))
                 .header(CONTENT_TYPE, Http.MimeTypes.JSON)
                 .uri(routes.VotingController.create().url());
 
-        String jwt = jwtTestUtils.createToken(userId);
+        String jwt = jwtTestUtils.createToken(userId, email);
         addJwtTokenTo(httpRequest, jwt);
 
         return route(application, httpRequest, 75 * 1000);

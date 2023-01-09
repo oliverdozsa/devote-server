@@ -8,7 +8,6 @@ import data.entities.Visibility;
 import io.ebean.Ebean;
 import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;
-import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,10 +15,8 @@ import org.junit.rules.RuleChain;
 import play.inject.guice.GuiceApplicationBuilder;
 import play.mvc.Result;
 import rules.RuleChainForTests;
-import security.UserInfoCollectorForTest;
 import security.jwtverification.JwtVerification;
 import security.jwtverification.JwtVerificationForTests;
-import services.commissionsubs.userinfo.UserInfoCollector;
 import units.ipfs.api.imp.MockIpfsApi;
 import units.ipfs.api.imp.MockIpfsProvider;
 
@@ -46,7 +43,6 @@ public class VotingsPagingTest {
         GuiceApplicationBuilder applicationBuilder = new GuiceApplicationBuilder()
                 .overrides(bind(IpfsApi.class).to(MockIpfsApi.class))
                 .overrides(bind(IPFS.class).toProvider(MockIpfsProvider.class))
-                .overrides(bind(UserInfoCollector.class).to(UserInfoCollectorForTest.class))
                 .overrides((bind(JwtVerification.class).to(JwtVerificationForTests.class)));
 
         ruleChainForTests = new RuleChainForTests(applicationBuilder);
@@ -85,10 +81,7 @@ public class VotingsPagingTest {
     @DataSet(value = "datasets/yml/votings-paging.yml", disableConstraints = true, cleanBefore = true)
     public void testGetVotingsOfVoterPaging() {
         // Given
-        UserInfoCollectorForTest.setReturnValueFor("Alice");
-
         // When
-
         Result result = client.votingsOfVoter(0, 11, "Alice");
 
         // Then
@@ -107,8 +100,6 @@ public class VotingsPagingTest {
     @DataSet(value = "datasets/yml/votings-paging.yml", disableConstraints = true, cleanBefore = true)
     public void testGetVotingsOfVoterPaging_NoProperRole() {
         // Given
-        UserInfoCollectorForTest.setReturnValueFor("Alice");
-
         // When
         Result result = client.votingsOfVoter(0, 11, "Alice", new String[]{});
 
@@ -120,8 +111,6 @@ public class VotingsPagingTest {
     @DataSet(value = "datasets/yml/votings-paging.yml", disableConstraints = true, cleanBefore = true)
     public void testGetVoterVotingsPaging_NotAParticipantInAnyVote() {
         // Given
-        UserInfoCollectorForTest.setReturnValueFor("Someone");
-
         // When
         Result result = client.votingsOfVoter(0, 11, "Someone");
 
@@ -136,8 +125,6 @@ public class VotingsPagingTest {
     @DataSet(value = "datasets/yml/votings-paging.yml", disableConstraints = true, cleanBefore = true)
     public void testVoteCallersVotePaging() {
         // Given
-        UserInfoCollectorForTest.setReturnValueFor("Bob");
-
         // When
         Result result = client.votingsOfVoteCaller(0, 11, "Bob");
 
@@ -157,8 +144,6 @@ public class VotingsPagingTest {
     @DataSet(value = "datasets/yml/votings-paging.yml", disableConstraints = true, cleanBefore = true)
     public void testVoteCallersVotePaging_NoProperRole() {
         // Given
-        UserInfoCollectorForTest.setReturnValueFor("Bob");
-
         // When
         Result result = client.votingsOfVoteCaller(0, 11, "Bob", new String[]{});
 
@@ -170,8 +155,6 @@ public class VotingsPagingTest {
     @DataSet(value = "datasets/yml/votings-paging.yml", disableConstraints = true, cleanBefore = true)
     public void testVoteCallersVotePaging_ParticipantButNotCreatedAnyVote() {
         // Given
-        UserInfoCollectorForTest.setReturnValueFor("Eva");
-
         // When
         Result result = client.votingsOfVoteCaller(0, 11, "Eva");
 

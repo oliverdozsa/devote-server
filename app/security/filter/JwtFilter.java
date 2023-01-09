@@ -53,8 +53,6 @@ public class JwtFilter extends Filter {
     private final VoterDbOperations voterDbOperations;
 
     private final String jwtFilterTag;
-    private final String headerAuthorization;
-    private final String bearer;
     private final String jwtOptionalFilterTag;
 
     @Inject
@@ -64,8 +62,6 @@ public class JwtFilter extends Filter {
         this.voterDbOperations = voterDbOperations;
 
         jwtFilterTag = config.getString("devote.jwt.filtertag");
-        headerAuthorization = config.getString("devote.jwt.header.authorization");
-        bearer = config.getString("devote.jwt.header.bearer");
         jwtOptionalFilterTag = config.getString("devote.jwt.optionalfiltertag");
     }
 
@@ -82,8 +78,8 @@ public class JwtFilter extends Filter {
             return nextFilter.apply(requestHeader);
         }
 
-        Optional<String> authHeader = requestHeader.getHeaders().get(headerAuthorization);
-        boolean isBearerNotPresent = !authHeader.filter(ah -> ah.contains(bearer)).isPresent();
+        Optional<String> authHeader = requestHeader.getHeaders().get("Authorization");
+        boolean isBearerNotPresent = !authHeader.filter(ah -> ah.contains("Bearer ")).isPresent();
         boolean shouldOptionallyFilter = modifiers.contains(jwtOptionalFilterTag);
 
         if (isBearerNotPresent && shouldOptionallyFilter) {
@@ -95,16 +91,16 @@ public class JwtFilter extends Filter {
             return CompletableFuture.completedFuture(forbidden(ERR_AUTHORIZATION_HEADER));
         }
 
-        String token = authHeader.map(ah -> ah.replace(bearer, "")).orElse("");
+        String token = authHeader.map(ah -> ah.replace("Bearer ", "")).orElse("");
         Either<JwtCenter.Error, VerifiedJwt> res = jwtCenter.verify(token);
 
         if (res.left.isPresent()) {
             return CompletableFuture.completedFuture(forbidden(res.left.get().toString()));
         }
 
-        String accessToken = res.right.get().getAccessToken();
+        String email = res.right.get().getEmail().toLowerCase();
         String userId = res.right.get().getUserId();
-        return voterDbOperations.collectUserInfoIfNeeded(accessToken, userId)
+        return voterDbOperations.userAuthenticated(email, userId)
                 .thenCompose(v -> nextFilter.apply(requestHeader.withAttrs(requestHeader.attrs().put(Attrs.VERIFIED_JWT, res.right.get()))));
     }
 

@@ -41,7 +41,7 @@ public class EbeanPageOfVotingRepository implements PageOfVotingsRepository {
     public Page<JpaVoting> votingsOfVoter(int offset, int limit, String userId) {
         Query<JpaVoting> query = ebeanServer.createQuery(JpaVoting.class);
 
-        query.where().eq("voters.userId", userId);
+        query.where().eq("voters.voterIds.id", userId);
         offsetAndLimit(query, offset, limit);
 
         return toPage(query);

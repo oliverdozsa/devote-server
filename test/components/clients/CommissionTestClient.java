@@ -28,7 +28,7 @@ public class CommissionTestClient extends TestClient {
                 .header(CONTENT_TYPE, Http.MimeTypes.JSON)
                 .uri(routes.CommissionController.init().url());
 
-        String jwt = jwtTestUtils.createToken(userId);
+        String jwt = jwtTestUtils.createToken(userId, userId + "@mail.com");
         addJwtTokenTo(httpRequest, jwt);
 
         return route(application, httpRequest);
@@ -48,7 +48,7 @@ public class CommissionTestClient extends TestClient {
                 .header(CONTENT_TYPE, Http.MimeTypes.JSON)
                 .uri(routes.CommissionController.signEnvelope(votingId).url());
 
-        String jwt = jwtTestUtils.createToken(userId);
+        String jwt = jwtTestUtils.createToken(userId, userId + "@mail.com");
         addJwtTokenTo(httpRequest, jwt);
         Result httpResult = route(application, httpRequest);
         return new SignOnEnvelopeResult(httpResult, rsaEnvelope);
@@ -92,7 +92,7 @@ public class CommissionTestClient extends TestClient {
                 .header(CONTENT_TYPE, Http.MimeTypes.JSON)
                 .uri(routes.CommissionController.getEnvelopeSignature(votingId).url());
 
-        String jwt = jwtTestUtils.createToken(user);
+        String jwt = jwtTestUtils.createToken(user, user + "@mail.com");
         addJwtTokenTo(httpRequest, jwt);
 
         return route(application, httpRequest);

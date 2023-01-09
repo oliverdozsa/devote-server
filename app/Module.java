@@ -1,4 +1,5 @@
 import com.auth0.jwk.JwkProvider;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.google.inject.name.Names;
 import com.typesafe.config.Config;
 import data.operations.CommissionDbOperations;
@@ -23,6 +24,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import play.Environment;
 import play.data.format.Formatters;
 import security.JwtCenter;
+import security.UuidAuthAlgorithmProvider;
 import security.jwtverification.Auth0JwtVerification;
 import security.jwtverification.JwkProviderProvider;
 import security.jwtverification.JwtVerification;
@@ -30,9 +32,6 @@ import security.jwtverification.JwtVerificationForScaleTesting;
 import services.CommissionService;
 import services.EnvelopKeyPairProvider;
 import services.VotingService;
-import services.commissionsubs.userinfo.Auth0UserInfoCollector;
-import services.commissionsubs.userinfo.UserInfoCollector;
-import services.commissionsubs.userinfo.UserInfoCollectorForScaleTesting;
 import tasks.TasksOrganizer;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
 import tasks.refundbalances.RefundBalancesTaskContext;
@@ -88,15 +87,16 @@ public class Module extends AbstractModule {
         bind(TasksOrganizer.class).asEagerSingleton();
 
         // Auth
-        if(config.getBoolean("devote.scale.test.mode")) {
+        if (config.getBoolean("devote.scale.test.mode")) {
             bind(JwtVerification.class).to(JwtVerificationForScaleTesting.class).asEagerSingleton();
-            bind(UserInfoCollector.class).to(UserInfoCollectorForScaleTesting.class).asEagerSingleton();
         } else {
             bind(JwtVerification.class).to(Auth0JwtVerification.class).asEagerSingleton();
-            bind(UserInfoCollector.class).to(Auth0UserInfoCollector.class).asEagerSingleton();
         }
 
         bind(JwkProvider.class).toProvider(JwkProviderProvider.class).asEagerSingleton();
+        bind(Algorithm.class).annotatedWith(Names.named("uuidAuth"))
+                .toProvider(UuidAuthAlgorithmProvider.class)
+                .asEagerSingleton();
 
         // Other
         bind(AsymmetricCipherKeyPair.class).annotatedWith(Names.named("envelope"))

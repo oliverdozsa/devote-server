@@ -16,11 +16,9 @@ import org.junit.rules.RuleChain;
 import play.inject.guice.GuiceApplicationBuilder;
 import play.mvc.Result;
 import rules.RuleChainForTests;
-import security.UserInfoCollectorForTest;
 import security.jwtverification.JwtVerification;
 import security.jwtverification.JwtVerificationForTests;
 import services.Base62Conversions;
-import services.commissionsubs.userinfo.UserInfoCollector;
 import units.ipfs.api.imp.MockIpfsApi;
 import units.ipfs.api.imp.MockIpfsProvider;
 
@@ -52,7 +50,6 @@ public class EncryptedVotingTest {
         GuiceApplicationBuilder applicationBuilder = new GuiceApplicationBuilder()
                 .overrides(bind(IpfsApi.class).to(MockIpfsApi.class))
                 .overrides(bind(IPFS.class).toProvider(MockIpfsProvider.class))
-                .overrides(bind(UserInfoCollector.class).to(UserInfoCollectorForTest.class))
                 .overrides((bind(JwtVerification.class).to(JwtVerificationForTests.class)));
 
         ruleChainForTests = new RuleChainForTests(applicationBuilder);

@@ -10,16 +10,27 @@ import java.util.Set;
 public class VerifiedJwt {
     private final String userId;
     private final Set<String> roles;
-    private final String accessToken;
+    private final String email;
 
-    public VerifiedJwt(DecodedJWT decodedJWT, String accessToken, Config config) {
+    public VerifiedJwt(DecodedJWT decodedJWT, Config config) {
         this.userId = decodedJWT.getSubject();
-        this.accessToken = accessToken;
 
         String rolesClaim = config.getString("devote.jwt.roles.claim");
         List<String> rolesFromJwt = decodedJWT.getClaim(rolesClaim).asList(String.class);
 
         roles = new HashSet<>(rolesFromJwt);
+
+        String emailClaim = config.getString("devote.jwt.email.claim");
+        String emailVerifiedClaim = config.getString("devote.jwt.email.verified.claim");
+
+        String emailFromJwt = decodedJWT.getClaim(emailClaim).asString();
+        boolean isVerified = decodedJWT.getClaim(emailVerifiedClaim).asBoolean();
+
+        if(isVerified) {
+            email = emailFromJwt;
+        } else {
+            email = "";
+        }
     }
 
     public String getUserId() {
@@ -34,7 +45,7 @@ public class VerifiedJwt {
         return roles.contains("vote-caller");
     }
 
-    public String getAccessToken() {
-        return accessToken;
+    public String getEmail() {
+        return email;
     }
 }

@@ -3,13 +3,11 @@ package security.jwtverification;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import org.checkerframework.checker.units.qual.C;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class JwtVerificationForScaleTesting implements JwtVerification{
+public class JwtVerificationForScaleTesting implements JwtVerification {
     @Override
     public DecodedJWT verify(String token) {
         // Token is not really a jwt; it should merely be a merely an email string
@@ -105,62 +103,34 @@ public class JwtVerificationForScaleTesting implements JwtVerification{
 
         @Override
         public Claim getClaim(String name) {
-            return new Claim() {
-                @Override
-                public boolean isNull() {
-                    return false;
-                }
+            if (name.equals("https://devote.network/roles")) {
+                return new EmptyClaim() {
+                    @Override
+                    public <T> List<T> asList(Class<T> tClazz) throws JWTDecodeException {
+                        return (List) (Arrays.asList("voter", "vote-caller"));
+                    }
+                };
+            }
 
-                @Override
-                public Boolean asBoolean() {
-                    return null;
-                }
+            if (name.equals("https://devote.network/email")) {
+                return new EmptyClaim() {
+                    @Override
+                    public String asString() {
+                        return email;
+                    }
+                };
+            }
 
-                @Override
-                public Integer asInt() {
-                    return null;
-                }
+            if (name.equals("https://devote.network/email-verified")) {
+                return new EmptyClaim() {
+                    @Override
+                    public Boolean asBoolean() {
+                        return true;
+                    }
+                };
+            }
 
-                @Override
-                public Long asLong() {
-                    return null;
-                }
-
-                @Override
-                public Double asDouble() {
-                    return null;
-                }
-
-                @Override
-                public String asString() {
-                    return null;
-                }
-
-                @Override
-                public Date asDate() {
-                    return null;
-                }
-
-                @Override
-                public <T> T[] asArray(Class<T> tClazz) throws JWTDecodeException {
-                    return null;
-                }
-
-                @Override
-                public <T> List<T> asList(Class<T> tClazz) throws JWTDecodeException {
-                    return (List)Arrays.asList("voter", "vote-caller");
-                }
-
-                @Override
-                public Map<String, Object> asMap() throws JWTDecodeException {
-                    return null;
-                }
-
-                @Override
-                public <T> T as(Class<T> tClazz) throws JWTDecodeException {
-                    return null;
-                }
-            };
+            return new EmptyClaim();
         }
 
         @Override
@@ -168,4 +138,64 @@ public class JwtVerificationForScaleTesting implements JwtVerification{
             return null;
         }
     }
+
+    private static class EmptyClaim implements Claim {
+
+        @Override
+        public boolean isNull() {
+            return false;
+        }
+
+        @Override
+        public Boolean asBoolean() {
+            return null;
+        }
+
+        @Override
+        public Integer asInt() {
+            return null;
+        }
+
+        @Override
+        public Long asLong() {
+            return null;
+        }
+
+        @Override
+        public Double asDouble() {
+            return null;
+        }
+
+        @Override
+        public String asString() {
+            return null;
+        }
+
+        @Override
+        public Date asDate() {
+            return null;
+        }
+
+        @Override
+        public <T> T[] asArray(Class<T> tClazz) throws JWTDecodeException {
+            return null;
+        }
+
+        @Override
+        public <T> List<T> asList(Class<T> tClazz) throws JWTDecodeException {
+            return null;
+        }
+
+        @Override
+        public Map<String, Object> asMap() throws JWTDecodeException {
+            return null;
+        }
+
+        @Override
+        public <T> T as(Class<T> tClazz) throws JWTDecodeException {
+            return null;
+        }
+    }
 }
+
+

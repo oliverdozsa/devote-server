@@ -15,10 +15,8 @@ import requests.CommissionCreateTransactionRequest;
 import requests.CommissionInitRequest;
 import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
-import security.UserInfoCollectorForTest;
 import security.jwtverification.JwtVerification;
 import security.jwtverification.JwtVerificationForTests;
-import services.commissionsubs.userinfo.UserInfoCollector;
 import smokes.fixtures.BlockchainTestNet;
 import smokes.fixtures.StellarBlockchainTestNet;
 
@@ -57,7 +55,6 @@ public class ConductVotingSmokeTest {
 
     public ConductVotingSmokeTest() {
         GuiceApplicationBuilder applicationBuilder = new GuiceApplicationBuilder()
-                .overrides(bind(UserInfoCollector.class).to(UserInfoCollectorForTest.class))
                 .overrides((bind(JwtVerification.class).to(JwtVerificationForTests.class)));
 
         ruleChainForTests = new RuleChainForTests(applicationBuilder);
@@ -123,7 +120,6 @@ public class ConductVotingSmokeTest {
         Thread.sleep(30 * 1000);
         CommissionInitRequest initRequest = new CommissionInitRequest();
         initRequest.setVotingId(votingId);
-        UserInfoCollectorForTest.setReturnValueFor(userId);
 
         // When
         Result result = testClient.init(initRequest, userId);
@@ -150,7 +146,7 @@ public class ConductVotingSmokeTest {
         createVotingRequest.setFundingAccountSecret(funding.secret);
         createVotingRequest.setUseTestnet(true);
 
-        Result result = votingTestClient.createVoting(createVotingRequest, "Alice");
+        Result result = votingTestClient.createVoting(createVotingRequest, "Alice", "alice@mail.com");
         assertThat(statusOf(result), equalTo(CREATED));
         assertThat(result, hasLocationHeader());
 

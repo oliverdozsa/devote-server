@@ -6,7 +6,6 @@ import play.libs.Json;
 import play.mvc.Result;
 import requests.CommissionInitRequest;
 import requests.CreateVotingRequest;
-import security.UserInfoCollectorForTest;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -72,7 +71,7 @@ public class VoteCreationUtils {
     }
 
     public String createVoting(CreateVotingRequest createVotingRequest) {
-        Result result = votingTestClient.createVoting(createVotingRequest, "Alice");
+        Result result = votingTestClient.createVoting(createVotingRequest, "Alice", "alice@mail.com");
         assertThat(statusOf(result), equalTo(CREATED));
         assertThat(result, hasLocationHeader());
 
@@ -88,7 +87,6 @@ public class VoteCreationUtils {
         String votingId = createValidVotingWithWaitingForFullInit();
         CommissionInitRequest initRequest = new CommissionInitRequest();
         initRequest.setVotingId(votingId);
-        UserInfoCollectorForTest.setReturnValue(Json.parse("{\"sub\": \"Alice\", \"email\": \"alice@mail.com\", \"email_verified\": true}"));
 
         // When
         Result result = testClient.init(initRequest, userId);

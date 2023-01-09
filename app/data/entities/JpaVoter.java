@@ -1,32 +1,15 @@
 package data.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(
-        name = "voter",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"user_id", "email"})
-        }
-)
+@Table(name = "voter")
 public class JpaVoter {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-
-    @Column(name = "user_id")
-    private String userId;
 
     @Column(name = "email")
     private String email;
@@ -39,13 +22,8 @@ public class JpaVoter {
     )
     private List<JpaVoting> votings;
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+    @OneToMany(mappedBy = "voter", cascade = {CascadeType.REMOVE})
+    private List<JpaVoterUserId> voterIds;
 
     public String getEmail() {
         return email;

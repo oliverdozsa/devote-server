@@ -6,7 +6,6 @@ import data.entities.JpaVotingChannelAccount;
 import data.repositories.CommissionRepository;
 import executioncontexts.DatabaseExecutionContext;
 import play.Logger;
-import services.commissionsubs.userinfo.UserInfoCollector;
 
 import javax.inject.Inject;
 import java.util.Optional;
@@ -19,18 +18,15 @@ import static utils.StringUtils.redactWithEllipsis;
 public class CommissionDbOperations {
     private final CommissionRepository commissionRepository;
     private final DatabaseExecutionContext dbExecContext;
-    private final UserInfoCollector userInfoCollector;
 
     private static final Logger.ALogger logger = Logger.of(CommissionDbOperations.class);
 
     @Inject
     public CommissionDbOperations(
             CommissionRepository commissionRepository,
-            DatabaseExecutionContext dbExecContext,
-            UserInfoCollector userInfoCollector) {
+            DatabaseExecutionContext dbExecContext) {
         this.commissionRepository = commissionRepository;
         this.dbExecContext = dbExecContext;
-        this.userInfoCollector = userInfoCollector;
     }
 
     public CompletionStage<Boolean> doesSessionExistForUserInVoting(Long votingId, String userId) {

@@ -3,7 +3,6 @@ package components.clients;
 import play.Application;
 import play.mvc.Http;
 import play.mvc.Result;
-import security.UserInfoCollectorForTest;
 import utils.JwtTestUtils;
 
 import static play.mvc.Http.HttpVerbs.GET;
@@ -27,13 +26,12 @@ class TestClient {
         return route(application, request);
     }
 
-    public Result byLocation(String url, String userId, String[] roles) {
-        UserInfoCollectorForTest.setReturnValueFor(userId);
+    public Result byLocation(String url, String userId, String[] roles, String email) {
         Http.RequestBuilder request = new Http.RequestBuilder()
                 .method(GET)
                 .uri(url);
 
-        String jwt = jwtTestUtils.createToken(userId, roles);
+        String jwt = jwtTestUtils.createToken(userId, roles, email);
         addJwtTokenTo(request, jwt);
 
         return route(application, request);
