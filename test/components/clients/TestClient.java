@@ -32,6 +32,14 @@ class TestClient {
                 .uri(url);
 
         String jwt = jwtTestUtils.createToken(userId, roles, email);
+        return byLocation(url, jwt);
+    }
+
+    public Result byLocation(String url, String jwt) {
+        Http.RequestBuilder request = new Http.RequestBuilder()
+                .method(GET)
+                .uri(url);
+
         addJwtTokenTo(request, jwt);
 
         return route(application, request);

@@ -23,3 +23,6 @@ GET     /castvote/envlSignature/:votingId           controllers.CommissionContro
 
 # Other
 GET     /encryptchoice/:votingId/:choice            controllers.CommissionController.getAnEncryptedChoice(votingId: String, choice: String)
+
+# Token auth
+GET    /tokenauth/:token                            controllers.TokenAuthController.auth(token: String)
