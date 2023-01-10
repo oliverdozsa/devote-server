@@ -23,4 +23,9 @@ public class VotingResponseFromResult {
         JsonNode votingResponseJson = GenericDataFromResult.jsonOf(result);
         return votingResponseJson.get("isOnTestNetwork").asBoolean();
     }
+
+    public static String titleOf(Result result) {
+        JsonNode votingResponseJson = GenericDataFromResult.jsonOf(result);
+        return votingResponseJson.get("title").asText();
+    }
 }

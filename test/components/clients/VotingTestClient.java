@@ -36,4 +36,14 @@ public class VotingTestClient extends TestClient {
 
         return route(application, httpRequest);
     }
+
+    public Result single(String votingId, String jwt) {
+        Http.RequestBuilder httpRequest = new Http.RequestBuilder()
+                .method(GET)
+                .uri(routes.VotingController.single(votingId).url());
+
+        addJwtTokenTo(httpRequest, jwt);
+
+        return route(application, httpRequest);
+    }
 }

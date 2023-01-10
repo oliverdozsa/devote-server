@@ -61,6 +61,8 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
 
     private Boolean useTestnet;
 
+    private boolean sendInvites;
+
     public String getNetwork() {
         return network;
     }
@@ -220,6 +222,14 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
         this.fundingAccountSecret = fundingAccountSecret;
     }
 
+    public boolean isSendInvites() {
+        return sendInvites;
+    }
+
+    public void setSendInvites(boolean sendInvites) {
+        this.sendInvites = sendInvites;
+    }
+
     @Override
     public String toString() {
         return "CreateVotingRequest{" +
@@ -234,8 +244,10 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
                 ", authorizationEmailOptions=" + authorizationEmailOptions +
                 ", polls=" + polls +
                 ", visibility=" + visibility +
-                ", fundingAccountPublic='" + StringUtils.redactWithEllipsis(fundingAccountPublic, 5) + '\'' +
-                ", fundingAccountSecret='***'" +
+                ", fundingAccountPublic='" + fundingAccountPublic + '\'' +
+                ", fundingAccountSecret='" + StringUtils.redactWithEllipsis(fundingAccountSecret, 5) + '\'' +
+                ", useTestnet=" + useTestnet +
+                ", sendInvites=" + sendInvites +
                 '}';
     }
 
