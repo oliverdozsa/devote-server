@@ -3,10 +3,12 @@ package components.controllers;
 import components.clients.CommissionTestClient;
 import components.clients.TokenAuthTestClient;
 import components.clients.VotingTestClient;
+import components.clients.VotingsPagingTestClient;
 import data.entities.JpaAuthToken;
 import io.ebean.Ebean;
 import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,6 +27,7 @@ import java.util.Arrays;
 import static components.controllers.VotingRequestMaker.createValidVotingRequest;
 import static components.extractors.GenericDataFromResult.statusOf;
 import static components.extractors.TokenAuthResponseFromResult.jwtOf;
+import static components.extractors.VotingPagingItemResponsesFromResult.votingIdsOf;
 import static components.extractors.VotingResponseFromResult.titleOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,6 +46,7 @@ public class TokenAuthVotingTest {
     private VotingTestClient votingTestClient;
     private VoteCreationUtils voteCreationUtils;
     private TokenAuthTestClient tokenAuthTestClient;
+    private VotingsPagingTestClient votingsPagingTestClient;
 
     private String authTokenForAliceForFirstVoting;
     private String votingIdOfFirst;
@@ -63,6 +67,8 @@ public class TokenAuthVotingTest {
         tokenAuthTestClient = new TokenAuthTestClient(ruleChainForTests.getApplication());
         commissionTestClient = new CommissionTestClient(ruleChainForTests.getApplication());
         votingTestClient = new VotingTestClient(ruleChainForTests.getApplication());
+        votingsPagingTestClient = new VotingsPagingTestClient(ruleChainForTests.getApplication());
+
         voteCreationUtils = new VoteCreationUtils(commissionTestClient, votingTestClient);
 
         setupVotingsAndToken();
@@ -100,13 +106,20 @@ public class TokenAuthVotingTest {
     }
 
     @Test
-    public void testAccessingVotesViaToken() {
+    public void testAccessingVotingsViaToken() {
         // Given
-        // When
-        // Then
+        Result result = tokenAuthTestClient.auth(authTokenForAliceForFirstVoting);
+        assertThat(statusOf(result), equalTo(OK));
 
-        // TODO
-        fail();
+        String jwt = jwtOf(result);
+
+        // Given
+        Result votingsResult = votingsPagingTestClient.votingsOfVoterWithRawJwt(0, 10, jwt);
+
+        // Then
+        assertThat(statusOf(votingsResult), equalTo(OK));
+        assertThat(votingIdsOf(votingsResult).size(), Matchers.equalTo(1));
+        assertThat(votingIdsOf(votingsResult).get(0), equalTo(votingIdOfFirst));
     }
 
     @Test
