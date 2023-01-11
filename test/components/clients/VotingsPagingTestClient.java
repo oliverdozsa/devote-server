@@ -46,15 +46,19 @@ public class VotingsPagingTestClient extends TestClient {
         Http.RequestBuilder httpRequest = votingsOfVoterBase(offset, limit);
 
         String jwt = jwtTestUtils.createToken(userId, userId + "@mail.com");
-        addJwtTokenTo(httpRequest, jwt);
-
-        return route(application, httpRequest);
+        return votingsOfVoterWithRawJwt(offset, limit, jwt);
     }
 
     public Result votingsOfVoter(int offset, int limit, String userId, String[] roles) {
         Http.RequestBuilder httpRequest = votingsOfVoterBase(offset, limit);
 
         String jwt = jwtTestUtils.createToken(userId, roles, userId + "@mail.com");
+        return votingsOfVoterWithRawJwt(offset, limit, jwt);
+    }
+
+    public Result votingsOfVoterWithRawJwt(int offset, int limit, String jwt) {
+        Http.RequestBuilder httpRequest = votingsOfVoterBase(offset, limit);
+
         addJwtTokenTo(httpRequest, jwt);
 
         return route(application, httpRequest);
