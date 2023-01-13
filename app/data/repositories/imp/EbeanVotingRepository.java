@@ -8,6 +8,7 @@ import devote.blockchain.api.Account;
 import io.ebean.EbeanServer;
 import play.Logger;
 import requests.CreateVotingRequest;
+import utils.StringUtils;
 
 import javax.inject.Inject;
 import java.time.Instant;
@@ -134,6 +135,8 @@ public class EbeanVotingRepository implements VotingRepository {
 
     @Override
     public void internalFundingAccountCreated(Long id, Account funding) {
+        logger.info("internalFundingAccountCreated(): id = {}, funding = {}", id, StringUtils.redactWithEllipsis(funding.publik, 5));
+
         JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
         voting.setFundingAccountPublic(funding.publik);
         voting.setFundingAccountSecret(funding.secret);
@@ -143,10 +146,33 @@ public class EbeanVotingRepository implements VotingRepository {
 
     @Override
     public void internalFundingAccountRefunded(Long id) {
+        logger.info("internalFundingAccountRefunded(): id = {}", id);
+
         JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
         voting.setInternalFundingRefunded(true);
 
         ebeanServer.update(voting);
+    }
+
+    @Override
+    public Optional<JpaVoting> findOneWithAuthTokenNeedsToBeCreated() {
+        logger.info("findOneWithAuthTokenNeedsToBeCreated()");
+
+        return ebeanServer.createQuery(JpaVoting.class)
+                .where()
+                .eq("isAuthTokenBased", true)
+                .eq("isAuthTokensNeedToBeCreated", true)
+                .findOneOrEmpty();
+    }
+
+    @Override
+    public void allAuthTokensCreated(Long id) {
+        logger.info("allAuthTokensCreated(): id = {}", id);
+
+        JpaVoting voting = ebeanServer.find(JpaVoting.class, id);
+        voting.setAuthTokensNeedToBeCreated(false);
+
+        ebeanServer.save(voting);
     }
 
     private JpaChannelGeneratorAccount fromChannelGenerator(ChannelGenerator channelGenerator) {

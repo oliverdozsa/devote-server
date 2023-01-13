@@ -307,6 +307,7 @@ public class TokenAuthVotingTest {
         createVotingRequest.setTitle("First voting");
 
         votingIdOfFirst = voteCreationUtils.createVoting(createVotingRequest);
+        Thread.sleep(3 * 1000);
 
         JpaAuthToken authToken = Ebean.createQuery(JpaAuthToken.class)
                 .where()

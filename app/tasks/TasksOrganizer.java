@@ -6,6 +6,8 @@ import play.Logger;
 import scala.concurrent.ExecutionContext;
 import tasks.channelaccounts.ChannelAccountBuilderTask;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
+import tasks.emailinvites.EmailInvitesTask;
+import tasks.emailinvites.EmailInvitesTaskContext;
 import tasks.refundbalances.RefundBalancesTask;
 import tasks.refundbalances.RefundBalancesTaskContext;
 import tasks.votingblockchaininit.VotingBlockchainInitTask;
@@ -24,13 +26,15 @@ public class TasksOrganizer {
     private final ChannelAccountBuilderTaskContext channelContext;
     private final VotingBlockchainInitTaskContext votingInitContext;
     private final RefundBalancesTaskContext refundBalancesContext;
+    private final EmailInvitesTaskContext emailInvitesTaskContext;
 
     private static final Logger.ALogger logger = Logger.of(TasksOrganizer.class);
 
     private final int initialDelaySecs;
     private final int channelTaskIntervalSecs;
     private final int votingInitTaskIntervalSecs;
-    private final int refundBalancesIntervalSecs ;
+    private final int refundBalancesTaskIntervalSecs;
+    private final int emailInvitesTaskIntervalSecs;
 
     @Inject
     public TasksOrganizer(
@@ -39,23 +43,27 @@ public class TasksOrganizer {
             ExecutionContext executionContext,
             ChannelAccountBuilderTaskContext channelContext,
             VotingBlockchainInitTaskContext votingInitContext,
-            RefundBalancesTaskContext refundBalancesContext) {
+            RefundBalancesTaskContext refundBalancesContext,
+            EmailInvitesTaskContext emailInvitesTaskContext) {
         this.actorSystem = actorSystem;
         this.executionContext = executionContext;
         this.channelContext = channelContext;
         this.votingInitContext = votingInitContext;
         this.refundBalancesContext = refundBalancesContext;
+        this.emailInvitesTaskContext = emailInvitesTaskContext;
 
         initialDelaySecs = config.getInt("devote.tasks.initial.delay.secs");
         channelTaskIntervalSecs = config.getInt("devote.tasks.channel.interval.secs");
         votingInitTaskIntervalSecs = config.getInt("devote.tasks.voting.init.interval.secs");
-        refundBalancesIntervalSecs = config.getInt("devote.tasks.refund.balances.interval.secs");
+        refundBalancesTaskIntervalSecs = config.getInt("devote.tasks.refund.balances.interval.secs");
+        emailInvitesTaskIntervalSecs = config.getInt("devote.tasks.email.invites.interval.secs");
 
         numberOfWorkers = config.getInt("devote.vote.buckets");
 
         initializeChannelBuilderTasks();
         initializeVotingInitTasks();
         initializeRefundBalancesTask();
+        initializeEmailInvitesTask();
     }
 
     private void initializeChannelBuilderTasks() {
@@ -78,7 +86,12 @@ public class TasksOrganizer {
 
     private void initializeRefundBalancesTask() {
         RefundBalancesTask task = new RefundBalancesTask(refundBalancesContext);
-        initialize(Collections.singletonList(task), "refund balances", refundBalancesIntervalSecs);
+        initialize(Collections.singletonList(task), "refund balances", refundBalancesTaskIntervalSecs);
+    }
+
+    private void initializeEmailInvitesTask() {
+        EmailInvitesTask task = new EmailInvitesTask(emailInvitesTaskContext);
+        initialize(Collections.singletonList(task), "email invites", emailInvitesTaskIntervalSecs);
     }
 
     private void initialize(List<Runnable> tasks, String name, long intervalSecs) {
