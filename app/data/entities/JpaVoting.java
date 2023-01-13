@@ -129,8 +129,8 @@ public class JpaVoting {
     @Column(name = "is_auth_token_based")
     private boolean isAuthTokenBased;
 
-    @Column(name = "are_auth_tokens_need_to_be_created")
-    private boolean areAuthTokensNeedToBeCreated;
+    @Column(name = "is_auth_tokens_need_to_be_created")
+    private boolean isAuthTokensNeedToBeCreated;
 
     public Long getId() {
         return id;
@@ -386,5 +386,13 @@ public class JpaVoting {
 
     public void setAuthTokenBased(boolean authTokenBased) {
         isAuthTokenBased = authTokenBased;
+    }
+
+    public boolean isAuthTokensNeedToBeCreated() {
+        return isAuthTokensNeedToBeCreated;
+    }
+
+    public void setAuthTokensNeedToBeCreated(boolean authTokensNeedToBeCreated) {
+        isAuthTokensNeedToBeCreated = authTokensNeedToBeCreated;
     }
 }

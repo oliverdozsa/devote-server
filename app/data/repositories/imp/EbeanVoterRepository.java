@@ -56,6 +56,8 @@ public class EbeanVoterRepository implements VoterRepository {
 
     @Override
     public List<JpaVoter> findThoseWhoNeedsAuthToken(Long votingId, int limit) {
+        logger.info("findThoseWhoNeedsAuthToken(): votingId = {}, limit = {}", votingId, limit);
+
         Query<JpaAuthToken> authTokensOfVotingQuery = ebeanServer.createQuery(JpaAuthToken.class)
                 .select("voter.id")
                 .where()
@@ -64,7 +66,6 @@ public class EbeanVoterRepository implements VoterRepository {
 
         return ebeanServer.createQuery(JpaVoter.class)
                 .where()
-                .eq("votings.isAuthTokenBased", true)
                 .eq("votings.id", votingId)
                 .not(in("id", authTokensOfVotingQuery))
                 .setMaxRows(limit)

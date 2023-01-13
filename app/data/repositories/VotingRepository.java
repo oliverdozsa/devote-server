@@ -21,4 +21,6 @@ public interface VotingRepository {
     void distributionAccountRefunded(Long id);
     void internalFundingAccountCreated(Long id, Account funding);
     void internalFundingAccountRefunded(Long id);
+    Optional<JpaVoting> findOneWithAuthTokenNeedsToBeCreated();
+    void allAuthTokensCreated(Long id);
 }

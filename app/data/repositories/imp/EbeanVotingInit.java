@@ -40,6 +40,13 @@ public class EbeanVotingInit {
 
         setIndices(voting);
 
+        if (request.isSendInvites()) {
+            voting.setAuthTokenBased(true);
+            boolean hasEmails = request.getAuthorizationEmailOptions() != null &&
+                    request.getAuthorizationEmailOptions().size() > 0;
+            voting.setAuthTokensNeedToBeCreated(hasEmails);
+        }
+
         return voting;
     }
 

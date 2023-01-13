@@ -35,6 +35,8 @@ import services.TokenAuthService;
 import services.VotingService;
 import tasks.TasksOrganizer;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
+import tasks.emailinvites.EmailInvitesTask;
+import tasks.emailinvites.EmailInvitesTaskContext;
 import tasks.refundbalances.RefundBalancesTaskContext;
 import tasks.votingblockchaininit.VotingBlockchainInitTaskContext;
 
@@ -87,6 +89,7 @@ public class Module extends AbstractModule {
         bind(ChannelAccountBuilderTaskContext.class).asEagerSingleton();
         bind(VotingBlockchainInitTaskContext.class).asEagerSingleton();
         bind(RefundBalancesTaskContext.class).asEagerSingleton();
+        bind(EmailInvitesTaskContext.class).asEagerSingleton();
         bind(TasksOrganizer.class).asEagerSingleton();
 
         // Auth
