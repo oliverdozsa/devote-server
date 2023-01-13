@@ -31,6 +31,7 @@ import security.jwtverification.JwtVerification;
 import security.jwtverification.JwtVerificationForScaleTesting;
 import services.CommissionService;
 import services.EnvelopKeyPairProvider;
+import services.TokenAuthService;
 import services.VotingService;
 import tasks.TasksOrganizer;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
@@ -68,6 +69,7 @@ public class Module extends AbstractModule {
         bind(PageOfVotingsRepository.class).to(EbeanPageOfVotingRepository.class).asEagerSingleton();
         bind(ChannelAccountRepository.class).to(EbeanChannelAccountRepository.class).asEagerSingleton();
         bind(ChannelGeneratorAccountRepository.class).to(EbeanChannelGeneratorAccountRepository.class).asEagerSingleton();
+        bind(TokenAuthRepository.class).to(EbeanTokenAuthRepository.class).asEagerSingleton();
 
         // Operations
         bind(VotingDbOperations.class).asEagerSingleton();
@@ -79,6 +81,7 @@ public class Module extends AbstractModule {
         // Services
         bind(VotingService.class).asEagerSingleton();
         bind(CommissionService.class).asEagerSingleton();
+        bind(TokenAuthService.class).asEagerSingleton();
 
         // Tasks
         bind(ChannelAccountBuilderTaskContext.class).asEagerSingleton();

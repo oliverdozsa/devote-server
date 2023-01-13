@@ -1,13 +1,18 @@
 package data.repositories.imp;
 
+import data.entities.JpaAuthToken;
 import data.entities.JpaVoter;
 import data.entities.JpaVoterUserId;
 import data.repositories.VoterRepository;
 import io.ebean.EbeanServer;
+import io.ebean.Query;
 import play.Logger;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Optional;
+
+import static io.ebean.Expr.in;
 
 public class EbeanVoterRepository implements VoterRepository {
     private final EbeanServer ebeanServer;
@@ -47,6 +52,23 @@ public class EbeanVoterRepository implements VoterRepository {
                 .findOne();
 
         return voter != null;
+    }
+
+    @Override
+    public List<JpaVoter> findThoseWhoNeedsAuthToken(Long votingId, int limit) {
+        Query<JpaAuthToken> authTokensOfVotingQuery = ebeanServer.createQuery(JpaAuthToken.class)
+                .select("voter.id")
+                .where()
+                .eq("voting.id", votingId)
+                .query();
+
+        return ebeanServer.createQuery(JpaVoter.class)
+                .where()
+                .eq("votings.isAuthTokenBased", true)
+                .eq("votings.id", votingId)
+                .not(in("id", authTokensOfVotingQuery))
+                .setMaxRows(limit)
+                .findList();
     }
 
     private void createVoterByEmailAndUserIdIfNeeded(String email, String userId) {

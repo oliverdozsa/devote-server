@@ -39,7 +39,7 @@ public class JwtCenter {
         }
     }
 
-    public String createUuidAuthJwt(String userId) {
+    public String createTokenAuthJwt(String userId) {
         String issuer = config.getString("devote.jwt.uuid.auth.issuer");
         int expiryMins = config.getInt("devote.jwt.uuid.auth.token.expiry.mins");
         String rolesClaim = config.getString("devote.jwt.roles.claim");

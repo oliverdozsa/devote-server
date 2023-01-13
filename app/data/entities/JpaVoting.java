@@ -126,6 +126,12 @@ public class JpaVoting {
     @Column(name = "is_internal_funding_refunded")
     private boolean isInternalFundingRefunded;
 
+    @Column(name = "is_auth_token_based")
+    private boolean isAuthTokenBased;
+
+    @Column(name = "are_auth_tokens_need_to_be_created")
+    private boolean areAuthTokensNeedToBeCreated;
+
     public Long getId() {
         return id;
     }
@@ -366,11 +372,19 @@ public class JpaVoting {
         this.userGivenFundingAccountSecret = userGivenFundingAccountSecret;
     }
 
-    public Boolean getInternalFundingRefunded() {
+    public boolean isInternalFundingRefunded() {
         return isInternalFundingRefunded;
     }
 
-    public void setInternalFundingRefunded(Boolean internalFundingRefunded) {
+    public void setInternalFundingRefunded(boolean internalFundingRefunded) {
         isInternalFundingRefunded = internalFundingRefunded;
+    }
+
+    public boolean isAuthTokenBased() {
+        return isAuthTokenBased;
+    }
+
+    public void setAuthTokenBased(boolean authTokenBased) {
+        isAuthTokenBased = authTokenBased;
     }
 }
