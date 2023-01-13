@@ -25,6 +25,9 @@ public class JpaVoter {
     @OneToMany(mappedBy = "voter", cascade = {CascadeType.REMOVE})
     private List<JpaVoterUserId> voterIds;
 
+    @OneToMany(mappedBy = "voter", cascade = {CascadeType.REMOVE})
+    private List<JpaAuthToken> authTokens;
+
     public String getEmail() {
         return email;
     }

@@ -5,6 +5,7 @@ import components.clients.TokenAuthTestClient;
 import components.clients.VotingTestClient;
 import components.clients.VotingsPagingTestClient;
 import data.entities.JpaAuthToken;
+import data.entities.JpaVoting;
 import io.ebean.Ebean;
 import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;
@@ -15,26 +16,34 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import play.inject.guice.GuiceApplicationBuilder;
 import play.mvc.Result;
+import requests.CommissionCreateTransactionRequest;
+import requests.CommissionInitRequest;
 import requests.CreateVotingRequest;
 import rules.RuleChainForTests;
 import security.jwtverification.JwtVerification;
 import security.jwtverification.JwtVerificationForTests;
+import services.Base62Conversions;
 import units.ipfs.api.imp.MockIpfsApi;
 import units.ipfs.api.imp.MockIpfsProvider;
+import utils.JwtTestUtils;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 
+import static asserts.DbAsserts.assertThatTransactionIsStoredFor;
 import static components.controllers.VotingRequestMaker.createValidVotingRequest;
+import static components.extractors.CommissionResponseFromResult.*;
 import static components.extractors.GenericDataFromResult.statusOf;
 import static components.extractors.TokenAuthResponseFromResult.jwtOf;
 import static components.extractors.VotingPagingItemResponsesFromResult.votingIdsOf;
 import static components.extractors.VotingResponseFromResult.titleOf;
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.isEmptyString;
 import static play.inject.Bindings.bind;
-import static play.mvc.Http.Status.FORBIDDEN;
-import static play.mvc.Http.Status.OK;
+import static play.mvc.Http.Status.*;
 
 public class TokenAuthVotingTest {
     @Rule
@@ -91,7 +100,7 @@ public class TokenAuthVotingTest {
     }
 
     @Test
-    public void testAccessingSingleVote_TokeIsForOtherVoting() {
+    public void testAccessingSingleVoteViaTokenButItIsForOtherVoting() {
         // Given
         Result result = tokenAuthTestClient.auth(authTokenForAliceForFirstVoting);
         assertThat(statusOf(result), equalTo(OK));
@@ -113,7 +122,7 @@ public class TokenAuthVotingTest {
 
         String jwt = jwtOf(result);
 
-        // Given
+        // When
         Result votingsResult = votingsPagingTestClient.votingsOfVoterWithRawJwt(0, 10, jwt);
 
         // Then
@@ -123,73 +132,170 @@ public class TokenAuthVotingTest {
     }
 
     @Test
-    public void castingVoteViaToken() {
+    public void testAccessingVotingsViaAuthAndTokenExistsForEmail() {
         // Given
         // When
-        // Then
+        Result result = votingsPagingTestClient.votingsOfVoter(0, 10, "Alice");
 
-        // TODO
-        fail();
+        // Then
+        assertThat(statusOf(result), equalTo(OK));
+        assertThat(votingIdsOf(result).size(), Matchers.equalTo(2));
     }
 
     @Test
-    public void testAccessingSingleVoteViaAuthAndTokenExistsForEmail() {
+    public void testAccessingSingleVotingViaAuthTokenExistsForEmail() {
         // Given
-        // When
-        // Then
+        String jwt = new JwtTestUtils(ruleChainForTests.getApplication().config())
+                .createToken("Alice", new String[]{"voter"}, "alice@mail.com");
 
-        // TODO
-        fail();
+        // When
+        Result singleVotingResult = votingTestClient.single(votingIdOfFirst, jwt);
+
+        // Then
+        assertThat(statusOf(singleVotingResult), equalTo(OK));
+        assertThat(titleOf(singleVotingResult), equalTo("First voting"));
     }
 
     @Test
-    public void testAccessingVotesViaAuthAndTokenExistsForEmail() {
+    public void createTransactionViaToken() {
         // Given
+        Result result = tokenAuthTestClient.auth(authTokenForAliceForFirstVoting);
+        assertThat(statusOf(result), equalTo(OK));
+
+        String jwt = jwtOf(result);
+
         // When
         // Then
 
-        // TODO
-        fail();
+        // Init
+        CommissionInitRequest initRequest = new CommissionInitRequest();
+        initRequest.setVotingId(votingIdOfFirst);
+
+        Result initResult = commissionTestClient.initWithJwt(initRequest, jwt);
+
+        assertThat(statusOf(initResult), equalTo(OK));
+
+        VoteCreationUtils.InitData initData = new VoteCreationUtils.InitData();
+        initData.votingId = votingIdOfFirst;
+        initData.publicKey = publicKeyOf(initResult);
+
+        // Sign envelope
+        String message = voteCreationUtils.createMessage(votingIdOfFirst, "someAccountId");
+
+        CommissionTestClient.SignOnEnvelopeResult signOnEnvelopeResult =
+                commissionTestClient.signOnEnvelopeWithJwt(initData.publicKey, jwt, message, initData.votingId);
+        assertThat(statusOf(signOnEnvelopeResult.http), equalTo(OK));
+        assertThat(envelopeSignatureOf(signOnEnvelopeResult.http), notNullValue());
+        assertThat(envelopeSignatureOf(signOnEnvelopeResult.http).length(), greaterThan(0));
+
+        String envelopeSignatureBase64 = envelopeSignatureOf(signOnEnvelopeResult.http);
+
+        // Create transaction
+        CommissionCreateTransactionRequest createTransactionRequest = CommissionTestClient.createTransactionCreationRequest(message, envelopeSignatureBase64, signOnEnvelopeResult.envelope);
+        Result createTransactionRequestResult = commissionTestClient.requestAccountCreation(createTransactionRequest);
+
+        assertThat(statusOf(createTransactionRequestResult), equalTo(OK));
+        assertThat(transactionOf(createTransactionRequestResult), notNullValue());
+        assertThat(transactionOf(createTransactionRequestResult), not(isEmptyString()));
+        assertThatTransactionIsStoredFor(createTransactionRequest.getRevealedSignatureBase64());
     }
 
     @Test
-    public void testCastingVoteInTokenBasedVotingThroughAuth() {
+    public void testCreateTransactionThroughAuthAndTokenExistsForEmail() {
         // Given
         // When
         // Then
 
-        // TODO
-        fail();
+        // Init
+        CommissionInitRequest initRequest = new CommissionInitRequest();
+        initRequest.setVotingId(votingIdOfFirst);
+
+        Result initResult = commissionTestClient.init(initRequest, "Alice");
+
+        assertThat(statusOf(initResult), equalTo(OK));
+
+        VoteCreationUtils.InitData initData = new VoteCreationUtils.InitData();
+        initData.votingId = votingIdOfFirst;
+        initData.publicKey = publicKeyOf(initResult);
+
+        // Sign envelope
+        String message = voteCreationUtils.createMessage(votingIdOfFirst, "someAccountId");
+
+        CommissionTestClient.SignOnEnvelopeResult signOnEnvelopeResult =
+                commissionTestClient.signOnEnvelope(initData.publicKey, "Alice", message, initData.votingId);
+        assertThat(statusOf(signOnEnvelopeResult.http), equalTo(OK));
+        assertThat(envelopeSignatureOf(signOnEnvelopeResult.http), notNullValue());
+        assertThat(envelopeSignatureOf(signOnEnvelopeResult.http).length(), greaterThan(0));
+
+        String envelopeSignatureBase64 = envelopeSignatureOf(signOnEnvelopeResult.http);
+
+        // Create transaction
+        CommissionCreateTransactionRequest createTransactionRequest = CommissionTestClient.createTransactionCreationRequest(message, envelopeSignatureBase64, signOnEnvelopeResult.envelope);
+        Result createTransactionRequestResult = commissionTestClient.requestAccountCreation(createTransactionRequest);
+
+        assertThat(statusOf(createTransactionRequestResult), equalTo(OK));
+        assertThat(transactionOf(createTransactionRequestResult), notNullValue());
+        assertThat(transactionOf(createTransactionRequestResult), not(isEmptyString()));
+        assertThatTransactionIsStoredFor(createTransactionRequest.getRevealedSignatureBase64());
     }
 
     @Test
-    public void testAccessingVotesViaToken_TokenExpired() {
+    public void testAccessingVotingsViaToken_TokenExpired() throws InterruptedException {
         // Given
-        // When
-        // Then
+        Result result = tokenAuthTestClient.auth(authTokenForAliceForFirstVoting);
+        assertThat(statusOf(result), equalTo(OK));
 
-        // TODO
-        fail();
+        String jwt = jwtOf(result);
+
+        expireVotingBy40Days(votingIdOfFirst);
+        waitForTokenCleanUp();
+
+        // When
+        Result votingsResult = votingsPagingTestClient.votingsOfVoterWithRawJwt(0, 10, jwt);
+
+        // Then
+        assertThat(statusOf(votingsResult), equalTo(NOT_FOUND));
     }
 
     @Test
-    public void testAccessingSingleVoteViaToken_TokenExpired() {
+    public void testTokenExpired() throws InterruptedException {
         // Given
-        // When
-        // Then
+        expireVotingBy40Days(votingIdOfFirst);
+        waitForTokenCleanUp();
 
-        // TODO
-        fail();
+        // When
+        Result result = tokenAuthTestClient.auth(authTokenForAliceForFirstVoting);
+
+        // Then
+        assertThat(statusOf(result), equalTo(NOT_FOUND));
+    }
+
+    @Test
+    public void testAccessingSingleVoteViaToken_TokenExpired() throws InterruptedException {
+        // Given
+        Result result = tokenAuthTestClient.auth(authTokenForAliceForFirstVoting);
+        assertThat(statusOf(result), equalTo(OK));
+
+        String jwt = jwtOf(result);
+
+        expireVotingBy40Days(votingIdOfFirst);
+        waitForTokenCleanUp();
+
+        // When
+        Result singleVotingResult = votingTestClient.single(votingIdOfFirst, jwt);
+
+        // Then
+        assertThat(statusOf(singleVotingResult), equalTo(NOT_FOUND));
     }
 
     @Test
     public void testTokenNotFound() {
         // Given
         // When
-        // Then
+        Result result = tokenAuthTestClient.auth("someRandomAuthToken");
 
-        // TODO
-        fail();
+        // Then
+        assertThat(statusOf(result), equalTo(NOT_FOUND));
     }
 
     private void setupVotingsAndToken() throws InterruptedException {
@@ -216,5 +322,17 @@ public class TokenAuthVotingTest {
 
         votingIdOfSecond = voteCreationUtils.createVoting(createVotingRequest);
         Thread.sleep(3 * 1000);
+    }
+
+    private void expireVotingBy40Days(String votingId) {
+        // Expire the voting
+        Long votingIdDecoded = Base62Conversions.decode(votingId);
+        JpaVoting voting = Ebean.find(JpaVoting.class, votingIdDecoded);
+        voting.setEndDate(Instant.now().minus(Duration.ofDays(40)));
+        Ebean.save(voting);
+    }
+
+    private void waitForTokenCleanUp() throws InterruptedException {
+        Thread.sleep(2000);
     }
 }
