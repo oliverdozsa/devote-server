@@ -1,5 +1,6 @@
 package services;
 
+import com.typesafe.config.Config;
 import data.entities.JpaAuthToken;
 import data.operations.TokenAuthDbOperations;
 import responses.TokenAuthResponse;
@@ -11,11 +12,13 @@ import java.util.concurrent.CompletionStage;
 public class TokenAuthService {
     private final TokenAuthDbOperations dbOperations;
     private final JwtCenter jwtCenter;
+    private final String tokenAuthSubjectPrefix;
 
     @Inject
-    public TokenAuthService(TokenAuthDbOperations dbOperations, JwtCenter jwtCenter) {
+    public TokenAuthService(TokenAuthDbOperations dbOperations, JwtCenter jwtCenter, Config config) {
         this.dbOperations = dbOperations;
         this.jwtCenter = jwtCenter;
+        tokenAuthSubjectPrefix = config.getString("devote.jwt.token.auth.subject.prefix");
     }
 
     public CompletionStage<TokenAuthResponse> auth(String token) {
@@ -24,7 +27,8 @@ public class TokenAuthService {
     }
 
     private TokenAuthResponse toResponse(JpaAuthToken jpaAuthToken) {
-        String jwt = jwtCenter.createTokenAuthJwt(jpaAuthToken.getToken().toString());
+        String userIdWithSubjectPrefix = tokenAuthSubjectPrefix + jpaAuthToken.getToken().toString();
+        String jwt = jwtCenter.createTokenAuthJwt(userIdWithSubjectPrefix);
         TokenAuthResponse response = new TokenAuthResponse();
         response.setToken(jwt);
 

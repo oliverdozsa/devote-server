@@ -6,11 +6,11 @@ import com.typesafe.config.Config;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class UuidAuthAlgorithmProvider implements Provider<Algorithm> {
+public class TokenAuthAlgorithmProvider implements Provider<Algorithm> {
     private final Algorithm algorithm;
 
     @Inject
-    public UuidAuthAlgorithmProvider(Config config){
+    public TokenAuthAlgorithmProvider(Config config){
         String secret = config.getString("play.http.secret.key");
         algorithm = Algorithm.HMAC256(secret);
     }
