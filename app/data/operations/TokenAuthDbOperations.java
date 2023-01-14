@@ -24,7 +24,7 @@ public class TokenAuthDbOperations {
     }
 
     public CompletionStage<JpaAuthToken> findBy(String token) {
-        logger.info("findBy(): token = {}", StringUtils.redact(token, 5));
+        logger.info("findBy(): token = {}", StringUtils.redactWithEllipsis(token, 5));
         return supplyAsync(() -> repository.findBy(token), dbExecContext);
     }
 

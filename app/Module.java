@@ -15,27 +15,21 @@ import formatters.FormattersProvider;
 import io.ebean.EbeanServer;
 import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;
-import ipfs.api.imp.IpfsApiImp;
 import ipfs.api.imp.IpfsProvider;
-import ipfs.api.imp.PinataIpfsApiImp;
 import ipfs.api.imp.Web3StorageIpfsApiImp;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import play.Environment;
 import play.data.format.Formatters;
 import security.JwtCenter;
-import security.UuidAuthAlgorithmProvider;
-import security.jwtverification.Auth0JwtVerification;
-import security.jwtverification.JwkProviderProvider;
-import security.jwtverification.JwtVerification;
-import security.jwtverification.JwtVerificationForScaleTesting;
+import security.TokenAuthAlgorithmProvider;
+import security.jwtverification.*;
 import services.CommissionService;
 import services.EnvelopKeyPairProvider;
 import services.TokenAuthService;
 import services.VotingService;
 import tasks.TasksOrganizer;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
-import tasks.emailinvites.EmailInvitesTask;
 import tasks.emailinvites.EmailInvitesTaskContext;
 import tasks.refundbalances.RefundBalancesTaskContext;
 import tasks.votingblockchaininit.VotingBlockchainInitTaskContext;
@@ -94,14 +88,29 @@ public class Module extends AbstractModule {
 
         // Auth
         if (config.getBoolean("devote.scale.test.mode")) {
-            bind(JwtVerification.class).to(JwtVerificationForScaleTesting.class).asEagerSingleton();
+            // TODO: Get rid of it thanks to token auth once scale testing uses token auth too.
+            bind(JwtVerification.class).annotatedWith(Names.named("auth0"))
+                    .to(JwtVerificationForScaleTesting.class)
+                    .asEagerSingleton();
         } else {
-            bind(JwtVerification.class).to(Auth0JwtVerification.class).asEagerSingleton();
+            bind(JwtVerification.class)
+                    .annotatedWith(Names.named("auth0"))
+                    .to(Auth0JwtVerification.class)
+                    .asEagerSingleton();
         }
 
+        bind(JwtVerification.class)
+                .annotatedWith(Names.named("tokenAuth"))
+                .to(TokenAuthJwtVerification.class)
+                .asEagerSingleton();
+        bind(JwtVerification.class)
+                .annotatedWith(Names.named("central"))
+                .to(JwtCentralVerification.class)
+                .asEagerSingleton();
+
         bind(JwkProvider.class).toProvider(JwkProviderProvider.class).asEagerSingleton();
-        bind(Algorithm.class).annotatedWith(Names.named("uuidAuth"))
-                .toProvider(UuidAuthAlgorithmProvider.class)
+        bind(Algorithm.class).annotatedWith(Names.named("tokenAuth"))
+                .toProvider(TokenAuthAlgorithmProvider.class)
                 .asEagerSingleton();
 
         // Other

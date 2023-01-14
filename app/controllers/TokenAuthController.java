@@ -29,7 +29,7 @@ public class TokenAuthController extends Controller {
     }
 
     public CompletionStage<Result> auth(String token) {
-        logger.info("auth(): token = {}", StringUtils.redact(token, 5));
+        logger.info("auth(): token = {}", StringUtils.redactWithEllipsis(token, 5));
 
         return service.auth(token)
                 .thenApply(TokenAuthController::toResult)

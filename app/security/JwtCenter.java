@@ -18,15 +18,15 @@ import java.time.temporal.ChronoUnit;
 public class JwtCenter {
     private final JwtVerification jwtVerification;
     private final Config config;
-    private final Algorithm algorithm;
+    private final Algorithm algoForTokenAuth;
 
     private static final Logger.ALogger logger = Logger.of(JwtCenter.class);
 
     @Inject
-    public JwtCenter(JwtVerification jwtVerification, Config config, @Named("uuidAuth") Algorithm algorithm) {
+    public JwtCenter(@Named("central") JwtVerification jwtVerification, Config config, @Named("tokenAuth") Algorithm algorithmForTokenAuth) {
         this.jwtVerification = jwtVerification;
         this.config = config;
-        this.algorithm = algorithm;
+        this.algoForTokenAuth = algorithmForTokenAuth;
     }
 
     public F.Either<Error, VerifiedJwt> verify(String token) {
@@ -40,8 +40,8 @@ public class JwtCenter {
     }
 
     public String createTokenAuthJwt(String userId) {
-        String issuer = config.getString("devote.jwt.uuid.auth.issuer");
-        int expiryMins = config.getInt("devote.jwt.uuid.auth.token.expiry.mins");
+        String issuer = config.getString("devote.jwt.token.auth.issuer");
+        int expiryMins = config.getInt("devote.jwt.token.auth.token.expiry.mins");
         String rolesClaim = config.getString("devote.jwt.roles.claim");
 
         return JWT.create()
@@ -49,7 +49,7 @@ public class JwtCenter {
                 .withSubject(userId)
                 .withArrayClaim(rolesClaim, new String[]{"voter"})
                 .withExpiresAt(Date.from(Instant.now().plus(expiryMins, ChronoUnit.MINUTES)))
-                .sign(algorithm);
+                .sign(algoForTokenAuth);
     }
 
     public enum Error {

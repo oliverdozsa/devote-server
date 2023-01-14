@@ -40,5 +40,7 @@ public class EmailInvitesTask implements Runnable {
 
         logger.info("[EMAIL-INVITE-TASK]: Creating tokens for {} voters", votersWhoNeedAuthTokens.size());
         votersWhoNeedAuthTokens.forEach(voter -> context.tokenAuthRepository.createFor(voting.getId(), voter.getId()));
+
+        // TODO: send the invites too. But of course only send really if it's in prod
     }
 }
