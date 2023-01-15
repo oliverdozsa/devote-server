@@ -132,6 +132,9 @@ public class JpaVoting {
     @Column(name = "is_auth_tokens_need_to_be_created")
     private boolean isAuthTokensNeedToBeCreated;
 
+    @Column(name = "organizer")
+    private String organizer;
+
     public Long getId() {
         return id;
     }
@@ -394,5 +397,13 @@ public class JpaVoting {
 
     public void setAuthTokensNeedToBeCreated(boolean authTokensNeedToBeCreated) {
         isAuthTokensNeedToBeCreated = authTokensNeedToBeCreated;
+    }
+
+    public String getOrganizer() {
+        return organizer;
+    }
+
+    public void setOrganizer(String organizer) {
+        this.organizer = organizer;
     }
 }

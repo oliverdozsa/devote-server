@@ -63,6 +63,8 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
 
     private boolean sendInvites;
 
+    private String organizer;
+
     public String getNetwork() {
         return network;
     }
@@ -135,61 +137,6 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
         this.authorizationEmailOptions = authorizationEmailOptions;
     }
 
-    @Override
-    public String validate(Config config) {
-        Integer minTimeInterval = config.getInt("devote.vote.related.min.time.interval.sec");
-
-        if (isEncryptedNotValid(minTimeInterval)) {
-            return "If encryption is needed, encrypted until must be at least " +
-                    minTimeInterval + " seconds from now!";
-        }
-
-        if (isAuthorizationNotValid()) {
-            return "Invalid authorization! If EMAILS is given, check email addresses!";
-        }
-
-        if (isStartEndDateNotValid(minTimeInterval)) {
-            return "The minimum difference between start and end date should be " +
-                    minTimeInterval + " seconds, and voting must end in the future!";
-        }
-
-        long maxVotesCap = config.getLong("devote.max.votes.cap");
-        if(votesCap > maxVotesCap) {
-            return "Requested votes cap (" + maxVotesCap + ") is greater, than the maximum allowed (" + maxVotesCap + ")";
-        }
-
-        return null;
-    }
-
-    private boolean isEncryptedNotValid(Integer minTimeIntervalSec) {
-        if (encryptedUntil == null) {
-            return false;
-        }
-
-        Instant now = Instant.now();
-        long gapSecs = Duration.between(now, encryptedUntil).toMillis() / 1000;
-
-        return gapSecs < minTimeIntervalSec;
-    }
-
-    private boolean isAuthorizationNotValid() {
-        return false;
-    }
-
-    private boolean isStartEndDateNotValid(Integer minTimeIntervalSecs) {
-        if (startDate == null || endDate == null) {
-            return true;
-        }
-
-        long gapMillis = Duration.between(startDate, endDate).toMillis();
-        long minTimeIntervalMillis = minTimeIntervalSecs * 1000;
-
-        Instant now = Instant.now();
-        boolean doesNotEndInFuture = this.endDate.isBefore(now);
-
-        return gapMillis < minTimeIntervalMillis || doesNotEndInFuture;
-    }
-
     public List<CreatePollRequest> getPolls() {
         return polls;
     }
@@ -230,6 +177,81 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
         this.sendInvites = sendInvites;
     }
 
+    public Boolean getUseTestnet() {
+        return useTestnet;
+    }
+
+    public void setUseTestnet(Boolean useTestnet) {
+        this.useTestnet = useTestnet;
+    }
+
+    public String getOrganizer() {
+        return organizer;
+    }
+
+    public void setOrganizer(String organizer) {
+        this.organizer = organizer;
+    }
+
+    @Override
+    public String validate(Config config) {
+        Integer minTimeInterval = config.getInt("devote.vote.related.min.time.interval.sec");
+
+        if (isEncryptedNotValid(minTimeInterval)) {
+            return "If encryption is needed, encrypted until must be at least " +
+                    minTimeInterval + " seconds from now!";
+        }
+
+        if (isAuthorizationNotValid()) {
+            return "Invalid authorization! If EMAILS is given, check email addresses!";
+        }
+
+        if (isStartEndDateNotValid(minTimeInterval)) {
+            return "The minimum difference between start and end date should be " +
+                    minTimeInterval + " seconds, and voting must end in the future!";
+        }
+
+        long maxVotesCap = config.getLong("devote.max.votes.cap");
+        if(votesCap > maxVotesCap) {
+            return "Requested votes cap (" + maxVotesCap + ") is greater, than the maximum allowed (" + maxVotesCap + ")";
+        }
+
+        if(isSendInvites() && (organizer == null || organizer.length() == 0)) {
+            return "Invites are requested, and in this case, organizer cannot be empty!";
+        }
+
+        return null;
+    }
+
+    private boolean isEncryptedNotValid(Integer minTimeIntervalSec) {
+        if (encryptedUntil == null) {
+            return false;
+        }
+
+        Instant now = Instant.now();
+        long gapSecs = Duration.between(now, encryptedUntil).toMillis() / 1000;
+
+        return gapSecs < minTimeIntervalSec;
+    }
+
+    private boolean isAuthorizationNotValid() {
+        return false;
+    }
+
+    private boolean isStartEndDateNotValid(Integer minTimeIntervalSecs) {
+        if (startDate == null || endDate == null) {
+            return true;
+        }
+
+        long gapMillis = Duration.between(startDate, endDate).toMillis();
+        long minTimeIntervalMillis = minTimeIntervalSecs * 1000;
+
+        Instant now = Instant.now();
+        boolean doesNotEndInFuture = this.endDate.isBefore(now);
+
+        return gapMillis < minTimeIntervalMillis || doesNotEndInFuture;
+    }
+
     @Override
     public String toString() {
         return "CreateVotingRequest{" +
@@ -248,6 +270,7 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
                 ", fundingAccountSecret='" + StringUtils.redactWithEllipsis(fundingAccountSecret, 5) + '\'' +
                 ", useTestnet=" + useTestnet +
                 ", sendInvites=" + sendInvites +
+                ", organizer=" + organizer +
                 '}';
     }
 
@@ -259,13 +282,5 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
         PUBLIC,
         UNLISTED,
         PRIVATE
-    }
-
-    public Boolean getUseTestnet() {
-        return useTestnet;
-    }
-
-    public void setUseTestnet(Boolean useTestnet) {
-        this.useTestnet = useTestnet;
     }
 }

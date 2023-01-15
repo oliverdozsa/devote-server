@@ -340,6 +340,7 @@ public class TokenAuthVotingTest {
         createVotingRequest.setVisibility(CreateVotingRequest.Visibility.PRIVATE);
         createVotingRequest.setTitle("First voting");
         createVotingRequest.setVotesCap(3L);
+        createVotingRequest.setOrganizer("William");
 
         votingIdOfFirst = voteCreationUtils.createVoting(createVotingRequest);
         Thread.sleep(3 * 100);
@@ -354,6 +355,7 @@ public class TokenAuthVotingTest {
         createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
         createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("alice@mail.com", "doe@where.de", "some@one.com"));
         createVotingRequest.setSendInvites(true);
+        createVotingRequest.setOrganizer("William");
         createVotingRequest.setTitle("Second voting");
         createVotingRequest.setVisibility(CreateVotingRequest.Visibility.PRIVATE);
         createVotingRequest.setVotesCap(3L);
