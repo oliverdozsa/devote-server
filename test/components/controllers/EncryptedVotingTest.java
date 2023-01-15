@@ -130,15 +130,20 @@ public class EncryptedVotingTest {
     @Test
     public void testEncryptChoiceEncryptedUntilExpires() throws InterruptedException {
         // Given
-        String votingId = voteCreationUtils.createValidVotingEncryptedUntil(Instant.now().plusSeconds(9));
+        String votingId = voteCreationUtils.createValidVotingEncryptedUntil(Instant.now().plusSeconds(10));
 
         // When
         String aChoice = "1234";
         Result anEncryptedOptionResult = testClient.encryptChoice(votingId, aChoice);
         Result anotherEncryptedOptionResult = testClient.encryptChoice(votingId, aChoice);
 
-        // Wait for expiration of encrypted until.
-        Thread.sleep(11 * 1000);
+        // Expire voting encryption
+        Long votingIdDecoded = Base62Conversions.decode(votingId);
+        JpaVoting voting = Ebean.find(JpaVoting.class, votingIdDecoded);
+        voting.setEncryptedUntil(Instant.now().minus(Duration.ofSeconds(10)));
+        Ebean.save(voting);
+
+        Thread.sleep(3 * 100);
 
         Result votingResult = votingTestClient.single(votingId);
 

@@ -32,7 +32,7 @@ public class VoteCreationUtils {
 
     public String createValidVotingWithWaitingForFullInit() throws InterruptedException {
         String votingId = createValidVoting();
-        Thread.sleep(3 * 1000);
+        Thread.sleep(3 * 100);
         return votingId;
     }
 
