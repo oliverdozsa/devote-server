@@ -12,6 +12,7 @@ import security.TokenAuthUserIdUtil;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static io.ebean.Expr.in;
 
@@ -54,7 +55,7 @@ public class EbeanVoterRepository implements VoterRepository {
         logger.info("doesParticipateInVoting(): userId = {}, votingId = {}", userId, votingId);
 
         if(tokenAuthUserIdUtil.isForTokenAuth(userId)) {
-            String token = tokenAuthUserIdUtil.getTokenFrom(userId);
+            UUID token = tokenAuthUserIdUtil.getTokenFrom(userId);
             Optional<JpaAuthToken> optionalAuthToken = ebeanServer.createQuery(JpaAuthToken.class)
                     .where()
                     .eq("token", token)

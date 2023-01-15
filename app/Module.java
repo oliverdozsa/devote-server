@@ -90,17 +90,11 @@ public class Module extends AbstractModule {
         bind(TasksOrganizer.class).asEagerSingleton();
 
         // Auth
-        if (config.getBoolean("devote.scale.test.mode")) {
-            // TODO: Get rid of it thanks to token auth once scale testing uses token auth too.
-            bind(JwtVerification.class).annotatedWith(Names.named("auth0"))
-                    .to(JwtVerificationForScaleTesting.class)
-                    .asEagerSingleton();
-        } else {
-            bind(JwtVerification.class)
-                    .annotatedWith(Names.named("auth0"))
-                    .to(Auth0JwtVerification.class)
-                    .asEagerSingleton();
-        }
+
+        bind(JwtVerification.class)
+                .annotatedWith(Names.named("auth0"))
+                .to(Auth0JwtVerification.class)
+                .asEagerSingleton();
 
         bind(JwtVerification.class)
                 .annotatedWith(Names.named("tokenAuth"))

@@ -44,10 +44,15 @@ public class JwtCenter {
         int expiryMins = config.getInt("devote.jwt.token.auth.token.expiry.mins");
         String rolesClaim = config.getString("devote.jwt.roles.claim");
 
+        String[] roles = new String[]{"voter"};
+        if(config.getBoolean("devote.scale.test.mode")) {
+            roles = new String[]{"voter", "vote-caller"};
+        }
+
         return JWT.create()
                 .withIssuer(issuer)
                 .withSubject(userId)
-                .withArrayClaim(rolesClaim, new String[]{"voter"})
+                .withArrayClaim(rolesClaim, roles)
                 .withExpiresAt(Date.from(Instant.now().plus(expiryMins, ChronoUnit.MINUTES)))
                 .sign(algoForTokenAuth);
     }

@@ -3,6 +3,7 @@ package security;
 import com.typesafe.config.Config;
 
 import javax.inject.Inject;
+import java.util.UUID;
 
 public class TokenAuthUserIdUtil {
     private final String tokenAuthSubjectPrefix;
@@ -16,7 +17,8 @@ public class TokenAuthUserIdUtil {
         return userId != null && userId.startsWith(tokenAuthSubjectPrefix);
     }
 
-    public String getTokenFrom(String userId) {
-        return userId.substring(tokenAuthSubjectPrefix.length());
+    public UUID getTokenFrom(String userId) {
+        String uuidStr = userId.substring(tokenAuthSubjectPrefix.length());
+        return UUID.fromString(uuidStr);
     }
 }
