@@ -2,8 +2,8 @@ package security.jwtverification;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.typesafe.config.Config;
 import play.Logger;
+import security.TokenAuthUserIdUtil;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -11,24 +11,24 @@ import javax.inject.Named;
 public class JwtCentralVerification implements JwtVerification {
     private final JwtVerification auth0JwtVerification;
     private final JwtVerification tokenAuthJwtVerification;
-    private final String tokenAuthSubjectPrefix;
+    private final TokenAuthUserIdUtil tokenAuthUserIdUtil;
 
     private static final Logger.ALogger logger = Logger.of(JwtCentralVerification.class);
 
     @Inject
     public JwtCentralVerification(@Named("auth0") JwtVerification auth0JwtVerification,
                                   @Named("tokenAuth") JwtVerification tokenAuthJwtVerification,
-                                  Config config) {
+                                  TokenAuthUserIdUtil tokenAuthUserIdUtil) {
         this.auth0JwtVerification = auth0JwtVerification;
         this.tokenAuthJwtVerification = tokenAuthJwtVerification;
-        tokenAuthSubjectPrefix = config.getString("devote.jwt.token.auth.subject.prefix");
+        this.tokenAuthUserIdUtil = tokenAuthUserIdUtil;
     }
 
     @Override
     public DecodedJWT verify(String token) {
         DecodedJWT unverifiedDecodedJWT = JWT.decode(token);
         String subject = unverifiedDecodedJWT.getSubject();
-        if (subject != null && subject.startsWith(tokenAuthSubjectPrefix)) {
+        if (tokenAuthUserIdUtil.isForTokenAuth(subject)) {
             logger.info("Verifying with token auth verifier.");
             return tokenAuthJwtVerification.verify(token);
         } else {

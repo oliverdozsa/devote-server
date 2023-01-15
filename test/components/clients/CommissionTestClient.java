@@ -95,12 +95,16 @@ public class CommissionTestClient extends TestClient {
     }
 
     public Result envelopeSignatureOf(String votingId, String user) {
+        String jwt = jwtTestUtils.createToken(user, user + "@mail.com");
+        return envelopeSignatureOfWithJwt(votingId, jwt);
+    }
+
+    public Result envelopeSignatureOfWithJwt(String votingId, String jwt) {
         Http.RequestBuilder httpRequest = new Http.RequestBuilder()
                 .method(GET)
                 .header(CONTENT_TYPE, Http.MimeTypes.JSON)
                 .uri(routes.CommissionController.getEnvelopeSignature(votingId).url());
 
-        String jwt = jwtTestUtils.createToken(user, user + "@mail.com");
         addJwtTokenTo(httpRequest, jwt);
 
         return route(application, httpRequest);

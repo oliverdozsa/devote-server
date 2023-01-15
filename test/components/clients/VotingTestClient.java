@@ -17,13 +17,17 @@ public class VotingTestClient extends TestClient {
     }
 
     public Result createVoting(CreateVotingRequest votingRequest, String userId, String email) {
+        String jwt = jwtTestUtils.createToken(userId, email);
+        return createVoting(votingRequest, jwt);
+    }
+
+    public Result createVoting(CreateVotingRequest votingRequest, String jwt) {
         Http.RequestBuilder httpRequest = new Http.RequestBuilder()
                 .method(POST)
                 .bodyJson(Json.toJson(votingRequest))
                 .header(CONTENT_TYPE, Http.MimeTypes.JSON)
                 .uri(routes.VotingController.create().url());
 
-        String jwt = jwtTestUtils.createToken(userId, email);
         addJwtTokenTo(httpRequest, jwt);
 
         return route(application, httpRequest, 75 * 1000);

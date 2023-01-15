@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import security.TokenAuthUserIdUtil;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -30,10 +31,13 @@ public class EbeanCommissionRepositoryTest {
     @Mock
     private EbeanServer mockEbeanServer;
 
+    @Mock
+    private TokenAuthUserIdUtil mockTokenAuthUserIdUtil;
+
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        repository = new EbeanCommissionRepository(mockEbeanServer);
+        repository = new EbeanCommissionRepository(mockEbeanServer, mockTokenAuthUserIdUtil);
     }
 
     @Test
@@ -66,8 +70,8 @@ public class EbeanCommissionRepositoryTest {
     }
 
     private JpaVoting prepareConsumeOneChannelTest() {
-        Query<JpaVotingChannelAccount> mockChannelAccountQuery = (Query<JpaVotingChannelAccount>)Mockito.mock(Query.class);
-        ExpressionList<JpaVotingChannelAccount> mockExpressionList = (ExpressionList<JpaVotingChannelAccount>)Mockito.mock(ExpressionList.class);
+        Query<JpaVotingChannelAccount> mockChannelAccountQuery = (Query<JpaVotingChannelAccount>) Mockito.mock(Query.class);
+        ExpressionList<JpaVotingChannelAccount> mockExpressionList = (ExpressionList<JpaVotingChannelAccount>) Mockito.mock(ExpressionList.class);
         Optional<JpaVotingChannelAccount> mockChannelAccountOptional = Optional.empty();
         JpaVoting mockJpaVoting = Mockito.mock(JpaVoting.class);
 

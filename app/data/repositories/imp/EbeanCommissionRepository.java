@@ -11,6 +11,7 @@ import exceptions.InternalErrorException;
 import exceptions.NotFoundException;
 import io.ebean.EbeanServer;
 import play.Logger;
+import security.TokenAuthUserIdUtil;
 
 import javax.inject.Inject;
 import java.util.Optional;
@@ -21,12 +22,14 @@ import static utils.StringUtils.redactWithEllipsis;
 
 public class EbeanCommissionRepository implements CommissionRepository {
     private final EbeanServer ebeanServer;
+    private final TokenAuthUserIdUtil tokenAuthUserIdUtil;
 
     private static final Logger.ALogger logger = Logger.of(EbeanCommissionRepository.class);
 
     @Inject
-    public EbeanCommissionRepository(EbeanServer ebeanServer) {
+    public EbeanCommissionRepository(EbeanServer ebeanServer, TokenAuthUserIdUtil tokenAuthUserIdUtil) {
         this.ebeanServer = ebeanServer;
+        this.tokenAuthUserIdUtil = tokenAuthUserIdUtil;
     }
 
     @Override
@@ -64,7 +67,7 @@ public class EbeanCommissionRepository implements CommissionRepository {
 
         JpaCommissionSession commissionSession = find(userId, votingId);
 
-        if(commissionSession == null) {
+        if (commissionSession == null) {
             throw new NotFoundException("Not found session for userId = " + userId + " and votingId = " + votingId);
         }
 
@@ -191,6 +194,14 @@ public class EbeanCommissionRepository implements CommissionRepository {
     }
 
     private JpaCommissionSession find(String userId, Long votingId) {
+        if (tokenAuthUserIdUtil.isForTokenAuth(userId)) {
+            return ebeanServer.createQuery(JpaCommissionSession.class)
+                    .where()
+                    .eq("voter.authTokens.token", tokenAuthUserIdUtil.getTokenFrom(userId))
+                    .eq("voting.id", votingId)
+                    .findOne();
+        }
+
         return ebeanServer.createQuery(JpaCommissionSession.class)
                 .where()
                 .eq("voter.voterIds.id", userId)
@@ -225,6 +236,13 @@ public class EbeanCommissionRepository implements CommissionRepository {
     }
 
     private JpaVoter findVoterWith(String userId) {
+        if (tokenAuthUserIdUtil.isForTokenAuth(userId)) {
+            return ebeanServer.createQuery(JpaVoter.class)
+                    .where()
+                    .eq("authTokens.token", tokenAuthUserIdUtil.getTokenFrom(userId))
+                    .findOne();
+        }
+
         return ebeanServer.createQuery(JpaVoter.class)
                 .where()
                 .eq("voterIds.id", userId)

@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import security.TokenAuthUserIdUtil;
 
 import static org.junit.Assert.assertThrows;
 
@@ -15,10 +16,13 @@ public class EbeanVoterRepositoryTest {
     @Mock
     private EbeanServer mockEbeanServer;
 
+    @Mock
+    private TokenAuthUserIdUtil mockIdCheckrer;
+
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        repository = new EbeanVoterRepository(mockEbeanServer);
+        repository = new EbeanVoterRepository(mockEbeanServer, mockIdCheckrer);
     }
 
     @Test

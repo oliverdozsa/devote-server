@@ -25,26 +25,24 @@ public class VotingsPagingTestClient extends TestClient {
     }
 
     public Result votingsOfVoteCaller(int offset, int limit, String userId) {
-        Http.RequestBuilder httpRequest = votingsOfVoteCallerBase(offset, limit);
-
         String jwt = jwtTestUtils.createToken(userId, userId + "@mail.com");
-        addJwtTokenTo(httpRequest, jwt);
-
-        return route(application, httpRequest);
+        return votingsOfVoteCallerWithJwt(offset, limit, jwt);
     }
 
     public Result votingsOfVoteCaller(int offset, int limit, String userId, String[] roles) {
+        String jwt = jwtTestUtils.createToken(userId, roles, userId + "@mail.com");
+        return votingsOfVoteCallerWithJwt(offset, limit, jwt);
+    }
+
+    public Result votingsOfVoteCallerWithJwt(int offset, int limit, String jwt) {
         Http.RequestBuilder httpRequest = votingsOfVoteCallerBase(offset, limit);
 
-        String jwt = jwtTestUtils.createToken(userId, roles, userId + "@mail.com");
         addJwtTokenTo(httpRequest, jwt);
 
         return route(application, httpRequest);
     }
 
     public Result votingsOfVoter(int offset, int limit, String userId) {
-        Http.RequestBuilder httpRequest = votingsOfVoterBase(offset, limit);
-
         String jwt = jwtTestUtils.createToken(userId, userId + "@mail.com");
         return votingsOfVoterWithRawJwt(offset, limit, jwt);
     }

@@ -190,6 +190,9 @@ public class TokenAuthVotingTest {
 
         String envelopeSignatureBase64 = envelopeSignatureOf(signOnEnvelopeResult.http);
 
+        Result envelopeSignatureResult = commissionTestClient.envelopeSignatureOfWithJwt(votingIdOfFirst, jwt);
+        assertThat(statusOf(envelopeSignatureResult), equalTo(OK));
+
         // Create transaction
         CommissionCreateTransactionRequest createTransactionRequest = CommissionTestClient.createTransactionCreationRequest(message, envelopeSignatureBase64, signOnEnvelopeResult.envelope);
         Result createTransactionRequestResult = commissionTestClient.requestAccountCreation(createTransactionRequest);
@@ -285,7 +288,7 @@ public class TokenAuthVotingTest {
         Result singleVotingResult = votingTestClient.single(votingIdOfFirst, jwt);
 
         // Then
-        assertThat(statusOf(singleVotingResult), equalTo(NOT_FOUND));
+        assertThat(statusOf(singleVotingResult), equalTo(FORBIDDEN));
     }
 
     @Test
@@ -295,7 +298,38 @@ public class TokenAuthVotingTest {
         Result result = tokenAuthTestClient.auth("someRandomAuthToken");
 
         // Then
-        assertThat(statusOf(result), equalTo(NOT_FOUND));
+        assertThat(statusOf(result), equalTo(BAD_REQUEST));
+    }
+
+    @Test
+    public void testCreateVotingIsForbiddenViaToken() {
+        // Given
+        Result result = tokenAuthTestClient.auth(authTokenForAliceForFirstVoting);
+        assertThat(statusOf(result), equalTo(OK));
+
+        String jwt = jwtOf(result);
+
+        // When
+        CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        Result createVotingResult = votingTestClient.createVoting(createVotingRequest, jwt);
+
+        // Then
+        assertThat(statusOf(createVotingResult), equalTo(FORBIDDEN));
+    }
+
+    @Test
+    public void testAccessingVotingsAsVoteCallerViaToken() {
+        // Given
+        Result result = tokenAuthTestClient.auth(authTokenForAliceForFirstVoting);
+        assertThat(statusOf(result), equalTo(OK));
+
+        String jwt = jwtOf(result);
+
+        // When
+        Result votingsResult = votingsPagingTestClient.votingsOfVoteCallerWithJwt(0, 10, jwt);
+
+        // Then
+        assertThat(statusOf(votingsResult), equalTo(FORBIDDEN));
     }
 
     private void setupVotingsAndToken() throws InterruptedException {
@@ -305,6 +339,7 @@ public class TokenAuthVotingTest {
         createVotingRequest.setSendInvites(true);
         createVotingRequest.setVisibility(CreateVotingRequest.Visibility.PRIVATE);
         createVotingRequest.setTitle("First voting");
+        createVotingRequest.setVotesCap(3L);
 
         votingIdOfFirst = voteCreationUtils.createVoting(createVotingRequest);
         Thread.sleep(3 * 1000);
@@ -320,6 +355,8 @@ public class TokenAuthVotingTest {
         createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("alice@mail.com", "doe@where.de", "some@one.com"));
         createVotingRequest.setSendInvites(true);
         createVotingRequest.setTitle("Second voting");
+        createVotingRequest.setVisibility(CreateVotingRequest.Visibility.PRIVATE);
+        createVotingRequest.setVotesCap(3L);
 
         votingIdOfSecond = voteCreationUtils.createVoting(createVotingRequest);
         Thread.sleep(3 * 1000);
