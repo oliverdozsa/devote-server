@@ -11,6 +11,10 @@ import utils.StringUtils;
 
 import javax.inject.Inject;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+
 import static data.repositories.imp.EbeanRepositoryUtils.assertEntityExists;
 
 public class EbeanTokenAuthRepository implements TokenAuthRepository {
@@ -53,5 +57,14 @@ public class EbeanTokenAuthRepository implements TokenAuthRepository {
         ebeanServer.save(authToken);
 
         return authToken;
+    }
+
+    @Override
+    public void cleanupOlderThanFromVotingEndDate(int days, int limit) {
+        ebeanServer.createQuery(JpaAuthToken.class)
+                .where()
+                .lt("voting.endDate", Instant.now().minus(Duration.ofDays(days)))
+                .setMaxRows(limit)
+                .delete();
     }
 }

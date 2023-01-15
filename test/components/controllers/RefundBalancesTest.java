@@ -33,7 +33,7 @@ public class RefundBalancesTest {
         GuiceApplicationBuilder applicationBuilder = new GuiceApplicationBuilder()
                 .overrides(bind(IpfsApi.class).to(MockIpfsApi.class))
                 .overrides(bind(IPFS.class).toProvider(MockIpfsProvider.class))
-                .overrides((bind(JwtVerification.class).to(JwtVerificationForTests.class)));
+                .overrides((bind(JwtVerification.class).qualifiedWith("auth0").to(JwtVerificationForTests.class)));
 
         ruleChainForTests = new RuleChainForTests(applicationBuilder);
         chain = ruleChainForTests.getRuleChain();

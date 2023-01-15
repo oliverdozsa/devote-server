@@ -10,6 +10,8 @@ import tasks.emailinvites.EmailInvitesTask;
 import tasks.emailinvites.EmailInvitesTaskContext;
 import tasks.refundbalances.RefundBalancesTask;
 import tasks.refundbalances.RefundBalancesTaskContext;
+import tasks.tokenauthcleanup.TokenAuthCleanupTask;
+import tasks.tokenauthcleanup.TokenAuthCleanupTaskContext;
 import tasks.votingblockchaininit.VotingBlockchainInitTask;
 import tasks.votingblockchaininit.VotingBlockchainInitTaskContext;
 
@@ -27,6 +29,7 @@ public class TasksOrganizer {
     private final VotingBlockchainInitTaskContext votingInitContext;
     private final RefundBalancesTaskContext refundBalancesContext;
     private final EmailInvitesTaskContext emailInvitesTaskContext;
+    private final TokenAuthCleanupTaskContext tokenAuthCleanupTaskContext;
 
     private static final Logger.ALogger logger = Logger.of(TasksOrganizer.class);
 
@@ -35,6 +38,7 @@ public class TasksOrganizer {
     private final int votingInitTaskIntervalSecs;
     private final int refundBalancesTaskIntervalSecs;
     private final int emailInvitesTaskIntervalSecs;
+    private final int tokenAuthCleanupTaskIntervalSecs;
 
     @Inject
     public TasksOrganizer(
@@ -44,19 +48,22 @@ public class TasksOrganizer {
             ChannelAccountBuilderTaskContext channelContext,
             VotingBlockchainInitTaskContext votingInitContext,
             RefundBalancesTaskContext refundBalancesContext,
-            EmailInvitesTaskContext emailInvitesTaskContext) {
+            EmailInvitesTaskContext emailInvitesTaskContext,
+            TokenAuthCleanupTaskContext tokenAuthCleanupTaskContext) {
         this.actorSystem = actorSystem;
         this.executionContext = executionContext;
         this.channelContext = channelContext;
         this.votingInitContext = votingInitContext;
         this.refundBalancesContext = refundBalancesContext;
         this.emailInvitesTaskContext = emailInvitesTaskContext;
+        this.tokenAuthCleanupTaskContext = tokenAuthCleanupTaskContext;
 
         initialDelaySecs = config.getInt("devote.tasks.initial.delay.secs");
         channelTaskIntervalSecs = config.getInt("devote.tasks.channel.interval.secs");
         votingInitTaskIntervalSecs = config.getInt("devote.tasks.voting.init.interval.secs");
         refundBalancesTaskIntervalSecs = config.getInt("devote.tasks.refund.balances.interval.secs");
         emailInvitesTaskIntervalSecs = config.getInt("devote.tasks.email.invites.interval.secs");
+        tokenAuthCleanupTaskIntervalSecs = config.getInt("devote.tasks.token.auth.cleanup.interval.secs");
 
         numberOfWorkers = config.getInt("devote.vote.buckets");
 
@@ -64,6 +71,7 @@ public class TasksOrganizer {
         initializeVotingInitTasks();
         initializeRefundBalancesTask();
         initializeEmailInvitesTask();
+        initializeTokenAuthCleanupTask();
     }
 
     private void initializeChannelBuilderTasks() {
@@ -92,6 +100,11 @@ public class TasksOrganizer {
     private void initializeEmailInvitesTask() {
         EmailInvitesTask task = new EmailInvitesTask(emailInvitesTaskContext);
         initialize(Collections.singletonList(task), "email invites", emailInvitesTaskIntervalSecs);
+    }
+
+    private void initializeTokenAuthCleanupTask() {
+        TokenAuthCleanupTask task = new TokenAuthCleanupTask(tokenAuthCleanupTaskContext);
+        initialize(Collections.singletonList(task), "token auth cleanup", tokenAuthCleanupTaskIntervalSecs);
     }
 
     private void initialize(List<Runnable> tasks, String name, long intervalSecs) {

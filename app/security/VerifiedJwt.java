@@ -24,7 +24,8 @@ public class VerifiedJwt {
         String emailVerifiedClaim = config.getString("devote.jwt.email.verified.claim");
 
         String emailFromJwt = decodedJWT.getClaim(emailClaim).asString();
-        boolean isVerified = decodedJWT.getClaim(emailVerifiedClaim).asBoolean();
+        boolean isVerified = !decodedJWT.getClaim(emailVerifiedClaim).isNull() &&
+                decodedJWT.getClaim(emailVerifiedClaim).asBoolean();
 
         if(isVerified) {
             email = emailFromJwt;

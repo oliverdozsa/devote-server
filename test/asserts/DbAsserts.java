@@ -155,7 +155,7 @@ public class DbAsserts {
 
     public static void assertInternalFundingIsMarkedAsRefunded(Long votingId) {
         JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
-        assertThat(voting.getInternalFundingRefunded(), is(true));
+        assertThat(voting.isInternalFundingRefunded(), is(true));
     }
 
     public static void assertChannelGeneratorsAreMarkedAsNotRefunded(Long votingId) {

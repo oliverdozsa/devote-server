@@ -23,6 +23,7 @@ import play.Environment;
 import play.data.format.Formatters;
 import security.JwtCenter;
 import security.TokenAuthAlgorithmProvider;
+import security.TokenAuthUserIdUtil;
 import security.jwtverification.*;
 import services.CommissionService;
 import services.EnvelopKeyPairProvider;
@@ -32,6 +33,7 @@ import tasks.TasksOrganizer;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
 import tasks.emailinvites.EmailInvitesTaskContext;
 import tasks.refundbalances.RefundBalancesTaskContext;
+import tasks.tokenauthcleanup.TokenAuthCleanupTaskContext;
 import tasks.votingblockchaininit.VotingBlockchainInitTaskContext;
 
 import java.security.Security;
@@ -84,6 +86,7 @@ public class Module extends AbstractModule {
         bind(VotingBlockchainInitTaskContext.class).asEagerSingleton();
         bind(RefundBalancesTaskContext.class).asEagerSingleton();
         bind(EmailInvitesTaskContext.class).asEagerSingleton();
+        bind(TokenAuthCleanupTaskContext.class).asEagerSingleton();
         bind(TasksOrganizer.class).asEagerSingleton();
 
         // Auth
@@ -112,6 +115,7 @@ public class Module extends AbstractModule {
         bind(Algorithm.class).annotatedWith(Names.named("tokenAuth"))
                 .toProvider(TokenAuthAlgorithmProvider.class)
                 .asEagerSingleton();
+        bind(TokenAuthUserIdUtil.class).asEagerSingleton();
 
         // Other
         bind(AsymmetricCipherKeyPair.class).annotatedWith(Names.named("envelope"))

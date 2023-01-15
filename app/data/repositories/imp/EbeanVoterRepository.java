@@ -7,6 +7,7 @@ import data.repositories.VoterRepository;
 import io.ebean.EbeanServer;
 import io.ebean.Query;
 import play.Logger;
+import security.TokenAuthUserIdUtil;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -16,12 +17,14 @@ import static io.ebean.Expr.in;
 
 public class EbeanVoterRepository implements VoterRepository {
     private final EbeanServer ebeanServer;
+    private final TokenAuthUserIdUtil tokenAuthUserIdUtil;
 
     private static final Logger.ALogger logger = Logger.of(EbeanVoterRepository.class);
 
     @Inject
-    public EbeanVoterRepository(EbeanServer ebeanServer) {
+    public EbeanVoterRepository(EbeanServer ebeanServer, TokenAuthUserIdUtil tokenAuthUserIdUtil) {
         this.ebeanServer = ebeanServer;
+        this.tokenAuthUserIdUtil = tokenAuthUserIdUtil;
     }
 
     @Override
@@ -30,6 +33,11 @@ public class EbeanVoterRepository implements VoterRepository {
 
         if ((email == null || email.length() == 0) && (userId == null || userId.length() == 0)) {
             throw new IllegalArgumentException("Both email and userId is empty! At least one should have value");
+        }
+
+        if(tokenAuthUserIdUtil.isForTokenAuth(userId)) {
+            logger.info("userAuthenticated(): user id is for token auth; skipping voter creation.");
+            return;
         }
 
         if (email != null && email.length() > 0) {
@@ -44,6 +52,17 @@ public class EbeanVoterRepository implements VoterRepository {
     @Override
     public boolean doesParticipateInVoting(String userId, Long votingId) {
         logger.info("doesParticipateInVoting(): userId = {}, votingId = {}", userId, votingId);
+
+        if(tokenAuthUserIdUtil.isForTokenAuth(userId)) {
+            String token = tokenAuthUserIdUtil.getTokenFrom(userId);
+            Optional<JpaAuthToken> optionalAuthToken = ebeanServer.createQuery(JpaAuthToken.class)
+                    .where()
+                    .eq("token", token)
+                    .eq("voting.id", votingId)
+                    .findOneOrEmpty();
+
+            return optionalAuthToken.isPresent();
+        }
 
         JpaVoter voter = ebeanServer.createQuery(JpaVoter.class)
                 .where()
