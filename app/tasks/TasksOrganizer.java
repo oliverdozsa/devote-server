@@ -1,8 +1,10 @@
 package tasks;
 
 import akka.actor.ActorSystem;
+import akka.actor.Cancellable;
 import com.typesafe.config.Config;
 import play.Logger;
+import play.api.inject.ApplicationLifecycle;
 import scala.concurrent.ExecutionContext;
 import tasks.channelaccounts.ChannelAccountBuilderTask;
 import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
@@ -20,6 +22,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
 public class TasksOrganizer {
     private final ActorSystem actorSystem;
@@ -33,12 +38,14 @@ public class TasksOrganizer {
 
     private static final Logger.ALogger logger = Logger.of(TasksOrganizer.class);
 
-    private final int initialDelaySecs;
-    private final int channelTaskIntervalSecs;
-    private final int votingInitTaskIntervalSecs;
-    private final int refundBalancesTaskIntervalSecs;
-    private final int emailInvitesTaskIntervalSecs;
-    private final int tokenAuthCleanupTaskIntervalSecs;
+    private final int initialDelayMillis;
+    private final int channelTaskIntervalMillis;
+    private final int votingInitTaskIntervalMillis;
+    private final int refundBalancesTaskIntervalMillis;
+    private final int emailInvitesTaskIntervalMillis;
+    private final int tokenAuthCleanupTaskIntervalMillis;
+
+    private final List<Cancellable> taskCancellables = new ArrayList<>();
 
     @Inject
     public TasksOrganizer(
@@ -49,7 +56,8 @@ public class TasksOrganizer {
             VotingBlockchainInitTaskContext votingInitContext,
             RefundBalancesTaskContext refundBalancesContext,
             EmailInvitesTaskContext emailInvitesTaskContext,
-            TokenAuthCleanupTaskContext tokenAuthCleanupTaskContext) {
+            TokenAuthCleanupTaskContext tokenAuthCleanupTaskContext,
+            ApplicationLifecycle lifecycle) {
         this.actorSystem = actorSystem;
         this.executionContext = executionContext;
         this.channelContext = channelContext;
@@ -58,12 +66,12 @@ public class TasksOrganizer {
         this.emailInvitesTaskContext = emailInvitesTaskContext;
         this.tokenAuthCleanupTaskContext = tokenAuthCleanupTaskContext;
 
-        initialDelaySecs = config.getInt("devote.tasks.initial.delay.secs");
-        channelTaskIntervalSecs = config.getInt("devote.tasks.channel.interval.secs");
-        votingInitTaskIntervalSecs = config.getInt("devote.tasks.voting.init.interval.secs");
-        refundBalancesTaskIntervalSecs = config.getInt("devote.tasks.refund.balances.interval.secs");
-        emailInvitesTaskIntervalSecs = config.getInt("devote.tasks.email.invites.interval.secs");
-        tokenAuthCleanupTaskIntervalSecs = config.getInt("devote.tasks.token.auth.cleanup.interval.secs");
+        initialDelayMillis = config.getInt("devote.tasks.initial.delay.millis");
+        channelTaskIntervalMillis = config.getInt("devote.tasks.channel.interval.millis");
+        votingInitTaskIntervalMillis = config.getInt("devote.tasks.voting.init.interval.millis");
+        refundBalancesTaskIntervalMillis = config.getInt("devote.tasks.refund.balances.interval.millis");
+        emailInvitesTaskIntervalMillis = config.getInt("devote.tasks.email.invites.interval.millis");
+        tokenAuthCleanupTaskIntervalMillis = config.getInt("devote.tasks.token.auth.cleanup.interval.millis");
 
         numberOfWorkers = config.getInt("devote.vote.buckets");
 
@@ -72,6 +80,11 @@ public class TasksOrganizer {
         initializeRefundBalancesTask();
         initializeEmailInvitesTask();
         initializeTokenAuthCleanupTask();
+
+        lifecycle.addStopHook(() -> {
+            taskCancellables.forEach(Cancellable::cancel);
+            return completedFuture(null);
+        });
     }
 
     private void initializeChannelBuilderTasks() {
@@ -80,7 +93,7 @@ public class TasksOrganizer {
             channelTasks.add(new ChannelAccountBuilderTask(i, channelContext));
         }
 
-        initialize(channelTasks, "channel builder", channelTaskIntervalSecs);
+        initialize(channelTasks, "channel builder", channelTaskIntervalMillis);
     }
 
     private void initializeVotingInitTasks() {
@@ -89,35 +102,36 @@ public class TasksOrganizer {
             votingInitTasks.add(new VotingBlockchainInitTask(i, votingInitContext));
         }
 
-        initialize(votingInitTasks, "voting init", votingInitTaskIntervalSecs);
+        initialize(votingInitTasks, "voting init", votingInitTaskIntervalMillis);
     }
 
     private void initializeRefundBalancesTask() {
         RefundBalancesTask task = new RefundBalancesTask(refundBalancesContext);
-        initialize(Collections.singletonList(task), "refund balances", refundBalancesTaskIntervalSecs);
+        initialize(Collections.singletonList(task), "refund balances", refundBalancesTaskIntervalMillis);
     }
 
     private void initializeEmailInvitesTask() {
         EmailInvitesTask task = new EmailInvitesTask(emailInvitesTaskContext);
-        initialize(Collections.singletonList(task), "email invites", emailInvitesTaskIntervalSecs);
+        initialize(Collections.singletonList(task), "email invites", emailInvitesTaskIntervalMillis);
     }
 
     private void initializeTokenAuthCleanupTask() {
         TokenAuthCleanupTask task = new TokenAuthCleanupTask(tokenAuthCleanupTaskContext);
-        initialize(Collections.singletonList(task), "token auth cleanup", tokenAuthCleanupTaskIntervalSecs);
+        initialize(Collections.singletonList(task), "token auth cleanup", tokenAuthCleanupTaskIntervalMillis);
     }
 
-    private void initialize(List<Runnable> tasks, String name, long intervalSecs) {
+    private void initialize(List<Runnable> tasks, String name, long intervalMillis) {
         logger.info("initialize(): creating {} workers for {}", tasks.size(), name);
 
         for (Runnable task : tasks) {
-            this.actorSystem.scheduler()
+            Cancellable cancellable = this.actorSystem.scheduler()
                     .scheduleAtFixedRate(
-                            Duration.ofSeconds(initialDelaySecs),
-                            Duration.ofSeconds(intervalSecs),
+                            Duration.ofMillis(initialDelayMillis),
+                            Duration.ofMillis(intervalMillis),
                             task,
                             executionContext
                     );
+            taskCancellables.add(cancellable);
         }
     }
 }

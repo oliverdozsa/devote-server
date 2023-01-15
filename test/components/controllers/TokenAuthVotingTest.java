@@ -342,7 +342,7 @@ public class TokenAuthVotingTest {
         createVotingRequest.setVotesCap(3L);
 
         votingIdOfFirst = voteCreationUtils.createVoting(createVotingRequest);
-        Thread.sleep(3 * 1000);
+        Thread.sleep(3 * 100);
 
         JpaAuthToken authToken = Ebean.createQuery(JpaAuthToken.class)
                 .where()
@@ -359,7 +359,7 @@ public class TokenAuthVotingTest {
         createVotingRequest.setVotesCap(3L);
 
         votingIdOfSecond = voteCreationUtils.createVoting(createVotingRequest);
-        Thread.sleep(3 * 1000);
+        Thread.sleep(3 * 100);
     }
 
     private void expireVotingBy40Days(String votingId) {
@@ -371,6 +371,6 @@ public class TokenAuthVotingTest {
     }
 
     private void waitForTokenCleanUp() throws InterruptedException {
-        Thread.sleep(2000);
+        Thread.sleep(200);
     }
 }
