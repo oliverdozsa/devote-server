@@ -39,6 +39,7 @@ public class VotingResponseFromJpaVoting {
         votingResponse.setOnTestNetwork(jpaVoting.getOnTestNetwork());
         votingResponse.setFundingAccountId(jpaVoting.getUserGivenFundingAccountPublic());
         votingResponse.setRefunded(jpaVoting.isInternalFundingRefunded());
+        votingResponse.setInvitesBased(jpaVoting.isAuthTokenBased());
         setDecryptionKeyIfNeeded(votingResponse, jpaVoting);
     }
 

@@ -45,6 +45,7 @@ public class EbeanVotingInit {
             boolean hasEmails = request.getAuthorizationEmailOptions() != null &&
                     request.getAuthorizationEmailOptions().size() > 0;
             voting.setAuthTokensNeedToBeCreated(hasEmails);
+            voting.setOrganizer(request.getOrganizer());
         }
 
         return voting;

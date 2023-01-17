@@ -54,7 +54,7 @@ public class EmailInvitesTask implements Runnable {
     }
 
     private void sendInviteMailFor(JpaAuthToken jpaAuthToken) {
-        String link = "https://devote.network/tokenauth/" + jpaAuthToken.getToken().toString();
+        String link = "https://devote.network/invite/" + jpaAuthToken.getToken().toString();
 
         String bodyText = String.format(BODY_TEMPLATE,
                 jpaAuthToken.getVoting().getTitle(),
@@ -63,8 +63,8 @@ public class EmailInvitesTask implements Runnable {
 
         Email email = new Email()
                 .setSubject("You've been invited to participate in voting: \"" + jpaAuthToken.getVoting().getTitle() + "\"")
-                .setFrom("DeVote FROM <info@devote.network>")
-                .addTo("TO <" + jpaAuthToken.getVoter().getEmail() + ">")
+                .setFrom("DeVote Invite Bot <info@devote.network>")
+                .addTo("<" + jpaAuthToken.getVoter().getEmail() + ">")
                 .setBodyText(bodyText);
 
         context.mailerClient.send(email);

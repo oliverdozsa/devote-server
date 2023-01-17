@@ -22,6 +22,7 @@ public class VotingResponse {
     private String authorization;
     private String visibility;
     private boolean isRefunded;
+    private boolean isInvitesBased;
 
     private boolean isOnTestNetwork;
 
@@ -175,5 +176,13 @@ public class VotingResponse {
 
     public void setRefunded(boolean refunded) {
         isRefunded = refunded;
+    }
+
+    public boolean isInvitesBased() {
+        return isInvitesBased;
+    }
+
+    public void setInvitesBased(boolean invitesBased) {
+        isInvitesBased = invitesBased;
     }
 }
