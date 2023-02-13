@@ -65,6 +65,8 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
 
     private String organizer;
 
+    private BallotType ballotType = BallotType.MULTI_POLL;
+
     public String getNetwork() {
         return network;
     }
@@ -193,6 +195,14 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
         this.organizer = organizer;
     }
 
+    public BallotType getBallotType() {
+        return ballotType;
+    }
+
+    public void setBallotType(BallotType ballotType) {
+        this.ballotType = ballotType;
+    }
+
     @Override
     public String validate(Config config) {
         Integer minTimeInterval = config.getInt("devote.vote.related.min.time.interval.sec");
@@ -270,7 +280,8 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
                 ", fundingAccountSecret='" + StringUtils.redactWithEllipsis(fundingAccountSecret, 5) + '\'' +
                 ", useTestnet=" + useTestnet +
                 ", sendInvites=" + sendInvites +
-                ", organizer=" + organizer +
+                ", organizer='" + organizer + '\'' +
+                ", ballotType=" + ballotType +
                 '}';
     }
 
@@ -282,5 +293,10 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
         PUBLIC,
         UNLISTED,
         PRIVATE
+    }
+
+    public enum BallotType {
+        MULTI_POLL,
+        MULTI_CHOICE
     }
 }

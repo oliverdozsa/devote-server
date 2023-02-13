@@ -1,12 +1,7 @@
 package data.repositories.imp;
 
 import crypto.EncryptedVoting;
-import data.entities.Authorization;
-import data.entities.JpaVoter;
-import data.entities.JpaVoting;
-import data.entities.JpaVotingPoll;
-import data.entities.JpaVotingPollOption;
-import data.entities.Visibility;
+import data.entities.*;
 import requests.CreatePollOptionRequest;
 import requests.CreatePollRequest;
 import requests.CreateVotingRequest;
@@ -32,6 +27,7 @@ public class EbeanVotingInit {
         voting.setStartDate(request.getStartDate());
         voting.setEndDate(request.getEndDate());
         voting.setVisibility(Visibility.valueOf(request.getVisibility().name()));
+        setBallotType(request.getBallotType(), voting);
 
         List<JpaVotingPoll> polls = request.getPolls().stream()
                 .map(EbeanVotingInit::toVotingPoll)
@@ -109,6 +105,14 @@ public class EbeanVotingInit {
         for (int i = 0; i < voting.getPolls().size(); i++) {
             JpaVotingPoll poll = voting.getPolls().get(i);
             poll.setIndex(i + 1);
+        }
+    }
+
+    private static void setBallotType(CreateVotingRequest.BallotType requestedBallotType, JpaVoting jpaVoting) {
+        if (requestedBallotType == CreateVotingRequest.BallotType.MULTI_CHOICE) {
+            jpaVoting.setBallotType(BallotType.MULTI_CHOICE);
+        } else if (requestedBallotType == CreateVotingRequest.BallotType.MULTI_POLL) {
+            jpaVoting.setBallotType(BallotType.MULTI_POLL);
         }
     }
 

@@ -3,6 +3,7 @@ package components.controllers;
 import com.github.database.rider.core.api.dataset.DataSet;
 import components.clients.VotingsPagingTestClient;
 import data.entities.Authorization;
+import data.entities.BallotType;
 import data.entities.JpaVoting;
 import data.entities.Visibility;
 import io.ebean.Ebean;
@@ -178,6 +179,7 @@ public class VotingsPagingTest {
             jpaVoting.setCreatedAt(Instant.now().minus(Duration.ofDays(1)));
             jpaVoting.setStartDate(Instant.now().minus(Duration.ofDays(1)));
             jpaVoting.setEndDate(Instant.now().plus(Duration.ofDays(1)));
+            jpaVoting.setBallotType(BallotType.MULTI_POLL);
             Ebean.save(jpaVoting);
         }
     }

@@ -101,6 +101,10 @@ public class JpaVoting {
     @Enumerated(EnumType.STRING)
     private Authorization authorization;
 
+    @Column(name = "ballot_type", nullable = false, length = 50)
+    @Enumerated(EnumType.STRING)
+    private BallotType ballotType;
+
     @OneToMany(mappedBy = "voting", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     private List<JpaVotingPoll> polls;
 
@@ -405,5 +409,13 @@ public class JpaVoting {
 
     public void setOrganizer(String organizer) {
         this.organizer = organizer;
+    }
+
+    public BallotType getBallotType() {
+        return ballotType;
+    }
+
+    public void setBallotType(BallotType ballotType) {
+        this.ballotType = ballotType;
     }
 }
