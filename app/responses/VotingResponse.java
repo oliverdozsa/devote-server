@@ -23,6 +23,7 @@ public class VotingResponse {
     private String visibility;
     private boolean isRefunded;
     private boolean isInvitesBased;
+    private String ballotType;
 
     private boolean isOnTestNetwork;
 
@@ -184,5 +185,13 @@ public class VotingResponse {
 
     public void setInvitesBased(boolean invitesBased) {
         isInvitesBased = invitesBased;
+    }
+
+    public String getBallotType() {
+        return ballotType;
+    }
+
+    public void setBallotType(String ballotType) {
+        this.ballotType = ballotType;
     }
 }

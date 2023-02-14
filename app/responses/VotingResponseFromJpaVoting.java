@@ -41,6 +41,7 @@ public class VotingResponseFromJpaVoting {
         votingResponse.setRefunded(jpaVoting.isInternalFundingRefunded());
         votingResponse.setInvitesBased(jpaVoting.isAuthTokenBased());
         setDecryptionKeyIfNeeded(votingResponse, jpaVoting);
+        votingResponse.setBallotType(jpaVoting.getBallotType().name());
     }
 
     private void setDistributionAndBallotAccountId(VotingResponse ipfsVoting, JpaVoting jpaVoting) {

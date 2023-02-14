@@ -28,4 +28,9 @@ public class VotingResponseFromResult {
         JsonNode votingResponseJson = GenericDataFromResult.jsonOf(result);
         return votingResponseJson.get("title").asText();
     }
+
+    public static String ballotTypeOf(Result result) {
+        JsonNode votingResponseJson = GenericDataFromResult.jsonOf(result);
+        return votingResponseJson.get("ballotType").asText();
+    }
 }

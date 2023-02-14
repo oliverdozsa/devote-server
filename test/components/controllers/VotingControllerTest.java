@@ -70,6 +70,7 @@ public class VotingControllerTest {
         CreateVotingRequest createVotingRequest = createValidVotingRequest();
         createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
         createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
+        createVotingRequest.setBallotType(CreateVotingRequest.BallotType.MULTI_CHOICE);
 
         // When
         Result result = client.createVoting(createVotingRequest, "Alice", "alice@mail.com");
@@ -89,6 +90,7 @@ public class VotingControllerTest {
         Long votingId = idOf(getByLocationResult);
         assertThat(votingId, greaterThan(0L));
         assertThat(networkOf(getByLocationResult), equalTo("mockblockchain"));
+        assertThat(ballotTypeOf(getByLocationResult), equalTo("MULTI_CHOICE"));
         assertIssuerAccountsCreatedOnBlockchain(votingId);
         assertDistributionAndBallotAccountsCreatedOnBlockchain(votingId);
         assertVoteTokenIsSavedInDb(votingId);
