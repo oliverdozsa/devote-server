@@ -33,4 +33,8 @@ public class VotingResponseFromResult {
         JsonNode votingResponseJson = GenericDataFromResult.jsonOf(result);
         return votingResponseJson.get("ballotType").asText();
     }
+    public static Integer maxChoicesOf(Result result) {
+        JsonNode votingResponseJson = GenericDataFromResult.jsonOf(result);
+        return votingResponseJson.get("maxChoices").asInt();
+    }
 }

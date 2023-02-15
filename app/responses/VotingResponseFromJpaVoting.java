@@ -42,6 +42,7 @@ public class VotingResponseFromJpaVoting {
         votingResponse.setInvitesBased(jpaVoting.isAuthTokenBased());
         setDecryptionKeyIfNeeded(votingResponse, jpaVoting);
         votingResponse.setBallotType(jpaVoting.getBallotType().name());
+        votingResponse.setMaxChoices(jpaVoting.getMaxChoices());
     }
 
     private void setDistributionAndBallotAccountId(VotingResponse ipfsVoting, JpaVoting jpaVoting) {

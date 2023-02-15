@@ -71,6 +71,7 @@ public class VotingControllerTest {
         createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
         createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
         createVotingRequest.setBallotType(CreateVotingRequest.BallotType.MULTI_CHOICE);
+        createVotingRequest.setMaxChoices(3);
 
         // When
         Result result = client.createVoting(createVotingRequest, "Alice", "alice@mail.com");
@@ -91,6 +92,7 @@ public class VotingControllerTest {
         assertThat(votingId, greaterThan(0L));
         assertThat(networkOf(getByLocationResult), equalTo("mockblockchain"));
         assertThat(ballotTypeOf(getByLocationResult), equalTo("MULTI_CHOICE"));
+        assertThat(maxChoicesOf(getByLocationResult), equalTo(3));
         assertIssuerAccountsCreatedOnBlockchain(votingId);
         assertDistributionAndBallotAccountsCreatedOnBlockchain(votingId);
         assertVoteTokenIsSavedInDb(votingId);
@@ -103,6 +105,22 @@ public class VotingControllerTest {
         assertChannelAccountsCreatedOnBlockchain(votingId);
         assertChannelProgressCompletedFor(votingId);
         assertUserGivenFundingAccountExist(votingId);
+    }
+
+    @Test
+    public void testCreateWithInvalidMaxChoices() throws InterruptedException, IOException {
+        // Given
+        CreateVotingRequest createVotingRequest = createValidVotingRequest();
+        createVotingRequest.setAuthorization(CreateVotingRequest.Authorization.EMAILS);
+        createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
+        createVotingRequest.setBallotType(CreateVotingRequest.BallotType.MULTI_CHOICE);
+        createVotingRequest.setMaxChoices(0);
+
+        // When
+        Result result = client.createVoting(createVotingRequest, "Alice", "alice@mail.com");
+
+        // Then
+        assertThat(statusOf(result), equalTo(BAD_REQUEST));
     }
 
     @Test

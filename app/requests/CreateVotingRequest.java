@@ -67,6 +67,8 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
 
     private BallotType ballotType = BallotType.MULTI_POLL;
 
+    private Integer maxChoices;
+
     public String getNetwork() {
         return network;
     }
@@ -230,6 +232,10 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
             return "Invites are requested, and in this case, organizer cannot be empty!";
         }
 
+        if(ballotType == BallotType.MULTI_CHOICE && (maxChoices == null || maxChoices < 1)) {
+            return "If ballot type is MULTI_CHOICE, max choices must be >= 1!";
+        }
+
         return null;
     }
 
@@ -262,6 +268,14 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
         return gapMillis < minTimeIntervalMillis || doesNotEndInFuture;
     }
 
+    public Integer getMaxChoices() {
+        return maxChoices;
+    }
+
+    public void setMaxChoices(Integer maxChoices) {
+        this.maxChoices = maxChoices;
+    }
+
     @Override
     public String toString() {
         return "CreateVotingRequest{" +
@@ -282,6 +296,7 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
                 ", sendInvites=" + sendInvites +
                 ", organizer='" + organizer + '\'' +
                 ", ballotType=" + ballotType +
+                ", maxChoices=" + maxChoices +
                 '}';
     }
 

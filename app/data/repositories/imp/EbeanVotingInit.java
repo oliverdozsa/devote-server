@@ -28,6 +28,7 @@ public class EbeanVotingInit {
         voting.setEndDate(request.getEndDate());
         voting.setVisibility(Visibility.valueOf(request.getVisibility().name()));
         setBallotType(request.getBallotType(), voting);
+        voting.setMaxChoices(request.getMaxChoices());
 
         List<JpaVotingPoll> polls = request.getPolls().stream()
                 .map(EbeanVotingInit::toVotingPoll)

@@ -105,6 +105,9 @@ public class JpaVoting {
     @Enumerated(EnumType.STRING)
     private BallotType ballotType;
 
+    @Column(name = "max_choices")
+    private Integer maxChoices;
+
     @OneToMany(mappedBy = "voting", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     private List<JpaVotingPoll> polls;
 
@@ -417,5 +420,13 @@ public class JpaVoting {
 
     public void setBallotType(BallotType ballotType) {
         this.ballotType = ballotType;
+    }
+
+    public Integer getMaxChoices() {
+        return maxChoices;
+    }
+
+    public void setMaxChoices(Integer maxChoices) {
+        this.maxChoices = maxChoices;
     }
 }

@@ -24,6 +24,7 @@ public class VotingResponse {
     private boolean isRefunded;
     private boolean isInvitesBased;
     private String ballotType;
+    private Integer maxChoices;
 
     private boolean isOnTestNetwork;
 
@@ -193,5 +194,13 @@ public class VotingResponse {
 
     public void setBallotType(String ballotType) {
         this.ballotType = ballotType;
+    }
+
+    public Integer getMaxChoices() {
+        return maxChoices;
+    }
+
+    public void setMaxChoices(Integer maxChoices) {
+        this.maxChoices = maxChoices;
     }
 }
