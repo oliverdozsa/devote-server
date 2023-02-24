@@ -25,6 +25,7 @@ public class VotingResponse {
     private boolean isInvitesBased;
     private String ballotType;
     private Integer maxChoices;
+    private String description;
 
     private boolean isOnTestNetwork;
 
@@ -202,5 +203,13 @@ public class VotingResponse {
 
     public void setMaxChoices(Integer maxChoices) {
         this.maxChoices = maxChoices;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

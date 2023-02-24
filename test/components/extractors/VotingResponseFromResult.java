@@ -37,4 +37,9 @@ public class VotingResponseFromResult {
         JsonNode votingResponseJson = GenericDataFromResult.jsonOf(result);
         return votingResponseJson.get("maxChoices").asInt();
     }
+
+    public static String descriptionOf(Result result) {
+        JsonNode votingResponseJson = GenericDataFromResult.jsonOf(result);
+        return votingResponseJson.get("description").asText();
+    }
 }

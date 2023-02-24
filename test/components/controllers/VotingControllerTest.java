@@ -72,6 +72,9 @@ public class VotingControllerTest {
         createVotingRequest.setAuthorizationEmailOptions(Arrays.asList("john@mail.com", "doe@where.de", "some@one.com"));
         createVotingRequest.setBallotType(CreateVotingRequest.BallotType.MULTI_CHOICE);
         createVotingRequest.setMaxChoices(3);
+        createVotingRequest.setDescription("Some description");
+
+        createVotingRequest.getPolls().get(0).setDescription("Some poll description.");
 
         // When
         Result result = client.createVoting(createVotingRequest, "Alice", "alice@mail.com");
@@ -93,6 +96,7 @@ public class VotingControllerTest {
         assertThat(networkOf(getByLocationResult), equalTo("mockblockchain"));
         assertThat(ballotTypeOf(getByLocationResult), equalTo("MULTI_CHOICE"));
         assertThat(maxChoicesOf(getByLocationResult), equalTo(3));
+        assertThat(descriptionOf(getByLocationResult), equalTo("Some description"));
         assertIssuerAccountsCreatedOnBlockchain(votingId);
         assertDistributionAndBallotAccountsCreatedOnBlockchain(votingId);
         assertVoteTokenIsSavedInDb(votingId);
@@ -100,6 +104,8 @@ public class VotingControllerTest {
         assertVotingStartEndDateSavedInDb(votingId);
         assertAuthorizationEmailsSavedInDb(votingId, "john@mail.com", "doe@where.de", "some@one.com");
         assertPollSavedInDb(votingId, createVotingRequest.getPolls());
+        assertPollsOfVotingHaveDescriptions(votingId, new String[]{"Some poll description."});
+
         ipfsAsserts.assertVotingSavedToIpfs(votingId);
 
         assertChannelAccountsCreatedOnBlockchain(votingId);

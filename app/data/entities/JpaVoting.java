@@ -142,6 +142,10 @@ public class JpaVoting {
     @Column(name = "organizer")
     private String organizer;
 
+    @Column(name = "description")
+    @Lob
+    private String description;
+
     public Long getId() {
         return id;
     }
@@ -428,5 +432,13 @@ public class JpaVoting {
 
     public void setMaxChoices(Integer maxChoices) {
         this.maxChoices = maxChoices;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
