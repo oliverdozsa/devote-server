@@ -5,7 +5,7 @@ import play.data.validation.Constraints;
 public class CreatePollOptionRequest {
     @Constraints.Required
     @Constraints.MinLength(2)
-    @Constraints.MaxLength(1000)
+    @Constraints.MaxLength(300)
     private String name;
 
     @Constraints.Required

@@ -29,6 +29,7 @@ public class EbeanVotingInit {
         voting.setVisibility(Visibility.valueOf(request.getVisibility().name()));
         setBallotType(request.getBallotType(), voting);
         voting.setMaxChoices(request.getMaxChoices());
+        voting.setDescription(request.getDescription());
 
         List<JpaVotingPoll> polls = request.getPolls().stream()
                 .map(EbeanVotingInit::toVotingPoll)
@@ -77,6 +78,7 @@ public class EbeanVotingInit {
     public static JpaVotingPoll toVotingPoll(CreatePollRequest pollRequest) {
         JpaVotingPoll votingPoll = new JpaVotingPoll();
         votingPoll.setQuestion(pollRequest.getQuestion());
+        votingPoll.setDescription(pollRequest.getDescription());
 
         List<JpaVotingPollOption> pollOptions = pollRequest.getOptions().stream()
                 .map(EbeanVotingInit::toVotingPollOption)

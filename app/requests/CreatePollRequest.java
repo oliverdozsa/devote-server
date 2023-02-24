@@ -14,6 +14,9 @@ public class CreatePollRequest implements Constraints.Validatable<String> {
     @Constraints.MaxLength(1000)
     private String question;
 
+    @Constraints.MaxLength(1000)
+    private String description;
+
     @Constraints.Required
     @Valid
     @Size(min = 2, max = 99)
@@ -35,6 +38,14 @@ public class CreatePollRequest implements Constraints.Validatable<String> {
         this.options = options;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String validate() {
         if(areOptionsEmpty()) {
@@ -54,8 +65,9 @@ public class CreatePollRequest implements Constraints.Validatable<String> {
 
     @Override
     public String toString() {
-        return "PollDto{" +
+        return "CreatePollRequest{" +
                 "question='" + question + '\'' +
+                ", description='" + description + '\'' +
                 ", options=" + options +
                 '}';
     }

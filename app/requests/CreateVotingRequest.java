@@ -69,6 +69,9 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
 
     private Integer maxChoices;
 
+    @Constraints.MaxLength(1000)
+    private String description;
+
     public String getNetwork() {
         return network;
     }
@@ -276,6 +279,14 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
         this.maxChoices = maxChoices;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         return "CreateVotingRequest{" +
@@ -297,6 +308,7 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
                 ", organizer='" + organizer + '\'' +
                 ", ballotType=" + ballotType +
                 ", maxChoices=" + maxChoices +
+                ", description='" + description + '\'' +
                 '}';
     }
 

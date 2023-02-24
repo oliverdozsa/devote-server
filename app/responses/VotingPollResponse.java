@@ -5,6 +5,7 @@ import java.util.List;
 public class VotingPollResponse {
     private Integer index;
     private String question;
+    private String description;
     private List<VotingPollOptionResponse> pollOptions;
 
     public Integer getIndex() {
@@ -29,5 +30,13 @@ public class VotingPollResponse {
 
     public void setPollOptions(List<VotingPollOptionResponse> pollOptions) {
         this.pollOptions = pollOptions;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

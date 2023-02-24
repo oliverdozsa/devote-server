@@ -43,6 +43,7 @@ public class VotingResponseFromJpaVoting {
         setDecryptionKeyIfNeeded(votingResponse, jpaVoting);
         votingResponse.setBallotType(jpaVoting.getBallotType().name());
         votingResponse.setMaxChoices(jpaVoting.getMaxChoices());
+        votingResponse.setDescription(jpaVoting.getDescription());
     }
 
     private void setDistributionAndBallotAccountId(VotingResponse ipfsVoting, JpaVoting jpaVoting) {
@@ -64,6 +65,7 @@ public class VotingResponseFromJpaVoting {
         VotingPollResponse votingPollResponse = new VotingPollResponse();
 
         votingPollResponse.setQuestion(jpaVotingPoll.getQuestion());
+        votingPollResponse.setDescription(jpaVotingPoll.getDescription());
         votingPollResponse.setIndex(jpaVotingPoll.getIndex());
 
         List<VotingPollOptionResponse> votingPollOptionResponses = jpaVotingPoll.getOptions().stream()

@@ -29,6 +29,10 @@ public class JpaVotingPoll {
     @Lob
     private String question;
 
+    @Column(name = "description")
+    @Lob
+    private String description;
+
     @OneToMany(mappedBy = "poll", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     private List<JpaVotingPollOption> options;
 
@@ -74,5 +78,13 @@ public class JpaVotingPoll {
 
     public void setVoting(JpaVoting voting) {
         this.voting = voting;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

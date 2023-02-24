@@ -97,6 +97,15 @@ public class DbAsserts {
         });
     }
 
+    public static void assertPollsOfVotingHaveDescriptions(Long votingId, String[] expectedDescriptions) {
+        JpaVoting voting = Ebean.find(JpaVoting.class, votingId);
+
+        for(int i = 0; i < expectedDescriptions.length; i++) {
+            JpaVotingPoll poll = voting.getPolls().get(i);
+            assertThat(poll.getDescription(), equalTo(expectedDescriptions[i]));
+        }
+    }
+
     public static void assertThatTransactionIsStoredFor(String signature) {
         Optional<JpaStoredTransaction> storedTransactionOptional = Ebean.createQuery(JpaStoredTransaction.class)
                 .where()
