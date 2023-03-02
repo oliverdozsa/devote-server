@@ -9,7 +9,6 @@ import devote.blockchain.api.ChannelGenerator;
 import play.Logger;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ChannelAccountBuilderTask implements Runnable {
     private final int taskId;
@@ -29,7 +28,7 @@ public class ChannelAccountBuilderTask implements Runnable {
         try {
             JpaChannelAccountProgress channelProgress = getAChannelAccountProgress();
             if (channelProgress == null) {
-                logger.info("[CHANNEL-TASK-{}]: No suitable channel progress found.", taskId);
+                logger.debug("[CHANNEL-TASK-{}]: No suitable channel progress found.", taskId);
                 return;
             }
 
@@ -83,15 +82,6 @@ public class ChannelAccountBuilderTask implements Runnable {
             if (candidate.getId() % context.voteBuckets == taskId) {
                 return candidate;
             }
-        }
-
-        if (sampleProgresses.size() > 0) {
-            List<Long> progressIds = sampleProgresses.stream()
-                    .map(JpaChannelAccountProgress::getId)
-                    .collect(Collectors.toList());
-
-            logger.warn("[CHANNEL-TASK-{}]: could not find a suitable channel progress! progress ids = {}",
-                    taskId, progressIds);
         }
 
         return null;

@@ -31,7 +31,7 @@ public class EmailInvitesTask implements Runnable {
         Optional<JpaVoting> optionalVoting = context.votingRepository.findOneWithAuthTokenNeedsToBeCreated();
 
         if (!optionalVoting.isPresent()) {
-            logger.info("[EMAIL-INVITE-TASK]: Not found voting that has auth tokens left to create.");
+            logger.debug("[EMAIL-INVITE-TASK]: Not found voting that has auth tokens left to create.");
             return;
         }
 
@@ -41,7 +41,7 @@ public class EmailInvitesTask implements Runnable {
                 context.voterRepository.findThoseWhoNeedsAuthToken(voting.getId(), context.invitesToSendInOneBatch);
 
         if (votersWhoNeedAuthTokens.size() == 0) {
-            logger.info("[EMAIL-INVITE-TASK]: No more voters need auth tokens in voting: {}", voting.getId());
+            logger.debug("[EMAIL-INVITE-TASK]: No more voters need auth tokens in voting: {}", voting.getId());
             context.votingRepository.allAuthTokensCreated(voting.getId());
             return;
         }

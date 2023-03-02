@@ -40,7 +40,7 @@ public class EbeanChannelProgressRepository implements ChannelProgressRepository
 
     @Override
     public List<JpaChannelAccountProgress> notFinishedSampleOf(int sampleSize) {
-        logger.info("notFinishedSampleOf(): sampleSize = {}", sampleSize);
+        logger.debug("notFinishedSampleOf(): sampleSize = {}", sampleSize);
 
         return ebeanServer.createQuery(JpaChannelAccountProgress.class)
                 .where()

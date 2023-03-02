@@ -103,7 +103,7 @@ public class EbeanVotingRepository implements VotingRepository {
 
     @Override
     public List<JpaVoting> notInitializedSampleOf(int size) {
-        logger.info("notInitializedSampleOf(): size = {}", size);
+        logger.debug("notInitializedSampleOf(): size = {}", size);
 
         return ebeanServer.createQuery(JpaVoting.class)
                 .where()
@@ -114,7 +114,7 @@ public class EbeanVotingRepository implements VotingRepository {
 
     @Override
     public Optional<JpaVoting> findANotRefundedEndedVoting() {
-        logger.info("findAnEndedVotingWithNotRefundedDistribution()");
+        logger.debug("findAnEndedVotingWithNotRefundedDistribution()");
 
         return ebeanServer.createQuery(JpaVoting.class)
                 .where()
@@ -156,7 +156,7 @@ public class EbeanVotingRepository implements VotingRepository {
 
     @Override
     public Optional<JpaVoting> findOneWithAuthTokenNeedsToBeCreated() {
-        logger.info("findOneWithAuthTokenNeedsToBeCreated()");
+        logger.debug("findOneWithAuthTokenNeedsToBeCreated()");
 
         return ebeanServer.createQuery(JpaVoting.class)
                 .where()
