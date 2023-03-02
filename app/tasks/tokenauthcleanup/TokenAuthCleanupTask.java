@@ -14,7 +14,7 @@ public class TokenAuthCleanupTask implements Runnable {
 
     @Override
     public void run() {
-        logger.info("[TOKEN-AUTH-CLEANUP]: Cleaning up max {} expired auth tokens older than {} days after voting ended",
+        logger.debug("[TOKEN-AUTH-CLEANUP]: Cleaning up max {} expired auth tokens older than {} days after voting ended",
                 context.maxToCleanupInOneBatch, context.usableDaysAfterVotingEnded);
         context.tokenAuthRepository.cleanupOlderThanFromVotingEndDate(context.usableDaysAfterVotingEnded, context.maxToCleanupInOneBatch);
     }

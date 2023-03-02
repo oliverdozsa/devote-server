@@ -32,7 +32,7 @@ public class VotingBlockchainInitTask implements Runnable {
         try {
             JpaVoting voting = getANotFullyInitializedVoting();
             if (voting == null) {
-                logger.info("[VOTING-BC-INIT-TASK-{}]: Could not find a voting to init.", taskId);
+                logger.debug("[VOTING-BC-INIT-TASK-{}]: Could not find a voting to init.", taskId);
                 return;
             }
 
@@ -50,14 +50,6 @@ public class VotingBlockchainInitTask implements Runnable {
             if (candidate.getId() % context.voteBuckets == taskId) {
                 return candidate;
             }
-        }
-
-        if (notInitializedVotings.size() > 0) {
-            List<Long> notInitializedVotingIds = notInitializedVotings.stream()
-                    .map(JpaVoting::getId)
-                    .collect(Collectors.toList());
-            logger.warn("[VOTING-BC-INIT-TASK-{}]: Could not find suitable voting for this task " +
-                    "(should be handled by other tasks)! voting ids in sample = {}", taskId, notInitializedVotingIds);
         }
 
         return null;

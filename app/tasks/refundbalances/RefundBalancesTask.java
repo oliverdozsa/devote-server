@@ -32,7 +32,7 @@ public class RefundBalancesTask implements Runnable {
                 logger.info("[REFUND-BALANCES-TASK]: about to refund balances of voting: {}", notRefundedVoting.getId());
                 refundVoting(notRefundedVoting);
             } else {
-                logger.info("[REFUND-BALANCES-TASK]: not found voting to refund.");
+                logger.debug("[REFUND-BALANCES-TASK]: not found voting to refund.");
             }
         } catch (Exception e) {
             logger.warn("[REFUND-BALANCES-TASK]: Failed to refund a voting", e);
@@ -51,7 +51,7 @@ public class RefundBalancesTask implements Runnable {
         if (channelAccountsToRefund.size() > 0) {
             refundChannelAccountsFor(voting, channelAccountsToRefund);
         } else {
-            logger.info("[REFUND-BALANCES-TASK]: not found channel accounts to refund for voting: {}; trying to refund " +
+            logger.debug("[REFUND-BALANCES-TASK]: not found channel accounts to refund for voting: {}; trying to refund " +
                     "channel generators, or distribution.");
             tryRefundChannelGeneratorsOrDistributionOrInternalFunding(voting);
         }
@@ -84,7 +84,7 @@ public class RefundBalancesTask implements Runnable {
         if (channelGeneratorAccountsToRefund.size() > 0) {
             refundChannelGeneratorAccountsFor(voting, channelGeneratorAccountsToRefund);
         } else if(!voting.isDistributionRefunded()){
-            logger.info("[REFUND-BALANCES-TASK]: not found channel generator accounts to refund for voting: {}; about to refund" +
+            logger.debug("[REFUND-BALANCES-TASK]: not found channel generator accounts to refund for voting: {}; about to refund" +
                     " distribution account.", voting.getId());
             Account destination = new Account(voting.getFundingAccountSecret(), voting.getFundingAccountPublic());
             Account accountToRefund = new Account(voting.getDistributionAccountSecret(), voting.getDistributionAccountPublic());
