@@ -29,7 +29,9 @@ public class EbeanPageOfVotingRepository implements PageOfVotingsRepository {
     public Page<JpaVoting> pageOfPublic(int offset, int limit) {
         Query<JpaVoting> query = ebeanServer.createQuery(JpaVoting.class);
 
-        query.where().eq("visibility", Visibility.PUBLIC.name());
+        query.where()
+                .eq("visibility", Visibility.PUBLIC.name())
+                .setOrderBy("createdAt desc");
         offsetAndLimit(query, offset, limit);
 
         return toPage(query);
@@ -39,7 +41,9 @@ public class EbeanPageOfVotingRepository implements PageOfVotingsRepository {
     public Page<JpaVoting> votingsOfVoteCaller(int offset, int limit, String userId) {
         Query<JpaVoting> query = ebeanServer.createQuery(JpaVoting.class);
 
-        query.where().eq("createdBy", userId);
+        query.where()
+                .eq("createdBy", userId)
+                .setOrderBy("createdAt desc");
         offsetAndLimit(query, offset, limit);
 
         return toPage(query);
@@ -55,7 +59,9 @@ public class EbeanPageOfVotingRepository implements PageOfVotingsRepository {
 
         Query<JpaVoting> query = ebeanServer.createQuery(JpaVoting.class);
 
-        query.where().eq("voters.voterIds.id", userId);
+        query.where()
+                .eq("voters.voterIds.id", userId)
+                .setOrderBy("createdAt desc");
         offsetAndLimit(query, offset, limit);
 
         return toPage(query);
