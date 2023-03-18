@@ -10,6 +10,8 @@ public class PageVotingsRequest {
     @Constraints.Min(5)
     private Integer limit;
 
+    private Boolean filterByNotTriedToCastVote;
+
     public Integer getOffset() {
         return offset;
     }
@@ -26,11 +28,20 @@ public class PageVotingsRequest {
         this.limit = limit;
     }
 
+    public Boolean getFilterByNotTriedToCastVote() {
+        return filterByNotTriedToCastVote;
+    }
+
+    public void setFilterByNotTriedToCastVote(Boolean filterByNotTriedToCastVote) {
+        this.filterByNotTriedToCastVote = filterByNotTriedToCastVote;
+    }
+
     @Override
     public String toString() {
-        return "PageOfVotingsRequest{" +
+        return "PageVotingsRequest{" +
                 "offset=" + offset +
                 ", limit=" + limit +
+                ", filterByNotTriedToCastVote=" + filterByNotTriedToCastVote +
                 '}';
     }
 }

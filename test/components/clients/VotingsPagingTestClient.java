@@ -62,6 +62,19 @@ public class VotingsPagingTestClient extends TestClient {
         return route(application, httpRequest);
     }
 
+    public Result votingsOfVoterFilteredByNotAlreadyTriedToVote(int offset, int limit, String userId) {
+        String queryParams = String.format("offset=%d&limit=%d&filterByNotTriedToCastVote=true", offset, limit);
+
+        Http.RequestBuilder httpRequest = new Http.RequestBuilder()
+                .method(GET)
+                .uri(routes.VotingsPagingController.votingsOfVoter().url() + "?" + queryParams);
+
+        String jwt = jwtTestUtils.createToken(userId, userId + "@mail.com");
+        addJwtTokenTo(httpRequest, jwt);
+
+        return route(application, httpRequest);
+    }
+
     private Http.RequestBuilder votingsOfVoterBase(int offset, int limit) {
         String queryParams = String.format("offset=%d&limit=%d", offset, limit);
 

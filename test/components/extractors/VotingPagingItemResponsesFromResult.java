@@ -2,9 +2,11 @@ package components.extractors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import play.mvc.Result;
+import services.Base62Conversions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static components.extractors.GenericDataFromResult.jsonOf;
 
@@ -20,6 +22,15 @@ public class VotingPagingItemResponsesFromResult {
         resultJson.get("items").forEach(item -> ids.add(item.get("id").asText()));
 
         return ids;
+    }
+
+    public static List<Long> votingIdsDecodedOf(Result result) {
+        JsonNode resultJson = jsonOf(result);
+        List<String> ids = new ArrayList<>();
+        resultJson.get("items").forEach(item -> ids.add(item.get("id").asText()));
+
+        return ids.stream().map(Base62Conversions::decode)
+                .collect(Collectors.toList());
     }
 
     public static List<String> votingTitlesOf(Result result) {

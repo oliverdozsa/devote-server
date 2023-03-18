@@ -49,9 +49,16 @@ public class VotingsPagingService {
 
         int offset = getOffsetOrDefault(request);
         int limit = getLimitOrDefault(request);
+        boolean filterByNotTriedToCastVote = Boolean.TRUE.equals(request.getFilterByNotTriedToCastVote());
 
         return checkIfUserIsAllowedToPageVotingsOfVoters(jwt)
-                .thenCompose(v -> pageOfVotingsDbOperations.votingsOfVoter(offset, limit, jwt.getUserId()))
+                .thenCompose(v -> {
+                    if(filterByNotTriedToCastVote) {
+                        return pageOfVotingsDbOperations.votingsOfVoterFilteredByNotTriedToCastVote(offset, limit, jwt.getUserId());
+                    } else {
+                        return pageOfVotingsDbOperations.votingsOfVoter(offset, limit, jwt.getUserId());
+                    }
+                })
                 .thenApply(this::toPageOfPageVotingResponse);
     }
 

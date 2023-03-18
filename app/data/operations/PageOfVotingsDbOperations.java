@@ -37,4 +37,9 @@ public class PageOfVotingsDbOperations {
         logger.info("votingsOfVoter(): offset = {}, limit = {}, userId = {}", offset, limit, userId);
         return supplyAsync(() -> repository.votingsOfVoter(offset, limit, userId), dbExecContext);
     }
+
+    public CompletionStage<Page<JpaVoting>> votingsOfVoterFilteredByNotTriedToCastVote(int offset, int limit, String userId) {
+        logger.info("votingsOfVoterFilteredByNotTriedToCastVote(): offset = {}, limit = {}, userId = {}", offset, limit, userId);
+        return supplyAsync(() -> repository.votingsOfVoterFilteredByNotTriedToCastVote(offset, limit, userId), dbExecContext);
+    }
 }

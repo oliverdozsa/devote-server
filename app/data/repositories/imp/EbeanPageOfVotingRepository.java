@@ -1,9 +1,8 @@
 package data.repositories.imp;
 
-import data.entities.JpaAuthToken;
-import data.entities.JpaVoting;
-import data.entities.Visibility;
+import data.entities.*;
 import data.repositories.PageOfVotingsRepository;
+import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Query;
 import responses.Page;
@@ -14,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static data.repositories.imp.EbeanRepositoryUtils.assertEntityExists;
+import static io.ebean.Expr.*;
 
 public class EbeanPageOfVotingRepository implements PageOfVotingsRepository {
     private final EbeanServer ebeanServer;
@@ -51,20 +51,28 @@ public class EbeanPageOfVotingRepository implements PageOfVotingsRepository {
 
     @Override
     public Page<JpaVoting> votingsOfVoter(int offset, int limit, String userId) {
-        if (tokenAuthUserIdUtil.isForTokenAuth(userId)) {
-            assertEntityExists(ebeanServer, JpaAuthToken.class, tokenAuthUserIdUtil.getTokenFrom(userId));
+        Query<JpaVoting> query = votingsOfVoterQuery(offset, limit, userId);
+        return votingsOfVoterBasedOn(query, userId);
+    }
 
-            return findVotingForTokenUserId(userId);
-        }
+    @Override
+    public Page<JpaVoting> votingsOfVoterFilteredByNotTriedToCastVote(int offset, int limit, String userId) {
+        Query<JpaVoting> query = votingsOfVoterQuery(offset, limit, userId);
 
-        Query<JpaVoting> query = ebeanServer.createQuery(JpaVoting.class);
+        JpaVoterUserId voterUserId = ebeanServer.find(JpaVoterUserId.class, userId);
+
+        Query<JpaCommissionSession> votingsOfSessionsOfVoter = ebeanServer.createQuery(JpaCommissionSession.class)
+                .select("voting.id")
+                .where()
+                .eq("voter.id", voterUserId.getVoter().getId())
+                .query();
 
         query.where()
-                .eq("voters.voterIds.id", userId)
-                .setOrderBy("createdAt desc");
-        offsetAndLimit(query, offset, limit);
+                .disjunction()
+                .isNull("initSessions.id")
+                .notIn("id", votingsOfSessionsOfVoter);
 
-        return toPage(query);
+        return votingsOfVoterBasedOn(query, userId);
     }
 
     private void offsetAndLimit(Query<JpaVoting> query, int offset, int limit) {
@@ -91,5 +99,26 @@ public class EbeanPageOfVotingRepository implements PageOfVotingsRepository {
         result.setItems(votingAsList);
         result.setTotalCount(1);
         return result;
+    }
+
+    private Query<JpaVoting> votingsOfVoterQuery(int offset, int limit, String userId) {
+        Query<JpaVoting> query = ebeanServer.createQuery(JpaVoting.class);
+
+        query.where()
+                .eq("voters.voterIds.id", userId)
+                .setOrderBy("createdAt desc");
+        offsetAndLimit(query, offset, limit);
+
+        return query;
+    }
+
+    private Page<JpaVoting> votingsOfVoterBasedOn(Query<JpaVoting> query, String userId) {
+        if (tokenAuthUserIdUtil.isForTokenAuth(userId)) {
+            assertEntityExists(ebeanServer, JpaAuthToken.class, tokenAuthUserIdUtil.getTokenFrom(userId));
+
+            return findVotingForTokenUserId(userId);
+        }
+
+        return toPage(query);
     }
 }

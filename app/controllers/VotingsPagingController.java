@@ -62,7 +62,7 @@ public class VotingsPagingController {
 
         if (form.hasErrors()) {
             JsonNode errorJson = form.errorsAsJson();
-            logger.warn("pagingsBase(): Form has errors! error json:\n{}", errorJson.toPrettyString());
+            logger.warn("preprocess(): Form has errors! error json:\n{}", errorJson.toPrettyString());
 
             return completedFuture(badRequest(errorJson));
         } else {

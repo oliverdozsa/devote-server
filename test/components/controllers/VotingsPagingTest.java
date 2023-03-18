@@ -2,10 +2,7 @@ package components.controllers;
 
 import com.github.database.rider.core.api.dataset.DataSet;
 import components.clients.VotingsPagingTestClient;
-import data.entities.Authorization;
-import data.entities.BallotType;
-import data.entities.JpaVoting;
-import data.entities.Visibility;
+import data.entities.*;
 import io.ebean.Ebean;
 import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;
@@ -18,11 +15,13 @@ import play.mvc.Result;
 import rules.RuleChainForTests;
 import security.jwtverification.JwtVerification;
 import security.jwtverification.JwtVerificationForTests;
+import services.Base62Conversions;
 import units.ipfs.api.imp.MockIpfsApi;
 import units.ipfs.api.imp.MockIpfsProvider;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 
 import static components.extractors.GenericDataFromResult.statusOf;
 import static components.extractors.VotingPagingItemResponsesFromResult.*;
@@ -164,6 +163,52 @@ public class VotingsPagingTest {
         assertThat(votingIdsOf(result).size(), equalTo(0));
         assertThat(votingTitlesOf(result).size(), equalTo(0));
         assertThat(endDatesOf(result).size(), equalTo(0));
+    }
+
+    @Test
+    @DataSet(value = "datasets/yml/votings-paging.yml", disableConstraints = true, cleanBefore = true)
+    public void testVoterVotingNotTriedToVote() {
+        // Given
+        // When
+        JpaVoter jpaAliceVoter = Ebean.find(JpaVoter.class, 1L);
+        JpaVoter jpaBobVoter = Ebean.find(JpaVoter.class, 2L);
+
+        JpaVoting jpaVoting = new JpaVoting();
+        jpaVoting.setId(142L);
+        jpaVoting.setTitle("Vote 142");
+        jpaVoting.setAuthorization(Authorization.EMAILS);
+        jpaVoting.setVisibility(Visibility.PRIVATE);
+        jpaVoting.setBallotType(BallotType.MULTI_POLL);
+        jpaVoting.setCreatedBy("Bob");
+        jpaVoting.setNetwork("mockblockchain");
+        jpaVoting.setVotesCap(100L);
+        jpaVoting.setCreatedAt(Instant.now().minus(Duration.ofDays(1)));
+        jpaVoting.setStartDate(Instant.now().minus(Duration.ofDays(1)));
+        jpaVoting.setEndDate(Instant.now().plus(Duration.ofDays(1)));
+        jpaVoting.setVoters(Arrays.asList(jpaAliceVoter, jpaBobVoter));
+        Ebean.save(jpaVoting);
+
+        JpaCommissionSession initSessionAlice = new JpaCommissionSession();
+        initSessionAlice.setVoter(jpaAliceVoter);
+        initSessionAlice.setVoting(jpaVoting);
+        Ebean.save(initSessionAlice);
+
+        Result votesResult = client.votingsOfVoterFilteredByNotAlreadyTriedToVote(0, 10, "Bob");
+        assertThat(statusOf(votesResult), equalTo(OK));
+
+        assertThat(votingIdsDecodedOf(votesResult).size(), equalTo(3));
+        assertThat(votingIdsDecodedOf(votesResult), containsInAnyOrder(1L, 2L, 142L));
+
+        JpaCommissionSession initSessionBob = new JpaCommissionSession();
+        initSessionBob.setVoter(jpaBobVoter);
+        initSessionBob.setVoting(jpaVoting);
+        Ebean.save(initSessionBob);
+
+        votesResult = client.votingsOfVoterFilteredByNotAlreadyTriedToVote(0, 10, "Bob");
+        assertThat(statusOf(votesResult), equalTo(OK));
+
+        assertThat(votingIdsDecodedOf(votesResult).size(), equalTo(2));
+        assertThat(votingIdsDecodedOf(votesResult), containsInAnyOrder(1L, 2L));
     }
 
     private void seedPublicVotingTestData() {
