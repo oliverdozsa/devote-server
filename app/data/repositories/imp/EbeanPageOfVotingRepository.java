@@ -9,6 +9,7 @@ import responses.Page;
 import security.TokenAuthUserIdUtil;
 
 import javax.inject.Inject;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -68,6 +69,7 @@ public class EbeanPageOfVotingRepository implements PageOfVotingsRepository {
                 .query();
 
         query.where()
+                .gt("endDate", Instant.now())
                 .disjunction()
                 .isNull("initSessions.id")
                 .notIn("id", votingsOfSessionsOfVoter);

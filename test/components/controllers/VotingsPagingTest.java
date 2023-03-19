@@ -188,6 +188,14 @@ public class VotingsPagingTest {
         jpaVoting.setVoters(Arrays.asList(jpaAliceVoter, jpaBobVoter));
         Ebean.save(jpaVoting);
 
+        JpaVoting jpaVoting1 = Ebean.find(JpaVoting.class, 1L);
+        jpaVoting1.setEndDate(Instant.now().plus(Duration.ofDays(1)));
+        Ebean.save(jpaVoting1);
+
+        JpaVoting jpaVoting2 = Ebean.find(JpaVoting.class, 2L);
+        jpaVoting2.setEndDate(Instant.now().plus(Duration.ofDays(1)));
+        Ebean.save(jpaVoting2);
+
         JpaCommissionSession initSessionAlice = new JpaCommissionSession();
         initSessionAlice.setVoter(jpaAliceVoter);
         initSessionAlice.setVoting(jpaVoting);
