@@ -2,15 +2,14 @@ package tasks.votingblockchaininit;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import data.entities.JpaVoting;
-import devote.blockchain.BlockchainFactory;
-import devote.blockchain.api.*;
+import galactic.blockchain.BlockchainFactory;
+import galactic.blockchain.api.*;
 import ipfs.data.IpfsVoting;
 import ipfs.data.IpfsVotingFromJpaVoting;
 import play.Logger;
 import play.libs.Json;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class VotingBlockchainInitTask implements Runnable {
     private final int taskId;

@@ -5,7 +5,7 @@ import data.entities.JpaVoting;
 import data.operations.CommissionDbOperations;
 import data.operations.VoterDbOperations;
 import data.operations.VotingDbOperations;
-import devote.blockchain.operations.CommissionBlockchainOperations;
+import galactic.blockchain.operations.CommissionBlockchainOperations;
 import exceptions.BusinessLogicViolationException;
 import exceptions.ForbiddenException;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;

@@ -1,5 +1,5 @@
-name := """devote"""
-organization := "org.devote"
+name := """galactic vote"""
+organization := "vote.galactic"
 
 version := "1.0-SNAPSHOT"
 
@@ -41,7 +41,7 @@ jacocoExcludes ++= Seq("router.*")
 jacocoExcludes ++= Seq("data.entities.*")
 
 jacocoReportSettings := JacocoReportSettings()
-  .withTitle("DeVote coverage")
+  .withTitle("Galactic Vote coverage")
   .withFormats(JacocoReportFormats.HTML, JacocoReportFormats.XML)
 
 

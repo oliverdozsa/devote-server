@@ -17,7 +17,7 @@ public class JwkProviderProvider implements Provider<JwkProvider> {
 
     @Override
     public JwkProvider get() {
-        String issuer = config.getString("devote.jwt.issuer");
+        String issuer = config.getString("galactic.vote.jwt.issuer");
         return new UrlJwkProvider(issuer);
     }
 }

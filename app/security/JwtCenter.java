@@ -40,12 +40,12 @@ public class JwtCenter {
     }
 
     public String createTokenAuthJwt(String userId) {
-        String issuer = config.getString("devote.jwt.token.auth.issuer");
-        int expiryMins = config.getInt("devote.jwt.token.auth.token.expiry.mins");
-        String rolesClaim = config.getString("devote.jwt.roles.claim");
+        String issuer = config.getString("galactic.vote.jwt.token.auth.issuer");
+        int expiryMins = config.getInt("galactic.vote.jwt.token.auth.token.expiry.mins");
+        String rolesClaim = config.getString("galactic.vote.jwt.roles.claim");
 
         String[] roles = new String[]{"voter"};
-        if(config.getBoolean("devote.scale.test.mode")) {
+        if(config.getBoolean("galactic.vote.scale.test.mode")) {
             roles = new String[]{"voter", "vote-caller"};
         }
 

@@ -1,7 +1,7 @@
 package controllers;
 
 import com.google.common.base.Function;
-import devote.blockchain.api.BlockchainException;
+import galactic.blockchain.api.BlockchainException;
 import exceptions.BusinessLogicViolationException;
 import exceptions.ForbiddenException;
 import exceptions.NotFoundException;

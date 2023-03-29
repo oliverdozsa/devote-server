@@ -2,7 +2,7 @@ package smokes;
 
 import components.clients.CommissionTestClient;
 import components.clients.VotingTestClient;
-import devote.blockchain.api.Account;
+import galactic.blockchain.api.Account;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

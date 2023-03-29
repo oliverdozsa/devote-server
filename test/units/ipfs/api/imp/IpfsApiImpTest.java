@@ -1,7 +1,7 @@
 package units.ipfs.api.imp;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import devote.blockchain.api.BlockchainException;
+import galactic.blockchain.api.BlockchainException;
 import io.ipfs.api.IPFS;
 import io.ipfs.api.MerkleNode;
 import io.ipfs.multihash.Multihash;

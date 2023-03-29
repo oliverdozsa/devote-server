@@ -3,8 +3,8 @@ package tasks.refundbalances;
 import data.entities.JpaChannelGeneratorAccount;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
-import devote.blockchain.api.Account;
-import devote.blockchain.api.RefundBalancesOperation;
+import galactic.blockchain.api.Account;
+import galactic.blockchain.api.RefundBalancesOperation;
 import play.Logger;
 
 import java.util.Collections;

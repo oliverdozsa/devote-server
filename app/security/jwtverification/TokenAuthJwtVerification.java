@@ -15,7 +15,7 @@ public class TokenAuthJwtVerification implements JwtVerification {
 
     @Inject
     public TokenAuthJwtVerification(@Named("tokenAuth") Algorithm algorithm, Config config) {
-        this.issuer = config.getString("devote.jwt.token.auth.issuer");
+        this.issuer = config.getString("galactic.vote.jwt.token.auth.issuer");
         jwtVerifier = JWT.require(algorithm)
                 .withIssuer(issuer)
                 .build();

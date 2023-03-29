@@ -2,7 +2,7 @@ package ipfs.api.imp;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.typesafe.config.Config;
-import devote.blockchain.api.BlockchainException;
+import galactic.blockchain.api.BlockchainException;
 import ipfs.api.IpfsApi;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSResponse;
@@ -17,7 +17,7 @@ public class Web3StorageIpfsApiImp implements IpfsApi {
     @Inject
     public Web3StorageIpfsApiImp(WSClient wsClient, Config config) {
         this.wsClient = wsClient;
-        this.jwt = config.getString("devote.ipfs.web3storage.jwt");
+        this.jwt = config.getString("galactic.vote.ipfs.web3storage.jwt");
     }
 
     @Override

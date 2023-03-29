@@ -32,7 +32,7 @@
     <logger name="data" level="DEBUG"/>
     <logger name="rules" level="DEBUG"/>
     <logger name="security" level="DEBUG"/>
-    <logger name="devote" level="DEBUG"/>
+    <logger name="galactic" level="DEBUG"/>
     <logger name="smokes" level="DEBUG"/>
     <logger name="tasks" level="DEBUG"/>
     <logger name="ipfs" level="DEBUG"/>

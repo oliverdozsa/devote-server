@@ -10,7 +10,7 @@ public class TokenAuthUserIdUtil {
 
     @Inject
     public TokenAuthUserIdUtil(Config config) {
-        this.tokenAuthSubjectPrefix = config.getString("devote.jwt.token.auth.subject.prefix");
+        this.tokenAuthSubjectPrefix = config.getString("galactic.vote.jwt.token.auth.subject.prefix");
     }
 
     public boolean isForTokenAuth(String userId) {

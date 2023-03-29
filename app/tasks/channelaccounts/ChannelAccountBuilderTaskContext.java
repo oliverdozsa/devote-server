@@ -3,7 +3,7 @@ package tasks.channelaccounts;
 import com.typesafe.config.Config;
 import data.repositories.ChannelProgressRepository;
 import data.repositories.VotingRepository;
-import devote.blockchain.Blockchains;
+import galactic.blockchain.Blockchains;
 
 import javax.inject.Inject;
 
@@ -22,6 +22,6 @@ public class ChannelAccountBuilderTaskContext {
         this.blockchains = blockchains;
         this.votingRepository = votingRepository;
         this.channelProgressRepository = channelProgressRepository;
-        this.voteBuckets = config.getInt("devote.vote.buckets");
+        this.voteBuckets = config.getInt("galactic.vote.vote.buckets");
     }
 }

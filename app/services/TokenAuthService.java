@@ -18,7 +18,7 @@ public class TokenAuthService {
     public TokenAuthService(TokenAuthDbOperations dbOperations, JwtCenter jwtCenter, Config config) {
         this.dbOperations = dbOperations;
         this.jwtCenter = jwtCenter;
-        tokenAuthSubjectPrefix = config.getString("devote.jwt.token.auth.subject.prefix");
+        tokenAuthSubjectPrefix = config.getString("galactic.vote.jwt.token.auth.subject.prefix");
     }
 
     public CompletionStage<TokenAuthResponse> auth(String token) {

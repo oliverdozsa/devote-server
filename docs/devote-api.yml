@@ -1,13 +1,13 @@
 openapi: 3.0.0
 info:
   version: '1.0.0'
-  title: devote
+  title: Galactic Vote
   license:
     name: MIT
     url: 'https://opensource.org/licenses/MIT'
   description: |
-    # DeVote
-    This is the API doc of DeVote
+    # Galactic Vote
+    This is the API doc of Galactic Vote
 paths:
   '/voting':
     post:

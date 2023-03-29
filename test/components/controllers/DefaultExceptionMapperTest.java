@@ -3,7 +3,7 @@ package components.controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import controllers.DefaultExceptionMapper;
-import devote.blockchain.api.BlockchainException;
+import galactic.blockchain.api.BlockchainException;
 import exceptions.BusinessLogicViolationException;
 import exceptions.ForbiddenException;
 import exceptions.NotFoundException;

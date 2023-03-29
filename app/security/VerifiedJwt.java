@@ -15,13 +15,13 @@ public class VerifiedJwt {
     public VerifiedJwt(DecodedJWT decodedJWT, Config config) {
         this.userId = decodedJWT.getSubject();
 
-        String rolesClaim = config.getString("devote.jwt.roles.claim");
+        String rolesClaim = config.getString("galactic.vote.jwt.roles.claim");
         List<String> rolesFromJwt = decodedJWT.getClaim(rolesClaim).asList(String.class);
 
         roles = new HashSet<>(rolesFromJwt);
 
-        String emailClaim = config.getString("devote.jwt.email.claim");
-        String emailVerifiedClaim = config.getString("devote.jwt.email.verified.claim");
+        String emailClaim = config.getString("galactic.vote.jwt.email.claim");
+        String emailVerifiedClaim = config.getString("galactic.vote.jwt.email.verified.claim");
 
         String emailFromJwt = decodedJWT.getClaim(emailClaim).asString();
         boolean isVerified = !decodedJWT.getClaim(emailVerifiedClaim).isNull() &&

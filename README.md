@@ -1,8 +1,8 @@
-[![build](https://github.com/oliverdozsa/devote/actions/workflows/scala.yml/badge.svg)](https://github.com/oliverdozsa/devote/actions/workflows/scala.yml) [![Maintainability](https://api.codeclimate.com/v1/badges/54de0e64c81d0ca543a4/maintainability)](https://codeclimate.com/github/oliverdozsa/devote/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/54de0e64c81d0ca543a4/test_coverage)](https://codeclimate.com/github/oliverdozsa/devote/test_coverage)
+[![build](https://github.com/oliverdozsa/galactic.vote/actions/workflows/scala.yml/badge.svg)](https://github.com/oliverdozsa/galactic.vote/actions/workflows/scala.yml) [![Maintainability](https://api.codeclimate.com/v1/badges/54de0e64c81d0ca543a4/maintainability)](https://codeclimate.com/github/oliverdozsa/galactic.vote/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/54de0e64c81d0ca543a4/test_coverage)](https://codeclimate.com/github/oliverdozsa/galactic.vote/test_coverage)
 
 <img src="docs/logo.png" alt="drawing"/>
 
-# DeVote
+# Galactic Vote
 A privacy first voting platform powered by blockchain technology. Inspired by [stellot](https://github.com/stanbar/stellot). 
 Work-in-progress.
 ## What are the differences?
@@ -19,4 +19,4 @@ about the voter's account where the vote token should be delivered.
 6. Server sends back the transaction so that voter can obtain the vote token.
 ![cast vote](./docs/cast-vote-seq.svg)
 ## Documentation
-The API doc is available [here](https://oliverdozsa.github.io/devote-server).
+The API doc is available [here](https://oliverdozsa.github.io/galactic.vote).

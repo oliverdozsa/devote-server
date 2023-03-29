@@ -1,9 +1,9 @@
 package data.repositories;
 
 import data.entities.JpaVoting;
-import devote.blockchain.api.ChannelGenerator;
-import devote.blockchain.api.DistributionAndBallotAccountOperation;
-import devote.blockchain.api.Account;
+import galactic.blockchain.api.ChannelGenerator;
+import galactic.blockchain.api.DistributionAndBallotAccountOperation;
+import galactic.blockchain.api.Account;
 import requests.CreateVotingRequest;
 
 import java.util.List;

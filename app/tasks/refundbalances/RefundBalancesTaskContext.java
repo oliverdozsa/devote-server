@@ -3,7 +3,7 @@ package tasks.refundbalances;
 import data.repositories.ChannelAccountRepository;
 import data.repositories.ChannelGeneratorAccountRepository;
 import data.repositories.VotingRepository;
-import devote.blockchain.Blockchains;
+import galactic.blockchain.Blockchains;
 
 import javax.inject.Inject;
 

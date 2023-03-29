@@ -2,9 +2,9 @@ package data.repositories.imp;
 
 import data.entities.*;
 import data.repositories.VotingRepository;
-import devote.blockchain.api.ChannelGenerator;
-import devote.blockchain.api.DistributionAndBallotAccountOperation;
-import devote.blockchain.api.Account;
+import galactic.blockchain.api.ChannelGenerator;
+import galactic.blockchain.api.DistributionAndBallotAccountOperation;
+import galactic.blockchain.api.Account;
 import io.ebean.EbeanServer;
 import play.Logger;
 import requests.CreateVotingRequest;

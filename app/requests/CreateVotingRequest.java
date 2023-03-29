@@ -210,7 +210,7 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
 
     @Override
     public String validate(Config config) {
-        Integer minTimeInterval = config.getInt("devote.vote.related.min.time.interval.sec");
+        Integer minTimeInterval = config.getInt("galactic.vote.vote.related.min.time.interval.sec");
 
         if (isEncryptedNotValid(minTimeInterval)) {
             return "If encryption is needed, encrypted until must be at least " +
@@ -226,7 +226,7 @@ public class CreateVotingRequest implements ValidatableWithConfig<String> {
                     minTimeInterval + " seconds, and voting must end in the future!";
         }
 
-        long maxVotesCap = config.getLong("devote.max.votes.cap");
+        long maxVotesCap = config.getLong("galactic.vote.max.votes.cap");
         if(votesCap > maxVotesCap) {
             return "Requested votes cap (" + maxVotesCap + ") is greater, than the maximum allowed (" + maxVotesCap + ")";
         }

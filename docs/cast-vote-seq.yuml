@@ -1,12 +1,12 @@
 // {type:sequence}
 // {generate:true}
-[Authenticated;Voter]initSession(voteId, authenticationData)>[DeVote;Commission]
-[DeVote;Commission]sessionInfo(rsaPublicKey).>[Authenticated;Voter]
+[Authenticated;Voter]initSession(voteId, authenticationData)>[Galactic Vote;Commission]
+[Galactic Vote;Commission]sessionInfo(rsaPublicKey).>[Authenticated;Voter]
 [Authenticated;Voter]createNewAccountData()>[Authenticated;Voter]
 [Authenticated;Voter]createConcealedAccountCreationRequest(voteId, newAccount.public, blindingParams)>[Authenticated;Voter]
-[Authenticated;Voter]signConcealedAccountCreationRequest(concealedRequest)>[DeVote;Commission]
-[DeVote;Commission]signatureOnConcealedAccountCreationRequest.>[Authenticated;Voter]
+[Authenticated;Voter]signConcealedAccountCreationRequest(concealedRequest)>[Galactic Vote;Commission]
+[Galactic Vote;Commission]signatureOnConcealedAccountCreationRequest.>[Authenticated;Voter]
 [Authenticated;Voter]createRevealedSignatureOfAccountCreationRequest(signatureOnConcealedRequest, blindingParams)>[Authenticated;Voter]
 [Authenticated;Voter]switchToBeingAnonymous()>[Anonymous;Voter]
-[Anonymous;Voter]requestAccountCreation(newKeyPair.public, voteId, revealedSignatureOfAccountRequest)>[DeVote;Commission]
-[DeVote;Commission]accountCreationTransaction.>[Anonymous;Voter]
+[Anonymous;Voter]requestAccountCreation(newKeyPair.public, voteId, revealedSignatureOfAccountRequest)>[Galactic Vote;Commission]
+[Galactic Vote;Commission]accountCreationTransaction.>[Anonymous;Voter]

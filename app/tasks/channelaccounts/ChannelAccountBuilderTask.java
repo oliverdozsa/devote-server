@@ -2,10 +2,10 @@ package tasks.channelaccounts;
 
 import data.entities.JpaChannelAccountProgress;
 import data.entities.JpaChannelGeneratorAccount;
-import devote.blockchain.BlockchainFactory;
-import devote.blockchain.api.Account;
-import devote.blockchain.api.ChannelAccountOperation;
-import devote.blockchain.api.ChannelGenerator;
+import galactic.blockchain.BlockchainFactory;
+import galactic.blockchain.api.Account;
+import galactic.blockchain.api.ChannelAccountOperation;
+import galactic.blockchain.api.ChannelGenerator;
 import play.Logger;
 
 import java.util.List;

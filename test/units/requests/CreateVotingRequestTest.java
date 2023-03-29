@@ -25,7 +25,7 @@ public class CreateVotingRequestTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
-        when(mockConfig.getInt("devote.vote.related.min.time.interval.sec")).thenReturn(42);
+        when(mockConfig.getInt("galactic.vote.vote.related.min.time.interval.sec")).thenReturn(42);
     }
 
     @Test

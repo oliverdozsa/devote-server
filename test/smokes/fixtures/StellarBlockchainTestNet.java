@@ -1,6 +1,6 @@
 package smokes.fixtures;
 
-import devote.blockchain.api.Account;
+import galactic.blockchain.api.Account;
 import org.stellar.sdk.KeyPair;
 import play.Logger;
 import play.libs.ws.WSClient;
@@ -9,7 +9,7 @@ import play.libs.ws.WSResponse;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static devote.blockchain.stellar.StellarUtils.toAccount;
+import static galactic.blockchain.stellar.StellarUtils.toAccount;
 import static utils.StringUtils.redactWithEllipsis;
 
 public class StellarBlockchainTestNet implements BlockchainTestNet {
