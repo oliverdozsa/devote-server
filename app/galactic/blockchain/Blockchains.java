@@ -87,7 +87,7 @@ public class Blockchains {
         Reflections blockchainReflections = new Reflections(packageName);
 
         if (doAllRequiredImplementationsExist(blockchainReflections)) {
-            blockchainConfiguration.init(config.withOnlyPath(packageName));
+            blockchainConfiguration.init(config);
             return new BlockchainFactory(blockchainConfiguration, blockchainReflections);
         } else {
             logger.warn("createBlockchainFactory(): Could not find one or more required implementation classes in package: {}", packageName);
