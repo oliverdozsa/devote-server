@@ -54,7 +54,7 @@ public class EmailInvitesTask implements Runnable {
     }
 
     private void sendInviteMailFor(JpaAuthToken jpaAuthToken) {
-        String link = "https://galactic.pub/vote/invite/" + jpaAuthToken.getToken().toString();
+        String link = "https://galactic.pub/voting-invite/" + jpaAuthToken.getToken().toString();
 
         String bodyText = String.format(BODY_TEMPLATE,
                 jpaAuthToken.getVoting().getTitle(),
