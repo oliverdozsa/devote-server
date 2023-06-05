@@ -15,7 +15,7 @@ public class EnvelopKeyPairProvider implements Provider<AsymmetricCipherKeyPair>
     public EnvelopKeyPairProvider(Config config) {
         password = config.getString("play.http.secret.key");
         // Used only for blind signature! https://en.wikipedia.org/wiki/Blind_signature#Dangers_of_RSA_blind_signing
-        path = config.getString("galactic.vote.commission.envelope.rsa.key.file");
+        path = config.getString("galactic.host.vote.commission.envelope.rsa.key.file");
     }
 
     @Override

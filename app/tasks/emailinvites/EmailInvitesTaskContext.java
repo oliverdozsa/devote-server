@@ -21,7 +21,7 @@ public class EmailInvitesTaskContext {
         this.tokenAuthRepository = tokenAuthRepository;
         this.votingRepository = votingRepository;
         this.voterRepository = voterRepository;
-        invitesToSendInOneBatch = config.getInt("galactic.vote.email.invites.max.to.send.in.one.batch");
+        invitesToSendInOneBatch = config.getInt("galactic.host.vote.email.invites.max.to.send.in.one.batch");
         this.mailerClient = mailerClient;
     }
 }

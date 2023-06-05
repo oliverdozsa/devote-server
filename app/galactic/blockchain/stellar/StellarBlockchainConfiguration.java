@@ -49,13 +49,13 @@ public class StellarBlockchainConfiguration implements BlockchainConfiguration {
     }
 
     public long getNumOfVoteBuckets() {
-        return config.getLong("galactic.vote.blockchain.stellar.votebuckets");
+        return config.getLong("galactic.host.vote.blockchain.stellar.votebuckets");
     }
 
     private void initServerAndNetworkIfNeeded() {
         if (server == null) {
-            String horizonUrl = config.getString("galactic.vote.blockchain.stellar.url");
-            String horizonTestNetUrl = config.getString("galactic.vote.blockchain.stellar.testnet.url");
+            String horizonUrl = config.getString("galactic.host.blockchain.stellar.url");
+            String horizonTestNetUrl = config.getString("galactic.host.blockchain.stellar.testnet.url");
 
             logger.info("[STELLAR]: horizon url = {}", horizonUrl);
             logger.info("[STELLAR]: horizon testnet url = {}", horizonTestNetUrl);

@@ -66,14 +66,14 @@ public class TasksOrganizer {
         this.emailInvitesTaskContext = emailInvitesTaskContext;
         this.tokenAuthCleanupTaskContext = tokenAuthCleanupTaskContext;
 
-        initialDelayMillis = config.getInt("galactic.vote.tasks.initial.delay.millis");
-        channelTaskIntervalMillis = config.getInt("galactic.vote.tasks.channel.interval.millis");
-        votingInitTaskIntervalMillis = config.getInt("galactic.vote.tasks.voting.init.interval.millis");
-        refundBalancesTaskIntervalMillis = config.getInt("galactic.vote.tasks.refund.balances.interval.millis");
-        emailInvitesTaskIntervalMillis = config.getInt("galactic.vote.tasks.email.invites.interval.millis");
-        tokenAuthCleanupTaskIntervalMillis = config.getInt("galactic.vote.tasks.token.auth.cleanup.interval.millis");
+        initialDelayMillis = config.getInt("galactic.host.vote.tasks.initial.delay.millis");
+        channelTaskIntervalMillis = config.getInt("galactic.host.vote.tasks.channel.interval.millis");
+        votingInitTaskIntervalMillis = config.getInt("galactic.host.vote.tasks.voting.init.interval.millis");
+        refundBalancesTaskIntervalMillis = config.getInt("galactic.host.vote.tasks.refund.balances.interval.millis");
+        emailInvitesTaskIntervalMillis = config.getInt("galactic.host.vote.tasks.email.invites.interval.millis");
+        tokenAuthCleanupTaskIntervalMillis = config.getInt("galactic.host.vote.tasks.token.auth.cleanup.interval.millis");
 
-        numberOfWorkers = config.getInt("galactic.vote.vote.buckets");
+        numberOfWorkers = config.getInt("galactic.host.vote.vote.buckets");
 
         initializeChannelBuilderTasks();
         initializeVotingInitTasks();

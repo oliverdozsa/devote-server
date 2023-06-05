@@ -1,5 +1,5 @@
-name := """galactic vote"""
-organization := "vote.galactic"
+name := """galactic host"""
+organization := "host.galactic"
 
 version := "1.0-SNAPSHOT"
 
@@ -41,7 +41,7 @@ jacocoExcludes ++= Seq("router.*")
 jacocoExcludes ++= Seq("data.entities.*")
 
 jacocoReportSettings := JacocoReportSettings()
-  .withTitle("Galactic Vote coverage")
+  .withTitle("Galactic Host coverage")
   .withFormats(JacocoReportFormats.HTML, JacocoReportFormats.XML)
 
 

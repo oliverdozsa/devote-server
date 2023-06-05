@@ -17,7 +17,7 @@ public class IpfsProvider implements Provider<IPFS> {
 
     @Override
     public IPFS get() {
-        String ipfsNodeAddress = config.getString("galactic.vote.ipfs.node.address");
+        String ipfsNodeAddress = config.getString("galactic.host.ipfs.node.address");
         return new IPFS(new MultiAddress(ipfsNodeAddress));
     }
 }

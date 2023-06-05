@@ -40,9 +40,9 @@ public class JwtTestUtils {
     }
 
     public String createToken(Date expiresAt, String userId, String[] roles, String email) {
-        String rolesClaim = config.getString("galactic.vote.jwt.roles.claim");
-        String emailClaim = config.getString("galactic.vote.jwt.email.claim");
-        String emailVerifiedClaim = config.getString("galactic.vote.jwt.email.verified.claim");
+        String rolesClaim = config.getString("galactic.host.jwt.roles.claim");
+        String emailClaim = config.getString("galactic.host.jwt.email.claim");
+        String emailVerifiedClaim = config.getString("galactic.host.jwt.email.verified.claim");
 
         return prepareBuilder(expiresAt)
                 .withSubject(userId)
@@ -57,7 +57,7 @@ public class JwtTestUtils {
     }
 
     private JWTCreator.Builder prepareBuilder(Date expiresAt) {
-        String issuer = config.getString("galactic.vote.jwt.issuer");
+        String issuer = config.getString("galactic.host.jwt.issuer");
 
 
         return JWT.create()

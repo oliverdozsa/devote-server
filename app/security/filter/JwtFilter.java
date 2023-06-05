@@ -61,8 +61,8 @@ public class JwtFilter extends Filter {
         this.jwtCenter = jwtCenter;
         this.voterDbOperations = voterDbOperations;
 
-        jwtFilterTag = config.getString("galactic.vote.jwt.filtertag");
-        jwtOptionalFilterTag = config.getString("galactic.vote.jwt.optionalfiltertag");
+        jwtFilterTag = config.getString("galactic.host.jwt.filtertag");
+        jwtOptionalFilterTag = config.getString("galactic.host.jwt.optionalfiltertag");
     }
 
     @Override

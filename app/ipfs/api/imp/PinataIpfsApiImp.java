@@ -17,7 +17,7 @@ public class PinataIpfsApiImp implements IpfsApi {
     @Inject
     public PinataIpfsApiImp(WSClient wsClient, Config config) {
         this.wsClient = wsClient;
-        this.jwt = config.getString("galactic.vote.ipfs.pinata.jtw");
+        this.jwt = config.getString("galactic.host.ipfs.pinata.jtw");
     }
 
     @Override

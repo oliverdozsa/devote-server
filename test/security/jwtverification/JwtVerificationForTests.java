@@ -17,7 +17,7 @@ public class JwtVerificationForTests implements JwtVerification {
         String secret = config.getString("play.http.secret.key");
         algorithm = Algorithm.HMAC256(secret);
 
-        issuer = config.getString("galactic.vote.jwt.issuer");
+        issuer = config.getString("galactic.host.jwt.issuer");
     }
 
     @Override

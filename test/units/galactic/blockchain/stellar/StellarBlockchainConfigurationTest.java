@@ -25,8 +25,8 @@ public class StellarBlockchainConfigurationTest {
     @Test
     public void testGetNonTestServer() {
         // Given
-        when(mockConfig.getString("galactic.vote.blockchain.stellar.url")).thenReturn("https://mock-horizon.stellar.org");
-        when(mockConfig.getString("galactic.vote.blockchain.stellar.testnet.url")).thenReturn("https://mock-test-horizon.stellar.org");
+        when(mockConfig.getString("galactic.host.blockchain.stellar.url")).thenReturn("https://mock-horizon.stellar.org");
+        when(mockConfig.getString("galactic.host.blockchain.stellar.testnet.url")).thenReturn("https://mock-test-horizon.stellar.org");
 
         // When
         StellarBlockchainConfiguration configuration = new StellarBlockchainConfiguration();
@@ -40,8 +40,8 @@ public class StellarBlockchainConfigurationTest {
     @Test
     public void testGetTestServer() {
         // Given
-        when(mockConfig.getString("galactic.vote.blockchain.stellar.url")).thenReturn("https://mock-horizon-testnet.stellar.org");
-        when(mockConfig.getString("galactic.vote.blockchain.stellar.testnet.url")).thenReturn("https://mock-test-horizon.stellar.org");
+        when(mockConfig.getString("galactic.host.blockchain.stellar.url")).thenReturn("https://mock-horizon-testnet.stellar.org");
+        when(mockConfig.getString("galactic.host.blockchain.stellar.testnet.url")).thenReturn("https://mock-test-horizon.stellar.org");
 
         // When
         StellarBlockchainConfiguration configuration = new StellarBlockchainConfiguration();
@@ -55,7 +55,7 @@ public class StellarBlockchainConfigurationTest {
     @Test
     public void testGetNumOfVoteBuckets() {
         // Given
-        when(mockConfig.getLong("galactic.vote.blockchain.stellar.votebuckets")).thenReturn(42L);
+        when(mockConfig.getLong("galactic.host.vote.blockchain.stellar.votebuckets")).thenReturn(42L);
 
         // When
         StellarBlockchainConfiguration configuration = new StellarBlockchainConfiguration();

@@ -19,7 +19,7 @@ public class VotingBlockchainInitTaskContext {
     public VotingBlockchainInitTaskContext(Blockchains blockchains, VotingRepository votingRepository, Config config, IpfsApi ipfsApi, ChannelProgressRepository channelProgressRepository) {
         this.blockchains = blockchains;
         this.votingRepository = votingRepository;
-        this.voteBuckets = config.getInt("galactic.vote.vote.buckets");
+        this.voteBuckets = config.getInt("galactic.host.vote.vote.buckets");
         this.ipfsApi = ipfsApi;
         this.channelProgressRepository = channelProgressRepository;
     }

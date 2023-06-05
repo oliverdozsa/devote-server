@@ -22,6 +22,6 @@ public class ChannelAccountBuilderTaskContext {
         this.blockchains = blockchains;
         this.votingRepository = votingRepository;
         this.channelProgressRepository = channelProgressRepository;
-        this.voteBuckets = config.getInt("galactic.vote.vote.buckets");
+        this.voteBuckets = config.getInt("galactic.host.vote.vote.buckets");
     }
 }
