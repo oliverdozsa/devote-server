@@ -1,4 +1,4 @@
-[![build](https://github.com/oliverdozsa/galactic.vote/actions/workflows/scala.yml/badge.svg)](https://github.com/oliverdozsa/galactic.vote/actions/workflows/scala.yml) [![Maintainability](https://api.codeclimate.com/v1/badges/54de0e64c81d0ca543a4/maintainability)](https://codeclimate.com/github/oliverdozsa/galactic.vote/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/54de0e64c81d0ca543a4/test_coverage)](https://codeclimate.com/github/oliverdozsa/galactic.vote/test_coverage)
+[![build](https://github.com/oliverdozsa/galactic.host/actions/workflows/scala.yml/badge.svg)](https://github.com/oliverdozsa/galactic.host/actions/workflows/scala.yml) [![Maintainability](https://api.codeclimate.com/v1/badges/93e42d6218e93df2e2a6/maintainability)](https://codeclimate.com/github/oliverdozsa/galactic.host/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/93e42d6218e93df2e2a6/test_coverage)](https://codeclimate.com/github/oliverdozsa/galactic.host/test_coverage) 
 
 <img src="docs/logo.png" alt="drawing"/>
 
