@@ -3,7 +3,7 @@ name: docs
 on:
   push:
     branches: [ master ]
-    paths: [ 'docs/galactic.vote-api.yml' ]
+    paths: [ 'docs/galactic.host-api.yml' ]
 
 jobs:
   deploy:
@@ -16,7 +16,7 @@ jobs:
       - name: Create docs
         uses: seeebiii/redoc-cli-github-action@v10
         with:
-          args: 'bundle docs/galactic.vote-api.yml --output docs/index.html'
+          args: 'bundle docs/galactic.host-api.yml --output docs/index.html'
 
       - name: Deploy docs
         uses: JamesIves/github-pages-deploy-action@v4.2.5

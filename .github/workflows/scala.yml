@@ -14,16 +14,16 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 11
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v3
       with:
         java-version: '11'
         distribution: 'temurin'
     - name: Run tests
       run: sbt "testOnly components.* units.*"
     - name: Publish coverage
-      uses: paambaati/codeclimate-action@v3.0.0
+      uses: paambaati/codeclimate-action@v3.1.1
       env:
-        CC_TEST_REPORTER_ID: 904c00199abc920083f0fa03c70e2dc4e381cd8c35890e938bb48cef89345f3a
+        CC_TEST_REPORTER_ID: beed6e819affbf21e32a910841aa30598a97cef0f3a7e71b15338d04d2b5860d
         JACOCO_SOURCE_PATH: "${{github.workspace}}/app/"
       with:
         coverageCommand: sbt jacocoReport
