@@ -19,7 +19,7 @@ public class Auth0JwtVerification implements JwtVerification {
     @Inject
     public Auth0JwtVerification(Config config, JwkProvider jwkProvider) {
         this.jwkProvider = jwkProvider;
-        issuer = config.getString("galactic.vote.jwt.issuer");
+        issuer = config.getString("galactic.host.jwt.issuer");
     }
 
     @Override
