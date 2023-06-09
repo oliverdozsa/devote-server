@@ -66,7 +66,7 @@ public class TasksOrganizer {
         this.emailInvitesTaskContext = emailInvitesTaskContext;
         this.tokenAuthCleanupTaskContext = tokenAuthCleanupTaskContext;
 
-        initialDelayMillis = config.getInt("galactic.host.vote.tasks.initial.delay.millis");
+        initialDelayMillis = config.getInt("galactic.host.tasks.initial.delay.millis");
         channelTaskIntervalMillis = config.getInt("galactic.host.vote.tasks.channel.interval.millis");
         votingInitTaskIntervalMillis = config.getInt("galactic.host.vote.tasks.voting.init.interval.millis");
         refundBalancesTaskIntervalMillis = config.getInt("galactic.host.vote.tasks.refund.balances.interval.millis");
