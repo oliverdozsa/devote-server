@@ -50,7 +50,7 @@ public class PlayApplicationWithGuiceDbRiderRule implements TestRule {
     private void startPlay() {
         application = appBuilder.build();
         Helpers.start(application);
-        emProvider = EntityManagerProvider.instance("GalacticVotePU");
+        emProvider = EntityManagerProvider.instance("GalacticHostPU");
         dbUnitRule = DBUnitRule.instance(emProvider.connection());
     }
 
