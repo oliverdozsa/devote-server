@@ -6,13 +6,12 @@ import galactic.blockchain.api.FundingAccountOperation;
 import exceptions.BusinessLogicViolationException;
 import executioncontexts.BlockchainExecutionContext;
 import play.Logger;
-import requests.CreateVotingRequest;
+import requests.voting.CreateVotingRequest;
 
 import javax.inject.Inject;
 import java.util.concurrent.CompletionStage;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
-import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static utils.StringUtils.redactWithEllipsis;
 
 public class VotingBlockchainOperations {

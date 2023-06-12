@@ -5,7 +5,7 @@ import galactic.blockchain.BlockchainFactory;
 import galactic.blockchain.Blockchains;
 import galactic.blockchain.api.BlockchainException;
 import galactic.blockchain.api.ChannelGeneratorAccountOperation;
-import galactic.blockchain.mockblockchain.MockBlockchainChannelGeneratorAccountOperation;
+import galactic.blockchain.mockblockchain.voting.MockBlockchainChannelGeneratorAccountOperation;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

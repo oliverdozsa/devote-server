@@ -25,16 +25,16 @@ import security.JwtCenter;
 import security.TokenAuthAlgorithmProvider;
 import security.TokenAuthUserIdUtil;
 import security.jwtverification.*;
-import services.CommissionService;
-import services.EnvelopKeyPairProvider;
-import services.TokenAuthService;
-import services.VotingService;
+import services.voting.CommissionService;
+import services.voting.EnvelopKeyPairProvider;
+import services.voting.TokenAuthService;
+import services.voting.VotingService;
 import tasks.TasksOrganizer;
-import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
-import tasks.emailinvites.EmailInvitesTaskContext;
-import tasks.refundbalances.RefundBalancesTaskContext;
-import tasks.tokenauthcleanup.TokenAuthCleanupTaskContext;
-import tasks.votingblockchaininit.VotingBlockchainInitTaskContext;
+import tasks.voting.channelaccounts.ChannelAccountBuilderTaskContext;
+import tasks.voting.emailinvites.EmailInvitesTaskContext;
+import tasks.voting.refundbalances.RefundBalancesTaskContext;
+import tasks.voting.tokenauthcleanup.TokenAuthCleanupTaskContext;
+import tasks.voting.votingblockchaininit.VotingBlockchainInitTaskContext;
 
 import java.security.Security;
 

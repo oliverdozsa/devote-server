@@ -6,23 +6,22 @@ import com.typesafe.config.Config;
 import play.Logger;
 import play.api.inject.ApplicationLifecycle;
 import scala.concurrent.ExecutionContext;
-import tasks.channelaccounts.ChannelAccountBuilderTask;
-import tasks.channelaccounts.ChannelAccountBuilderTaskContext;
-import tasks.emailinvites.EmailInvitesTask;
-import tasks.emailinvites.EmailInvitesTaskContext;
-import tasks.refundbalances.RefundBalancesTask;
-import tasks.refundbalances.RefundBalancesTaskContext;
-import tasks.tokenauthcleanup.TokenAuthCleanupTask;
-import tasks.tokenauthcleanup.TokenAuthCleanupTaskContext;
-import tasks.votingblockchaininit.VotingBlockchainInitTask;
-import tasks.votingblockchaininit.VotingBlockchainInitTaskContext;
+import tasks.voting.channelaccounts.ChannelAccountBuilderTask;
+import tasks.voting.channelaccounts.ChannelAccountBuilderTaskContext;
+import tasks.voting.emailinvites.EmailInvitesTask;
+import tasks.voting.emailinvites.EmailInvitesTaskContext;
+import tasks.voting.refundbalances.RefundBalancesTask;
+import tasks.voting.refundbalances.RefundBalancesTaskContext;
+import tasks.voting.tokenauthcleanup.TokenAuthCleanupTask;
+import tasks.voting.tokenauthcleanup.TokenAuthCleanupTaskContext;
+import tasks.voting.votingblockchaininit.VotingBlockchainInitTask;
+import tasks.voting.votingblockchaininit.VotingBlockchainInitTaskContext;
 
 import javax.inject.Inject;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
 

@@ -1,28 +1,28 @@
 # Voting administration
 + jwtFilter
-POST    /voting                                     controllers.VotingController.create(request: Request)
+POST    /voting                                     controllers.voting.VotingController.create(request: Request)
 + jwtOptionalFilter
-GET     /voting/:id                                 controllers.VotingController.single(id: String, request: Request)
+GET     /voting/:id                                 controllers.voting.VotingController.single(id: String, request: Request)
 
 # Voting lists
-GET    /votings/public                              controllers.VotingsPagingController.publicVotings(request: Request)
+GET    /votings/public                              controllers.voting.VotingsPagingController.publicVotings(request: Request)
 + jwtFilter
-GET    /votings/votecaller                          controllers.VotingsPagingController.votingsOfVoteCaller(request: Request)
+GET    /votings/votecaller                          controllers.voting.VotingsPagingController.votingsOfVoteCaller(request: Request)
 + jwtFilter
-GET    /votings/voter                               controllers.VotingsPagingController.votingsOfVoter(request: Request)
+GET    /votings/voter                               controllers.voting.VotingsPagingController.votingsOfVoter(request: Request)
 
 # Cast vote
 + jwtFilter
-POST    /castvote/init                              controllers.CommissionController.init(request: Request)
+POST    /castvote/init                              controllers.voting.CommissionController.init(request: Request)
 + jwtFilter
-POST    /castvote/:votingId/signEnvelope            controllers.CommissionController.signEnvelope(votingId: String, request: Request)
-POST    /castvote/createTransaction                 controllers.CommissionController.createTransaction(request: Request)
-GET     /castvote/txOfSignature/:signature          controllers.CommissionController.transactionOfSignature(signature: String)
+POST    /castvote/:votingId/signEnvelope            controllers.voting.CommissionController.signEnvelope(votingId: String, request: Request)
+POST    /castvote/createTransaction                 controllers.voting.CommissionController.createTransaction(request: Request)
+GET     /castvote/txOfSignature/:signature          controllers.voting.CommissionController.transactionOfSignature(signature: String)
 + jwtFilter
-GET     /castvote/envlSignature/:votingId           controllers.CommissionController.getEnvelopeSignature(votingId: String, request: Request)
+GET     /castvote/envlSignature/:votingId           controllers.voting.CommissionController.getEnvelopeSignature(votingId: String, request: Request)
 
 # Other
-GET     /encryptchoice/:votingId/:choice            controllers.CommissionController.getAnEncryptedChoice(votingId: String, choice: String)
+GET     /encryptchoice/:votingId/:choice            controllers.voting.CommissionController.getAnEncryptedChoice(votingId: String, choice: String)
 
 # Token auth
-GET    /tokenauth/:token                            controllers.TokenAuthController.auth(token: String)
+GET    /tokenauth/:token                            controllers.voting.TokenAuthController.auth(token: String)

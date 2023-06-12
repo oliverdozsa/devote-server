@@ -1,7 +1,7 @@
 package smokes;
 
-import components.clients.CommissionTestClient;
-import components.clients.VotingTestClient;
+import components.clients.voting.CommissionTestClient;
+import components.clients.voting.VotingTestClient;
 import galactic.blockchain.api.Account;
 import org.junit.Before;
 import org.junit.Rule;
@@ -11,9 +11,9 @@ import org.stellar.sdk.KeyPair;
 import play.inject.guice.GuiceApplicationBuilder;
 import play.libs.ws.WSClient;
 import play.mvc.Result;
-import requests.CommissionCreateTransactionRequest;
-import requests.CommissionInitRequest;
-import requests.CreateVotingRequest;
+import requests.voting.CommissionCreateTransactionRequest;
+import requests.voting.CommissionInitRequest;
+import requests.voting.CreateVotingRequest;
 import rules.RuleChainForTests;
 import security.jwtverification.JwtVerification;
 import security.jwtverification.JwtVerificationForTests;
@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static asserts.DbAsserts.assertThatTransactionIsStoredFor;
-import static components.controllers.VotingRequestMaker.createValidVotingRequest;
-import static components.extractors.CommissionResponseFromResult.*;
+import static components.controllers.voting.VotingRequestMaker.createValidVotingRequest;
+import static components.extractors.voting.CommissionResponseFromResult.*;
 import static components.extractors.GenericDataFromResult.statusOf;
 import static matchers.ResultHasHeader.hasLocationHeader;
 import static org.hamcrest.CoreMatchers.*;

@@ -7,7 +7,7 @@ import galactic.blockchain.api.DistributionAndBallotAccountOperation;
 import galactic.blockchain.api.Account;
 import io.ebean.EbeanServer;
 import play.Logger;
-import requests.CreateVotingRequest;
+import requests.voting.CreateVotingRequest;
 import utils.StringUtils;
 
 import javax.inject.Inject;

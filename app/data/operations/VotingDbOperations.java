@@ -4,7 +4,7 @@ import data.entities.JpaVoting;
 import data.repositories.VotingRepository;
 import executioncontexts.DatabaseExecutionContext;
 import play.Logger;
-import requests.CreateVotingRequest;
+import requests.voting.CreateVotingRequest;
 
 import javax.inject.Inject;
 import java.util.Locale;

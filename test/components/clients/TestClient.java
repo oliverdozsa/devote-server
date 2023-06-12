@@ -9,7 +9,7 @@ import static play.mvc.Http.HttpVerbs.GET;
 import static play.test.Helpers.route;
 import static utils.JwtTestUtils.addJwtTokenTo;
 
-class TestClient {
+public class TestClient {
     protected final Application application;
     protected final JwtTestUtils jwtTestUtils;
 

@@ -10,8 +10,8 @@ import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaVotingPoll;
 import data.entities.JpaVotingPollOption;
 import io.ebean.Ebean;
-import requests.CreatePollOptionRequest;
-import requests.CreatePollRequest;
+import requests.voting.CreatePollOptionRequest;
+import requests.voting.CreatePollRequest;
 
 import java.time.Instant;
 import java.util.HashSet;

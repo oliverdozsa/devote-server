@@ -1,11 +1,10 @@
 package units.requests;
 
 import org.junit.Test;
-import requests.CreatePollOptionRequest;
-import requests.CreatePollRequest;
+import requests.voting.CreatePollOptionRequest;
+import requests.voting.CreatePollRequest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;

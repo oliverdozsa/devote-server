@@ -3,9 +3,9 @@ package asserts;
 import data.entities.JpaVoting;
 import data.entities.JpaVotingChannelAccount;
 import data.entities.JpaChannelGeneratorAccount;
-import galactic.blockchain.mockblockchain.MockBlockchainChannelAccountOperation;
-import galactic.blockchain.mockblockchain.MockBlockchainDistributionAndBallotAccountOperation;
-import galactic.blockchain.mockblockchain.MockBlockchainChannelGeneratorAccountOperation;
+import galactic.blockchain.mockblockchain.voting.MockBlockchainChannelAccountOperation;
+import galactic.blockchain.mockblockchain.voting.MockBlockchainDistributionAndBallotAccountOperation;
+import galactic.blockchain.mockblockchain.voting.MockBlockchainChannelGeneratorAccountOperation;
 import io.ebean.Ebean;
 
 import java.util.List;

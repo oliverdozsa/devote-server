@@ -2,9 +2,9 @@ package data.repositories.imp;
 
 import crypto.EncryptedVoting;
 import data.entities.*;
-import requests.CreatePollOptionRequest;
-import requests.CreatePollRequest;
-import requests.CreateVotingRequest;
+import requests.voting.CreatePollOptionRequest;
+import requests.voting.CreatePollRequest;
+import requests.voting.CreateVotingRequest;
 
 import java.time.Instant;
 import java.util.List;

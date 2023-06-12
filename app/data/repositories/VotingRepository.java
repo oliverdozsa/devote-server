@@ -4,7 +4,7 @@ import data.entities.JpaVoting;
 import galactic.blockchain.api.ChannelGenerator;
 import galactic.blockchain.api.DistributionAndBallotAccountOperation;
 import galactic.blockchain.api.Account;
-import requests.CreateVotingRequest;
+import requests.voting.CreateVotingRequest;
 
 import java.util.List;
 import java.util.Optional;
