@@ -1,7 +1,7 @@
 package tasks.voting.votingblockchaininit;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import data.entities.JpaVoting;
+import data.entities.voting.JpaVoting;
 import galactic.blockchain.BlockchainFactory;
 import galactic.blockchain.api.*;
 import ipfs.data.IpfsVoting;

@@ -1,8 +1,8 @@
 package services.voting.commissionsubs;
 
-import data.entities.JpaCommissionSession;
-import data.entities.JpaStoredTransaction;
-import data.operations.CommissionDbOperations;
+import data.entities.voting.JpaCommissionSession;
+import data.entities.voting.JpaStoredTransaction;
+import data.operations.voting.CommissionDbOperations;
 import play.Logger;
 import responses.voting.CommissionGetEnvelopeSignatureResponse;
 import responses.voting.CommissionTransactionOfSignatureResponse;

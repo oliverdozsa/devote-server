@@ -1,7 +1,7 @@
 package tasks.voting.tokenauthcleanup;
 
 import com.typesafe.config.Config;
-import data.repositories.TokenAuthRepository;
+import data.repositories.voting.TokenAuthRepository;
 
 import javax.inject.Inject;
 

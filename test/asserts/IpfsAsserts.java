@@ -1,16 +1,12 @@
 package asserts;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import data.entities.JpaVoting;
-import data.entities.JpaVotingPoll;
-import data.entities.JpaVotingPollOption;
+import data.entities.voting.JpaVoting;
+import data.entities.voting.JpaVotingPoll;
+import data.entities.voting.JpaVotingPollOption;
 import io.ebean.Ebean;
-import io.ipfs.api.IPFS;
-import io.ipfs.cid.Cid;
-import io.ipfs.multiaddr.MultiAddress;
 import ipfs.api.IpfsApi;
 import play.Application;
-import play.libs.Json;
 
 import java.io.IOException;
 import java.util.List;

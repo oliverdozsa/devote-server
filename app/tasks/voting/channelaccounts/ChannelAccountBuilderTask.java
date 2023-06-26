@@ -1,7 +1,7 @@
 package tasks.voting.channelaccounts;
 
-import data.entities.JpaChannelAccountProgress;
-import data.entities.JpaChannelGeneratorAccount;
+import data.entities.voting.JpaChannelAccountProgress;
+import data.entities.voting.JpaChannelGeneratorAccount;
 import galactic.blockchain.BlockchainFactory;
 import galactic.blockchain.api.Account;
 import galactic.blockchain.api.ChannelAccountOperation;

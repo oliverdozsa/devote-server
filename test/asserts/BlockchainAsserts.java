@@ -1,8 +1,8 @@
 package asserts;
 
-import data.entities.JpaVoting;
-import data.entities.JpaVotingChannelAccount;
-import data.entities.JpaChannelGeneratorAccount;
+import data.entities.voting.JpaVoting;
+import data.entities.voting.JpaVotingChannelAccount;
+import data.entities.voting.JpaChannelGeneratorAccount;
 import galactic.blockchain.mockblockchain.voting.MockBlockchainChannelAccountOperation;
 import galactic.blockchain.mockblockchain.voting.MockBlockchainDistributionAndBallotAccountOperation;
 import galactic.blockchain.mockblockchain.voting.MockBlockchainChannelGeneratorAccountOperation;

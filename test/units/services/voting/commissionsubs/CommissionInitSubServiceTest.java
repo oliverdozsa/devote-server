@@ -1,7 +1,7 @@
 package units.services.voting.commissionsubs;
 
-import data.operations.CommissionDbOperations;
-import data.operations.VoterDbOperations;
+import data.operations.voting.CommissionDbOperations;
+import data.operations.voting.VoterDbOperations;
 import exceptions.ForbiddenException;
 import org.junit.Before;
 import org.junit.Test;

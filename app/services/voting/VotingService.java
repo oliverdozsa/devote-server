@@ -1,9 +1,9 @@
 package services.voting;
 
-import data.entities.JpaVoting;
-import data.entities.Visibility;
-import data.operations.VoterDbOperations;
-import data.operations.VotingDbOperations;
+import data.entities.voting.JpaVoting;
+import data.entities.voting.Visibility;
+import data.operations.voting.VoterDbOperations;
+import data.operations.voting.VotingDbOperations;
 import galactic.blockchain.api.ChannelGenerator;
 import galactic.blockchain.operations.VotingBlockchainOperations;
 import exceptions.ForbiddenException;

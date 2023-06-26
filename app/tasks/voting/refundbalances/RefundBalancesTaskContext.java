@@ -1,8 +1,8 @@
 package tasks.voting.refundbalances;
 
-import data.repositories.ChannelAccountRepository;
-import data.repositories.ChannelGeneratorAccountRepository;
-import data.repositories.VotingRepository;
+import data.repositories.voting.ChannelAccountRepository;
+import data.repositories.voting.ChannelGeneratorAccountRepository;
+import data.repositories.voting.VotingRepository;
 import galactic.blockchain.Blockchains;
 
 import javax.inject.Inject;

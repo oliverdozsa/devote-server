@@ -1,8 +1,8 @@
 package tasks.voting.emailinvites;
 
-import data.entities.JpaAuthToken;
-import data.entities.JpaVoter;
-import data.entities.JpaVoting;
+import data.entities.voting.JpaAuthToken;
+import data.entities.voting.JpaVoter;
+import data.entities.voting.JpaVoting;
 import play.Logger;
 import play.libs.mailer.Email;
 

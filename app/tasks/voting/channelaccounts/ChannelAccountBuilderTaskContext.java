@@ -1,8 +1,8 @@
 package tasks.voting.channelaccounts;
 
 import com.typesafe.config.Config;
-import data.repositories.ChannelProgressRepository;
-import data.repositories.VotingRepository;
+import data.repositories.voting.ChannelProgressRepository;
+import data.repositories.voting.VotingRepository;
 import galactic.blockchain.Blockchains;
 
 import javax.inject.Inject;

@@ -1,6 +1,6 @@
 package services.voting.commissionsubs;
 
-import data.operations.CommissionDbOperations;
+import data.operations.voting.CommissionDbOperations;
 import exceptions.ForbiddenException;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.engines.RSAEngine;

@@ -1,10 +1,10 @@
 package services.voting;
 
 import crypto.EncryptedVoting;
-import data.entities.JpaVoting;
-import data.operations.CommissionDbOperations;
-import data.operations.VoterDbOperations;
-import data.operations.VotingDbOperations;
+import data.entities.voting.JpaVoting;
+import data.operations.voting.CommissionDbOperations;
+import data.operations.voting.VoterDbOperations;
+import data.operations.voting.VotingDbOperations;
 import galactic.blockchain.operations.CommissionBlockchainOperations;
 import exceptions.BusinessLogicViolationException;
 import exceptions.ForbiddenException;

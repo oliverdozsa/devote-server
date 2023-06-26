@@ -1,9 +1,9 @@
 package services.voting.commissionsubs;
 
-import data.entities.JpaVoting;
-import data.entities.JpaVotingChannelAccount;
-import data.operations.CommissionDbOperations;
-import data.operations.VotingDbOperations;
+import data.entities.voting.JpaVoting;
+import data.entities.voting.JpaVotingChannelAccount;
+import data.operations.voting.CommissionDbOperations;
+import data.operations.voting.VotingDbOperations;
 import galactic.blockchain.api.Account;
 import galactic.blockchain.api.VoterAccountOperation;
 import galactic.blockchain.operations.CommissionBlockchainOperations;

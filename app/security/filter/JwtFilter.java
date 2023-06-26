@@ -26,7 +26,7 @@ package security.filter;
 
 import akka.stream.Materializer;
 import com.typesafe.config.Config;
-import data.operations.VoterDbOperations;
+import data.operations.voting.VoterDbOperations;
 import security.JwtCenter;
 import security.VerifiedJwt;
 import play.Logger;

@@ -1,10 +1,8 @@
 package ipfs.data;
 
-import data.entities.Authorization;
-import data.entities.JpaVoting;
-import data.entities.JpaChannelGeneratorAccount;
-import data.entities.JpaVotingPoll;
-import data.entities.JpaVotingPollOption;
+import data.entities.voting.JpaVoting;
+import data.entities.voting.JpaVotingPoll;
+import data.entities.voting.JpaVotingPollOption;
 
 import java.util.List;
 import java.util.stream.Collectors;

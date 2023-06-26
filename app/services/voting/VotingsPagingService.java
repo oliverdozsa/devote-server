@@ -1,7 +1,7 @@
 package services.voting;
 
-import data.entities.JpaVoting;
-import data.operations.PageOfVotingsDbOperations;
+import data.entities.voting.JpaVoting;
+import data.operations.voting.PageOfVotingsDbOperations;
 import exceptions.ForbiddenException;
 import play.Logger;
 import requests.voting.PageVotingsRequest;

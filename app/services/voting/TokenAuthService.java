@@ -1,8 +1,8 @@
 package services.voting;
 
 import com.typesafe.config.Config;
-import data.entities.JpaAuthToken;
-import data.operations.TokenAuthDbOperations;
+import data.entities.voting.JpaAuthToken;
+import data.operations.voting.TokenAuthDbOperations;
 import responses.voting.TokenAuthResponse;
 import security.JwtCenter;
 

@@ -1,14 +1,14 @@
 package asserts;
 
-import data.entities.Authorization;
-import data.entities.JpaChannelAccountProgress;
-import data.entities.JpaChannelGeneratorAccount;
-import data.entities.JpaStoredTransaction;
-import data.entities.JpaVoter;
-import data.entities.JpaVoting;
-import data.entities.JpaVotingChannelAccount;
-import data.entities.JpaVotingPoll;
-import data.entities.JpaVotingPollOption;
+import data.entities.voting.Authorization;
+import data.entities.voting.JpaChannelAccountProgress;
+import data.entities.voting.JpaChannelGeneratorAccount;
+import data.entities.voting.JpaStoredTransaction;
+import data.entities.voting.JpaVoter;
+import data.entities.voting.JpaVoting;
+import data.entities.voting.JpaVotingChannelAccount;
+import data.entities.voting.JpaVotingPoll;
+import data.entities.voting.JpaVotingPollOption;
 import io.ebean.Ebean;
 import requests.voting.CreatePollOptionRequest;
 import requests.voting.CreatePollRequest;

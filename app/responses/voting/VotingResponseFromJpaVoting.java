@@ -1,8 +1,8 @@
 package responses.voting;
 
-import data.entities.JpaVoting;
-import data.entities.JpaVotingPoll;
-import data.entities.JpaVotingPollOption;
+import data.entities.voting.JpaVoting;
+import data.entities.voting.JpaVotingPoll;
+import data.entities.voting.JpaVotingPollOption;
 import play.Logger;
 import services.Base62Conversions;
 

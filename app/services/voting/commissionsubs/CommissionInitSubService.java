@@ -1,8 +1,8 @@
 package services.voting.commissionsubs;
 
-import data.entities.JpaCommissionSession;
-import data.operations.CommissionDbOperations;
-import data.operations.VoterDbOperations;
+import data.entities.voting.JpaCommissionSession;
+import data.operations.voting.CommissionDbOperations;
+import data.operations.voting.VoterDbOperations;
 import exceptions.ForbiddenException;
 import play.Logger;
 import requests.voting.CommissionInitRequest;

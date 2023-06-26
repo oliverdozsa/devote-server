@@ -2,7 +2,7 @@ package components.controllers.voting;
 
 import com.github.database.rider.core.api.dataset.DataSet;
 import components.clients.voting.VotingsPagingTestClient;
-import data.entities.*;
+import data.entities.voting.*;
 import io.ebean.Ebean;
 import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;

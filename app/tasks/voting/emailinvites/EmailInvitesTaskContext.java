@@ -1,9 +1,9 @@
 package tasks.voting.emailinvites;
 
 import com.typesafe.config.Config;
-import data.repositories.TokenAuthRepository;
-import data.repositories.VoterRepository;
-import data.repositories.VotingRepository;
+import data.repositories.voting.TokenAuthRepository;
+import data.repositories.voting.VoterRepository;
+import data.repositories.voting.VotingRepository;
 import play.libs.mailer.MailerClient;
 
 import javax.inject.Inject;

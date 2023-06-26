@@ -3,7 +3,7 @@ package components.controllers.voting;
 import asserts.DbAsserts;
 import components.clients.voting.CommissionTestClient;
 import components.clients.voting.VotingTestClient;
-import data.entities.JpaVoting;
+import data.entities.voting.JpaVoting;
 import io.ebean.Ebean;
 import io.ipfs.api.IPFS;
 import ipfs.api.IpfsApi;
