@@ -13,7 +13,7 @@ resolvers +=
 
 libraryDependencies += guice
 libraryDependencies += "org.reflections" % "reflections" % "0.9.11"
-libraryDependencies += "org.postgresql" % "postgresql" % "9.4-1201-jdbc41"
+libraryDependencies += "org.postgresql" % "postgresql" % "42.6.0"
 libraryDependencies += "com.h2database" % "h2" % "1.4.192"
 libraryDependencies ++= Seq(evolutions, jdbc)
 libraryDependencies += "org.bouncycastle" % "bcprov-jdk15on" % "1.68"
